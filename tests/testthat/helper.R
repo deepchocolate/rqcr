@@ -1,5 +1,6 @@
 #' Create a temporary PDR dataset for use in testing
 #' @param error Any value in the column ERROR that should indicate an ERROR
+#' @return The temporary filename
 dataPDRCreate <- function (error=F) {
   dta <- read.csv('data/norwegian_drug_register.csv')
   fileNew <- withr::local_tempfile(.local_envir = .GlobalEnv)
