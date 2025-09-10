@@ -5,10 +5,12 @@ Authors@R:
     person("Andreas", "Jangmo", , "andreasjangmo@gmail.com", role = c("aut", "cre"),
     comment = c(ORCID = "0000-0001-6928-4791"))
 Description: RQCR is a collection of functions to automate and reuse common quality control procedures applied to register data.
-License: `use_mit_license()`
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Imports: utils
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    withr (>= 3.0.0)
 Config/testthat/edition: 3
+License: MIT + file LICENSE
