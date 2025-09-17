@@ -10,6 +10,7 @@ isDate <- function (x, format) {
 #' @param con A database connection.
 #' @param tables A vector of tables to remove.
 #' @importFrom duckdb dbRemoveTable
+#' @export
 dbRemoveTables <- function(con, tables) {
   for (tb in tables) duckdb::dbRemoveTable(con, tb, fail_if_missing=F)
 }
@@ -20,6 +21,7 @@ dbRemoveTables <- function(con, tables) {
 #' @param values A vector of values in the ENUM.
 #' @importFrom stringi %s+%
 #' @importFrom DBI dbExecute
+#' @export
 dbCreateTypeEnum <- function (con, name, values) {
   values <- unique(values)
   sql <- 'CREATE TYPE ' %s+% name %s+% " AS ENUM ('" %s+% paste0(values, collapse="','") %s+% "')"
@@ -31,6 +33,7 @@ dbCreateTypeEnum <- function (con, name, values) {
 #' @param checkpoint Whether to issue a CHECKPOINT prior to exiting.
 #' @importFrom duckdb dbDisconnect
 #' @importFrom DBI dbExecute
+#' @export
 dbDuckDisconnect <- function(con, checkpoint=T) {
   if (checkpoint) DBI::dbExecute(con, 'CHECKPOINT;')
   duckdb::dbDisconnect(con, shutdown=T)
@@ -39,6 +42,7 @@ dbDuckDisconnect <- function(con, checkpoint=T) {
 #' @param x A vector of inputs.
 #' @param cases Cases in x to convert to NA.
 #' @importFrom dplyr case_match
+#' @export
 recodeToNA <- function (x, cases) {
   if (all(is.na(x))) return(x)
   dplyr::case_match(x, cases~NA, .default=x)
@@ -48,6 +52,7 @@ recodeToNA <- function (x, cases) {
 #' @param x A vector of inputs.
 #' @param default Default value of x if no match is made.
 #' @importFrom dplyr case_match
+#' @export
 recodeSex <- function (x, default=NA) {
   x <- as.character(x)
   dplyr::case_match(x,

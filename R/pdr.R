@@ -4,6 +4,7 @@
 #' @param formatInput File format of input.
 #' @param formatOutput File format of output.
 #' @importFrom utils read.csv write.csv
+#' @export
 processDrugRegister <- function(fileInput, fileOutput, formatInput='csv', formatOutput='csv') {
   dtaIn <- read.csv(fileInput)
   nr <- nrow(dtaIn)

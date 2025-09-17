@@ -9,7 +9,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: utils
 Depends:
-    R (>= 4.5.0),
+    R (>= 4.4.0),
     DBI (>= 1.2.3),
     dplyr (>= 1.1.4),
     duckdb (>= 1.3.3),
