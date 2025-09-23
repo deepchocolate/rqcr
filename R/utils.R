@@ -1,3 +1,25 @@
+#' Count frequencies of discrete values.
+#' @param dta Any data accepted by dplyr.
+#' @param col Column in dta to count values.
+#' @param ... Columns to select in data.
+#' @details
+#' Count frequencies
+#' Without any columns passed in (...) this function simply returns the distinct
+#' values, counts and percent of these values. By passing other
+#' columns through ... the function performs this operation over these columns so
+#' that each value is only counted once for each group.
+#' @import dplyr
+frequencyCountDistinct <- function (dta, col, ...) {
+  dta <- dta %>% select(..., !!as.name(col)) %>% distinct() %>% select(!!as.name(col)) %>% count(!!as.name(col)) %>%
+    arrange(!!as.name(col))
+  dta <- collect(dta)
+  colnames(dta) <- c(col, 'n')
+  n <- sum(dta$n)
+  dta$Percent <-  100*dta$n/n
+  colnames(dta) <- c('ATC', 'N', 'Percent')
+  dta
+}
+
 #' Test if x is a date
 #' @param x Anything
 #' @param format If any other format than specified by as.Date
