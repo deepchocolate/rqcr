@@ -9,14 +9,14 @@
 #' columns through ... the function performs this operation over these columns so
 #' that each value is only counted once for each group.
 #' @import dplyr
+#' @export
 frequencyCountDistinct <- function (dta, col, ...) {
-  dta <- dta %>% select(..., !!as.name(col)) %>% distinct() %>% select(!!as.name(col)) %>% count(!!as.name(col)) %>%
+  dta <- dta %>% select(..., all_of(col)) %>% distinct() %>% select(all_of(col)) %>% collect() %>% count(pick(all_of(col)), name='n') %>%
     arrange(!!as.name(col))
-  dta <- collect(dta)
   colnames(dta) <- c(col, 'n')
   n <- sum(dta$n)
   dta$Percent <-  100*dta$n/n
-  colnames(dta) <- c('ATC', 'N', 'Percent')
+  colnames(dta) <- c(col, 'N', 'Percent')
   dta
 }
 

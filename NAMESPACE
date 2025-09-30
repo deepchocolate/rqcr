@@ -3,6 +3,7 @@
 export(dbCreateTypeEnum)
 export(dbDuckDisconnect)
 export(dbRemoveTables)
+export(frequencyCountDistinct)
 export(processDrugRegister)
 export(recodeSex)
 export(recodeToNA)
