@@ -9,9 +9,13 @@ createIntervalsAge(x, by, from = 0, to = 90, sep = "-")
 \arguments{
 \item{x}{A vector of numbers.}
 
+\item{by}{Width of intervals.}
+
 \item{from}{Interval start.}
 
 \item{to}{Interval end.}
+
+\item{sep}{Separator text between intervals.}
 }
 \description{
 Create age/positive number intervals from a variable.

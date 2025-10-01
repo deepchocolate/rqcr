@@ -1,7 +1,9 @@
 #' Create age/positive number intervals from a variable.
 #' @param x A vector of numbers.
+#' @param by Width of intervals.
 #' @param from Interval start.
 #' @param to Interval end.
+#' @param sep Separator text between intervals.
 #' @details
 #' Create age intervals
 #' Each number in x will be placed in one of the intervals between arguments from
