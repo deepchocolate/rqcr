@@ -8,7 +8,7 @@ dataPDRCreate <- function (error=F) {
   dta <- utils::read.csv(FILE_NO_DR)
   fileNew <- withr::local_tempfile(.local_envir = .GlobalEnv)
   if (!isFALSE(error)) dta <- subset(dta, ERROR %in% error)
-  utils::write.csv(dta, file=fileNew)
+  utils::write.csv(dta, file=fileNew, row.names=F)
   arrow::write_parquet(dta, sink=fileNew %s+% '.parquet')
   fileNew
 }

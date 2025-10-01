@@ -16,3 +16,23 @@ test_that('Test parquet', {
   dtaPar <- arrow::open_dataset(filePar) |> collect()
   expect_equal(dta, as.data.frame(dtaPar))
 })
+
+test_that('Test convertToCSV', {
+  require(stringi)
+  pathFile <- dataPDRCreate()
+  dta1 <- read.csv(pathFile)
+  fileOut <- withr::local_tempfile()
+  fle <- convertToCSV(pathFile %s+% '.parquet', fileOut)
+  dta2 <- read.csv(fle)
+  expect_equal(dta1, dta2)
+  # Test lowering columns
+  fle <- convertToCSV(pathFile %s+% '.parquet', fileOut, lowerColumns = T)
+  dta2 <- read.csv(fle)
+  colnames(dta1) <- tolower(colnames(dta1))
+  expect_equal(dta1, dta2)
+  # Test removing a column
+  fle <- convertToCSV(pathFile %s+% '.parquet', fileOut, lowerColumns = T, dropColumns = 'lopenr')
+  dta2 <- read.csv(fle)
+  dta1 <- dta1[,-1]
+  expect_equal(dta1, dta2)
+})

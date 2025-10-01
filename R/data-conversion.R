@@ -13,3 +13,22 @@ convertDBTableToParquet <- function (dbCon, table, pathOutput, partition=F, over
   q <- glue(q, ')')
   DBI::dbExecute(dbCon, q)
 }
+
+#' Convert a file to CSV.
+#' @details
+#' Additional details...
+#' Any file format accepted by rio::convert is accepted as input
+#' @import rio dplyr
+#' @export
+#' @param fileInput Path to an input file.
+#' @param fileOutput Path to the output CSV.
+#' @param formatInput Specify input format if not provided by file extension.
+#' @param dropColumns A vector of columns to remove.
+#' @param lowerColumns Wheter to lowercase column names.
+convertToCSV <- function (fileInput, fileOutput, formatInput, dropColumns=c(), lowerColumns=F) {
+  FUN <- ifelse(lowerColumns, tolower, identity)
+  import(fileInput, format=formatInput) %>%
+    select(-any_of(dropColumns)) %>%
+    rename_with(FUN) %>%
+    export(fileOutput, format='csv')
+}

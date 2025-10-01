@@ -18,3 +18,8 @@ deps <- c('arrow', 'DBI', 'dplyr', 'duckdb', 'stringi')
 install.packages(deps)
 install.packages(pgs='path/rqcr_vX.Y.Z.tar.gz', repos=NULL)
 ```
+
+### Dependencies
+Some functionality depend on R-packages `rio` and `getStatisticsFHI`. `getStatisticsFHI`
+and `rio` dependencies are not installed by default. Consult [https://github.com/deepchocolate/get-statistics-fhi](getStatisticsFHI)
+github page and `rio::install_formats` for more information.
