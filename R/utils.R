@@ -1,3 +1,22 @@
+#' Create age/positive number intervals from a variable.
+#' @param x A vector of numbers.
+#' @param from Interval start.
+#' @param to Interval end.
+#' @details
+#' Create age intervals
+#' Each number in x will be placed in one of the intervals between arguments from
+#' and to where by specifies the range of each interval. The right end of the interval
+#' is by default set to Inf, i.e. oldest will be "anyone above 90" if by=90.
+#' @export
+createIntervalsAge <- function (x, by, from=0, to=90, sep='-') {
+  ageL <- seq(from=from, to=to, by=by)
+  ageU <- ageL + by - 1
+  ageU <- ageU[-length(ageU)]
+  lab <- paste(ageL, ageU, sep=sep)
+  lab[length(lab)] <- substr(lab[length(lab)], 1, 3)
+  cut(x, breaks=c(ageL, Inf), labels=lab, include.lowest=T, right=F)
+}
+
 #' Count frequencies of discrete values.
 #' @param dta Any data accepted by dplyr.
 #' @param col Column in dta to count values.
@@ -18,6 +37,14 @@ frequencyCountDistinct <- function (dta, col, ...) {
   dta$Percent <-  100*dta$n/n
   colnames(dta) <- c(col, 'N', 'Percent')
   dta
+}
+
+#' Test if a vector is equal to the intersection of other vectors.
+#' @param x A vector.
+#' @param ... Vectors to intersect.
+intersectEquals <- function (x, ...) {
+  ints <- Reduce(intersect, list(...))
+  setequal(x, ints)
 }
 
 #' Test if x is a date
