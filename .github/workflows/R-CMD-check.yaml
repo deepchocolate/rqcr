@@ -24,8 +24,7 @@ jobs:
 
       - name: Install remotes
         run: |
-          install.packages("remotes")
-          remotes::install_github('deepchocolate/get-statistics-fhi')
+          R -e 'install.packages("remotes"); remotes::install_github("deepchocolate/get-statistics-fhi")'
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
