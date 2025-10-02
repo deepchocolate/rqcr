@@ -19,9 +19,12 @@ Imports:
 Depends: R (>= 4.4.0)
 Suggests: 
     arrow (>= 21.0.0),
-    getStatisticsFHI (>= 1.0.0),
+    getStatisticsFHI (>= 1.0.1),
+    nanoparquet,
     remotes,
     testthat (>= 3.0.0),
     withr (>= 3.0.0)
+Remotes:
+    github::deepchocolate/get-statistics-fhi
 Config/testthat/edition: 3
 License: MIT + file LICENSE
