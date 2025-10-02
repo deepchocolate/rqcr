@@ -30,7 +30,7 @@ processDrugRegister <- function(fileInput, fileOutput, formatInput='csv', format
 #' Local, and their difference (Public - Local).
 compareDrugFrequencies <- function (df.local, df.public) {
   cols <- c('atc', 'age','year', 'sex')
-  if (!requireNamespace("getStatisticsFHI", quietly = TRUE)) {
+  if (!base::requireNamespace("getStatisticsFHI", quietly = TRUE)) {
     remotes::install_github('deepchocolate/get-statistics-fhi')
   }
   suggests::need('getStatisticsFHI>=1.0.1',
