@@ -18,7 +18,7 @@ Imports:
     utils
 Depends: R (>= 4.4.0)
 Remotes:
-    github::deepchocolate/get-statistics-fhi
+    getStatisticsFHI=github::deepchocolate/get-statistics-fhi
 Suggests: 
     arrow (>= 21.0.0),
     getStatisticsFHI (>= 1.0.1),
