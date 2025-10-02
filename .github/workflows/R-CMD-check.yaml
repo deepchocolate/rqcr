@@ -23,16 +23,13 @@ jobs:
           use-public-rspm: true
 
       - name: Install remotes
-        run: install.packages("remotes")
-        shell: Rscript {0}
-
-      - name: Install getStatisticsFHI
-        run: remotes::install_github('deepchocolate/get-statistics-fhi')
-        shell: Rscript {0}
+        run: |
+          install.packages("remotes")
+          remotes::install_github('deepchocolate/get-statistics-fhi')
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
+          extra-packages: any::rcmdcheck, getStatisticsFHI=?ignore
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
