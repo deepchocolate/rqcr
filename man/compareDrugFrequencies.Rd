@@ -13,13 +13,12 @@ compareDrugFrequencies(df.local, df.public)
 }
 \value{
 A dataframe with ATC code, age group, year, sex, and columns Public,
-Local, and their difference (Public - Local).
+Local, their difference nominally (Public - Local) and in percent Public/Local.
 }
 \description{
 Compare statistics between the Norwegian drug register and public data.
 }
 \details{
-Additional details...
 Calculate and compare frequencies by ATC codes in the Norweigan drug register
 with aggregated data available through the Norwegian Institute of Public Health's
 public API available at statistikk.fhi.no. This data can be downloaded through

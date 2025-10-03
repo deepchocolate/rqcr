@@ -8,6 +8,8 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports:
+    bigreadr (>= 0.2.0),
+    data.table (>= 1.17.0),
     DBI (>= 1.2.3),
     dplyr (>= 1.1.4),
     duckdb (>= 1.3.3),
@@ -17,14 +19,15 @@ Imports:
     suggests,
     utils
 Depends: R (>= 4.4.0)
-Remotes:
-    getStatisticsFHI=github::deepchocolate/get-statistics-fhi
 Suggests: 
     arrow (>= 21.0.0),
     getStatisticsFHI (>= 1.0.1),
+    haven,
     nanoparquet,
     remotes,
     testthat (>= 3.0.0),
     withr (>= 3.0.0)
+Remotes:
+    getStatisticsFHI=github::deepchocolate/get-statistics-fhi
 Config/testthat/edition: 3
 License: MIT + file LICENSE

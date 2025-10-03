@@ -34,3 +34,34 @@ convertToCSV <- function (fileInput, fileOutput, formatInput, dropColumns=c(), l
     rename_with(FUN) %>%
     export(fileOutput, format='csv')
 }
+
+#' Memory efficient way to convert CSV/text files
+#' @details
+#' File formats are not limited to .csv files, but anything accepted by data.table::fread.
+#'
+#' @export
+#' @param fileInput A csv/text file.
+#' @param fileOutput Output file where type is determined by exension.
+#' @param nlines Number of lines to read in each chunk of fileInput.
+#' @param verbose Verbose output?
+#' @param ... Arguments passed to data.table::fread.
+convertBigCSV <- function (fileInput, fileOutput, nlines=1e6, verbose=F, ...) {
+  o <- bigreadr::big_fread1(fileInput, every_nlines=nlines, print_timings = verbose, ...)
+  rio::export(o, fileOutput)
+}
+
+#' Memory efficient way to read CSV/text files
+#' @details
+#' File formats are not limited to .csv files, but anything accepted by data.table::fread.
+#' @export
+#' @param fileInput A csv/text file.
+#' @param fileOutput Output file where type is determined by exension.
+#' @param nlines Number of lines to read in each chunk of fileInput.
+#' @param dataTable Whether to convert data to data.table.
+#' @param verbose Verbose output?
+#' @param ... Arguments passed to data.table::fread.
+readBigCSV <- function (fileInput, fileOutput, nlines=1e6, dataTable=T, verbose=F, ...) {
+  trans <- ifelse(dataTable, data.table::setDT, identity)
+  comb <- ifelse(dataTable, data.table::rbindlist, bigreadr::rbind_df)
+  bigreadr::big_fread1(fileInput, every_nlines=nlines, .transform=trans, .combine=comb, print_timings=verbose, ...)
+}

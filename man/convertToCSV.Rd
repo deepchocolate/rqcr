@@ -27,6 +27,6 @@ convertToCSV(
 Convert a file to CSV.
 }
 \details{
-Additional details...
-Any file format accepted by rio::convert is accepted as input
+Any file format accepted by rio::convert is accepted as input. If directories in the
+output file path do not exist, they are created.
 }

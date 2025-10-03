@@ -36,3 +36,23 @@ test_that('Test convertToCSV', {
   dta1 <- dta1[,-1]
   expect_equal(dta1, dta2)
 })
+
+test_that('readBigCSV', {
+  pathFile <- dataPDRCreate()
+  # There is a warning issued due to a bad date, it does not, however affect
+  # the resulting output.
+  suppressWarnings ({
+    dta <- readBigCSV(pathFile, nlines=2)
+  })
+  expect_type(dta, 'list')
+  expect_equal(nrow(dta), 4)
+})
+
+test_that('convertBigCSV', {
+  pathFile <- dataPDRCreate()
+  pathOutput <- pathFile %s+% '.dta'
+  fileSpss <- convertBigCSV(pathFile, pathOutput)
+  expect_true(file.exists(fileSpss))
+  dta <- haven::read_dta(fileSpss)
+  expect_equal(nrow(dta), 4)
+})
