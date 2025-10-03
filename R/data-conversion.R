@@ -16,8 +16,8 @@ convertDBTableToParquet <- function (dbCon, table, pathOutput, partition=F, over
 
 #' Convert a file to CSV.
 #' @details
-#' Additional details...
-#' Any file format accepted by rio::convert is accepted as input
+#' Any file format accepted by rio::convert is accepted as input. If directories in the
+#' output file path do not exist, they are created.
 #' @import rio dplyr
 #' @export
 #' @param fileInput Path to an input file.
@@ -26,6 +26,8 @@ convertDBTableToParquet <- function (dbCon, table, pathOutput, partition=F, over
 #' @param dropColumns A vector of columns to remove.
 #' @param lowerColumns Wheter to lowercase column names.
 convertToCSV <- function (fileInput, fileOutput, formatInput, dropColumns=c(), lowerColumns=F) {
+  dr <- dirname(fileOutput)
+  if (!dir.exists(dr)) dir.create(dr, recursive=T)
   FUN <- ifelse(lowerColumns, tolower, identity)
   import(fileInput, format=formatInput) %>%
     select(-any_of(dropColumns)) %>%

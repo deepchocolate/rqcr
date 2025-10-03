@@ -15,7 +15,7 @@ test_that('Compare drug frequencies', {
   dtaLoc$sex <- 'Females'
   # Compare
   res <- compareDrugFrequencies(dtaLoc, dtaApi)
-  resExp <- data.frame(ATC='A01AA',Age='10 - 14', Year=2016, Sex='Females', Public=106,Local=1, Difference=105)
+  resExp <- data.frame(ATC='A01AA',Age='10 - 14', Year=2016, Sex='Females', Public=106,Local=1, Difference=105, Percent=10500)
   expect_equal(res, resExp)
 })
 

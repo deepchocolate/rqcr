@@ -17,7 +17,6 @@ processDrugRegister <- function(fileInput, fileOutput, formatInput='csv', format
 #' Compare statistics between the Norwegian drug register and public data.
 #'
 #' @details
-#' Additional details...
 #' Calculate and compare frequencies by ATC codes in the Norweigan drug register
 #' with aggregated data available through the Norwegian Institute of Public Health's
 #' public API available at statistikk.fhi.no. This data can be downloaded through
@@ -27,7 +26,7 @@ processDrugRegister <- function(fileInput, fileOutput, formatInput='csv', format
 #' @param df.local Drug register data at an individual level
 #' @param df.public Raw data downloaded from statistikk.fhi.no.
 #' @return A dataframe with ATC code, age group, year, sex, and columns Public,
-#' Local, and their difference (Public - Local).
+#' Local, their difference nominally (Public - Local) and in percent Public/Local.
 compareDrugFrequencies <- function (df.local, df.public) {
   cols <- c('atc', 'age','year', 'sex')
   if (!base::requireNamespace("getStatisticsFHI", quietly = TRUE)) {
@@ -45,5 +44,6 @@ compareDrugFrequencies <- function (df.local, df.public) {
   dtaComp <- dtaComp[,c('atc','age','year','sex','individuals', 'N')]
   colnames(dtaComp) <- c('ATC', 'Age', 'Year', 'Sex', 'Public', 'Local')
   dtaComp$Difference <- with(dtaComp, Public - Local)
+  dtaComp$Percent <- with(dtaComp, 100*(Public/Local - 1))
   dtaComp
 }
