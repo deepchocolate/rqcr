@@ -31,3 +31,4 @@ Remotes:
     getStatisticsFHI=github::deepchocolate/get-statistics-fhi
 Config/testthat/edition: 3
 License: MIT + file LICENSE
+LazyData: true
