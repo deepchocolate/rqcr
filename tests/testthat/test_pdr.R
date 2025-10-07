@@ -2,7 +2,8 @@ test_that('Compare drug frequencies', {
   # Raw data from API
   dtaApi <- read.csv('data/fhi-api-lmr-sample.csv')
   # Adapt local input data
-  dtaLoc <- read.csv(FILE_NO_DR)
+  fileIn <- dataPDRCreate()
+  dtaLoc <- read.csv(fileIn)
   dtaLoc$Date <- c(2016, 2020,2009,2006)
   dtaLoc$atc <- c(rep('A01AA', 3), 'A01AA01')
   dtaLoc$year <- with(dtaLoc, as.integer(substr(dtaLoc$Date, 1, 4)))

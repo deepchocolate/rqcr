@@ -1,5 +1,5 @@
-lopenr,Date,ATC,DDD,faar,ERROR
-I1,2024-12-31,N06BA01,1,2006,
-I2,2025-01-03,N06BA02,2,1982,
-I3,2025-01-03,N06BA01,-1,1981,
-I3,x,N06BA01,-1,1980,Bad date
+ERROR,Lopenummer_NPR,Utlevering_Dato,Legemiddel_ATCkode_Niva5,Utlevering_DDD,Pasient_Fodselsar,Legemiddel_ATCkode_Niva4,Pasient_DodsarManed,Pasient_Kjonn_Verdi,Refusjon_Hjemmel_Verdi,Refusjon_ICD10kode_Verdi,Refusjon_ICPC2kode_Verdi,Refusjon_Refusjonspunkt_Verdi,Refusjon_Refusjonspunkt_Beskrivelse,Rekvirent_Lopenummer,Rekvirent_KjentIdentitet,Utlevering_AntallPakninger,Utlevering_Resepttype_Beskrivelse,Utlevering_Resepttype_Verdi,Utlevering_Utleveringstype_Verdi,Vare_DDD_Enhet,Vare_DDD_Verdi,Vare_Pakningsstorrelse,Vare_Pakningsstorrelse_Enhet,Vare_Preparattype_Verdi,Vare_Registreringstype_Verdi,Vare_Reseptgruppe_Verdi,Vare_Statistikkfaktor,Vare_Styrke_Samlet,Vare_Varegruppe_Verdi,Vare_Varenavn,Vare_Varenummer
+,I1,2024-12-31,N06BA01,1,2006,N06B,,,,,,,,,,,,,,,,,,,,,,,,,
+,I2,2025-01-03,N06BA02,2,1982,N06B,,,,,,,,,,,,,,,,,,,,,,,,,
+,I3,2025-01-03,N06BA01,-1,1981,N06B,,,,,,,,,,,,,,,,,,,,,,,,,
+Bad date,I3,x,N06BA01,-1,1980,N06B,,,,,,,,,,,,,,,,,,,,,,,,,

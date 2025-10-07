@@ -1,6 +1,7 @@
 require(duckdb)
 test_that('Test parquet', {
-  dta <- read.csv(FILE_NO_DR)
+  pathFile <- dataPDRCreate()
+  dta <- read.csv(pathFile)
   dta$year <- substr(dta$Date, 1, 4)
   tmpdb <- withr::local_tempfile()
   con <- dbConnect(duckdb())

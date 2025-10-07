@@ -44,3 +44,13 @@ test_that('Test intersectEquals', {
   expect_true(intersectEquals(v, c(v, 'c'), c(v, 'A','C')))
   expect_false(intersectEquals(c(v, 'C'), c(v, 'c'), c(v, 'A','C')))
 })
+
+test_that('renameColumns', {
+  fileIn <- dataPDRCreate()
+  dta <- read.csv(FILE_NO_DR)
+  dta2 <- renameColumns(dta, NO_NAMES$DRUG_REGISTER)
+  expect_equal(dta2$lopenr, dta$Lopenummer_NPR)
+  # No overlap should keep everything as is
+  dta3 <- data.frame(A=1,B=2)
+  expect_equal(renameColumns(dta3, NO_NAMES$DRUG_REGISTER), dta3)
+})
