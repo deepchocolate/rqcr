@@ -1,3 +1,5 @@
+#' @import methods
+NULL
 renameColumnsMap <- function (dta, dtaCols, english=F) {
   cnames <- colnames(dta)
   # Indices in Delivery
@@ -6,7 +8,7 @@ renameColumnsMap <- function (dta, dtaCols, english=F) {
   inx <- 1:length(overl)
   # Remove positions that are not present in the mapping as they should not be renamed
   if (any(is.na(overl))) inx <- inx[!is.na(overl)]
-  overl <- na.omit(overl)
+  overl <- stats::na.omit(overl)
   # If no overlap exists, just return data
   if (!any(overl)) return(dta)
   # Choose language
