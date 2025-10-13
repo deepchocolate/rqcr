@@ -1,4 +1,5 @@
 FILE_NO_DR <- 'data/norwegian_drug_register.csv'
+FILE_EXCEL <- 'data/workbook.xlsx'
 
 #' Create a temporary PDR dataset for use in testing
 #' @param error Any value in the column ERROR that should indicate an ERROR

@@ -9,6 +9,25 @@ test_that('Test createIntervals', {
   expect_equal(as.character(intsFac), c('0-4','10-14', '15-19', '90-', NA))
 })
 
+test_that('getExcelData', {
+  dta <- getExcelData(FILE_EXCEL, 'C', 'B', 1, c('A','B'))
+  expect_equal(dta, tibble(sheet=c('Sheet A', 'Sheet B'), a=c(3,7), b=c(4,8)))
+})
+
+test_that('splitDataByRow', {
+  require(data.table)
+  dta <- data.frame(a=c(1,NA,2), b=c(1,NA,2))
+  dtaExp <- list(data.frame(a=1,b=1), data.frame(a=2,b=2, row.names=3))
+  dtaOut <- splitDataByRow(dta)
+  rownames(dtaOut[[2]]) <- 3 # Seems impossible to get the type of row.names right when constructing the expected dataframe as above
+  expect_equal(dtaOut, dtaExp)
+  dtaOut <- splitDataByRow(as.data.table(dta))
+  rownames(dtaOut[[2]]) <- 1
+  dtaExp <- lapply(dtaExp, as.data.table)
+  rownames(dtaExp[[2]]) <- 1
+  expect_equal(dtaOut, dtaExp)
+})
+
 test_that('Test recodeToNA', {
   expect_equal(c('1','2',NA,NA), recodeToNA(c(1,2, NA, ''), c('')))
   # Cannot include numbers as NA codes
