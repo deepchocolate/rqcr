@@ -22,3 +22,6 @@ are present in a sheet. If such tables are separated by some character or an ent
 empty row this function can split such data into its constituents. If using
 \code{header=TRUE} it is currently required that tables have the same columns.
 }
+\seealso{
+\code{\link[=mergeDataByRow]{mergeDataByRow()}}
+}

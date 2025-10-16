@@ -21,6 +21,10 @@ test_that('splitDataByRow', {
   dtaOut <- splitDataByRow(dta)
   rownames(dtaOut[[2]]) <- 3 # Seems impossible to get the type of row.names right when constructing the expected dataframe as above
   expect_equal(dtaOut, dtaExp)
+  # Merge again
+  dtaMerged <- mergeDataByRow(dtaOut[[1]], dtaOut[[2]], insertColnames=F)
+  expect_equal(dtaMerged, dta)
+  # Test with data.table
   dtaOut <- splitDataByRow(as.data.table(dta))
   rownames(dtaOut[[2]]) <- 1
   dtaExp <- lapply(dtaExp, as.data.table)
