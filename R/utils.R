@@ -57,38 +57,6 @@ isDate <- function (x, format) {
   ifelse(is.na(x), F, T)
 }
 
-#' Remove database tables.
-#' @param con A database connection.
-#' @param tables A vector of tables to remove.
-#' @importFrom duckdb dbRemoveTable
-#' @export
-dbRemoveTables <- function(con, tables) {
-  for (tb in tables) duckdb::dbRemoveTable(con, tb, fail_if_missing=F)
-}
-
-#' Create a database ENUM type.
-#' @param con A database connections.
-#' @param name The name of the ENUM type.
-#' @param values A vector of values in the ENUM.
-#' @importFrom stringi %s+%
-#' @importFrom DBI dbExecute
-#' @export
-dbCreateTypeEnum <- function (con, name, values) {
-  values <- unique(values)
-  sql <- 'CREATE TYPE ' %s+% name %s+% " AS ENUM ('" %s+% paste0(values, collapse="','") %s+% "')"
-  DBI::dbExecute(con, sql)
-}
-
-#' Disconnect from a DuckDB.
-#' @param con A database connection.
-#' @param checkpoint Whether to issue a CHECKPOINT prior to exiting.
-#' @importFrom duckdb dbDisconnect
-#' @importFrom DBI dbExecute
-#' @export
-dbDuckDisconnect <- function(con, checkpoint=T) {
-  if (checkpoint) DBI::dbExecute(con, 'CHECKPOINT;')
-  duckdb::dbDisconnect(con, shutdown=T)
-}
 #' Recode values to missing.
 #' @param x A vector of inputs.
 #' @param cases Cases in x to convert to NA.
