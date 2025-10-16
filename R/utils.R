@@ -41,31 +41,6 @@ frequencyCountDistinct <- function (dta, col, ...) {
   dta
 }
 
-#' Get data from an excelfile by searching through all sheets.
-#' @export
-#' @param file The excel file path.
-#' @param col The column to search.
-#' @param val The value to look for in col.
-#' @param skip Number of lines to skip in each sheet.
-#' @param colsSelect Which columns to select.
-getExcelData <- function (file, col, val, skip, colsSelect) {
-  sheets <- readxl::excel_sheets(file)
-  col <- tolower(col)
-  colsSelect <- tolower(colsSelect)
-  dta <- NULL
-  for (sheet in sheets) {
-    tmp <- readxl::read_xlsx(file, sheet, skip=skip)
-    cnames <- tolower(colnames(tmp))
-    colnames(tmp) <- cnames
-    if (col %in% cnames) {
-      tmp$sheet <- sheet
-      dta <- rbind(dta,
-                   tmp[tmp[,col]==val, c('sheet',colsSelect)])
-    }
-  }
-  dta
-}
-
 #' Test if a vector is equal to the intersection of other vectors.
 #' @param x A vector.
 #' @param ... Vectors to intersect.
