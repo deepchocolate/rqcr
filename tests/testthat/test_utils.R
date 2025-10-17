@@ -38,6 +38,7 @@ test_that('labelStrings', {
   expect_equal(dta$out, dta$labExp)
   expect_error(labelStrings('A', c('A', 'B'), 'LabA'), 'sets and labels need to be of equal length')
   expect_equal(labelStrings(c('A', 'C'), c('A', 'B'), c('LabA', 'LabB'), c('B', 'C', 'D')), c('LabA', ''))
+  expect_equal(labelStrings(c('A', 'C'), c('A', 'B'), c('LabA', 'LabB'), c(NA, 'C', NA)), c('LabA', ''))
   expect_error(labelStrings(c('A', 'C'), c('A','A', 'B'), c('LabA', 'Lab A', 'LabB'), c('B','BB', 'C', 'D')),
                'sets contain duplicate patterns')
   expect_error(labelStrings(c('A', 'Bb', 'D'), c('A', 'B', 'F'), c('LabA', 'LabB', 'LabF'), c('Bb', 'C')),
