@@ -1,3 +1,14 @@
+test_that('closest', {
+  expect_equal(closest(1:3), 1)
+  expect_equal(closest(c(-2,-1,1,3)), c(-1,1))
+  vec <- -1:3
+  expect_equal(closest(vec), 0)
+  expect_equal(minPositive(vec), 0)
+  expect_equal(maxNegative(vec), -1)
+  expect_equal(maxNegative(1:3), NA)
+  expect_equal(minPositive(-1:-3), NA)
+})
+
 test_that('Test createIntervals', {
   ints <-  c(0, 10, 15, 99)
   intsFac <- createIntervalsAge(ints, 5, 0, 90)
@@ -9,27 +20,28 @@ test_that('Test createIntervals', {
   expect_equal(as.character(intsFac), c('0-4','10-14', '15-19', '90-', NA))
 })
 
-test_that('getExcelData', {
-  dta <- getExcelData(FILE_EXCEL, 'C', 'B', 1, c('A','B'))
-  expect_equal(dta, tibble(sheet=c('Sheet A', 'Sheet B'), a=c(3,7), b=c(4,8)))
-})
-
-test_that('splitDataByRow', {
-  require(data.table)
-  dta <- data.frame(a=c(1,NA,2), b=c(1,NA,2))
-  dtaExp <- list(data.frame(a=1,b=1), data.frame(a=2,b=2, row.names=3))
-  dtaOut <- splitDataByRow(dta)
-  rownames(dtaOut[[2]]) <- 3 # Seems impossible to get the type of row.names right when constructing the expected dataframe as above
-  expect_equal(dtaOut, dtaExp)
-  # Merge again
-  dtaMerged <- mergeDataByRow(dtaOut[[1]], dtaOut[[2]], insertColnames=F)
-  expect_equal(dtaMerged, dta)
-  # Test with data.table
-  dtaOut <- splitDataByRow(as.data.table(dta))
-  rownames(dtaOut[[2]]) <- 1
-  dtaExp <- lapply(dtaExp, as.data.table)
-  rownames(dtaExp[[2]]) <- 1
-  expect_equal(dtaOut, dtaExp)
+test_that('labelStrings', {
+  dta <- data.frame(id=c(1,1,2,2,3),
+                    str=c('A','B', 'AA', 'BB', 'CA'),
+                    labExp=c('LabA','LabB','LabA','LabB', ''))
+  dta$out <- labelStrings(dta$str, c('A', 'B'), c('LabA', 'LabB'))
+  expect_equal(dta$out, dta$labExp)
+  # Using exclusion across all sets
+  dta <- data.frame(str=c('A','B', 'AA', 'BB', 'CA', 'BBc'),
+                    labExp=c('LabA','LabB','LabA','', '', ''))
+  dta$out <- labelStrings(dta$str, c('A', 'B'), c('LabA', 'LabB'), c('BB'))
+  expect_equal(dta$out, dta$labExp)
+  # Using exclusion per set
+  dta <- data.frame(str=c('A','B', 'AA', 'BB', 'CA', 'BBc'),
+                    labExp=c('LabA','LabB','','LabB', '', ''))
+  dta$out <- labelStrings(dta$str, c('A', 'B'), c('LabA', 'LabB'), c('AA', 'BBc'))
+  expect_equal(dta$out, dta$labExp)
+  expect_error(labelStrings('A', c('A', 'B'), 'LabA'), 'sets and labels need to be of equal length')
+  expect_equal(labelStrings(c('A', 'C'), c('A', 'B'), c('LabA', 'LabB'), c('B', 'C', 'D')), c('LabA', ''))
+  expect_error(labelStrings(c('A', 'C'), c('A','A', 'B'), c('LabA', 'Lab A', 'LabB'), c('B','BB', 'C', 'D')),
+               'sets contain duplicate patterns')
+  expect_error(labelStrings(c('A', 'Bb', 'D'), c('A', 'B', 'F'), c('LabA', 'LabB', 'LabF'), c('Bb', 'C')),
+               'exclude needs to be length 1 or equal to sets')
 })
 
 test_that('Test recodeToNA', {

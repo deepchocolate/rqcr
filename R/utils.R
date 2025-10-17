@@ -57,6 +57,80 @@ isDate <- function (x, format) {
   ifelse(is.na(x), F, T)
 }
 
+# Label a string based on whether it occurs in a set of strings.
+# By default matching is performed by using a case sensitive matching fo the
+# first characters in a string. Any function to do matching can be passed through FUN
+# as long as it returns TRUE/FALSE for each pattern.
+# Parameters are documented by labelStrings below
+labelString <- function (string, stringSets, labels, exclude, FUN=startsWith) {
+  o <- ''
+  hits <- FUN(string, stringSets)
+  if (!any(hits)) return(o)
+  if (!isFALSE(exclude)) {
+    misses <- FUN(string, exclude)
+    if (length(exclude) == 1) misses <- rep(misses, length(stringSets))
+    if (any(is.na(misses))) misses[is.na(misses)] <- F
+    if (any(misses)) hits[which(misses)] <- F
+  }
+  if (any(hits)) {
+    i <- which(hits)
+    if (!isFALSE(exclude)) {
+      if (!misses[i]) o <- labels[i]
+    } else o <- labels[i]
+  }
+  o
+}
+#' Match a vector against another character set and label matches.
+#' @name labelStrings
+#' @export
+#' @param strings A vector of strings.
+#' @param sets A vector of strings to match against.
+#' @param labels A vector of labels to assign to matches.
+#' @param exclude A vector of strings to exclude. Either one for all sets or one per set.
+setGeneric('labelStrings', function (strings, sets, labels, exclude) standardGeneric('labelStrings'))
+#' @rdname labelStrings
+setMethod('labelStrings', signature('character', 'character', 'character', 'ANY'),
+          function (strings, sets, labels, exclude) {
+            if (length(sets) != length(unique(sets))) stop('sets contain duplicate patterns')
+            if (length(sets) != length(labels)) stop('sets and labels need to be of equal length')
+            lenExclude <- length(exclude)
+            if (lenExclude < length(sets) & lenExclude > 1) stop('exclude needs to be length 1 or equal to sets')
+            sapply(strings, FUN=labelString, stringSets=sets, labels=labels, exclude=exclude, USE.NAMES=F)
+          })
+#' @rdname labelStrings
+setMethod('labelStrings', signature('character','character','character', 'missing'),
+          function (strings, sets,labels) labelStrings(strings,sets,labels,F))
+
+#' Get the number(s) in a vector that are closest to another number.
+#' @export
+#' @param x A vector of numbers.
+#' @param y The comparison number.
+#' @param na.rm Whether to ignore missing.
+#' @return The number(s) in x closest to y.
+closest <- function (x, y=0, na.rm=T) {
+  dx <- abs(x - y)
+  w <- which(dx == min(dx, na.rm=na.rm))
+  x[w]
+}
+
+#' Maximum of negative numbers in a vector.
+#' @export
+#' @param x A vector.
+#' @param na.rm Whether to ignore missing.
+maxNegative <- function (x, na.rm=T) {
+  x <- x[x < 0]
+  ifelse(length(x) == 0, NA, closest(x, na.rm=na.rm))
+}
+
+#' Minimum of positive numbers in a vector.
+#' @export
+#' @param x A vector.
+#' @param na.rm Whether to ignore missing.
+minPositive <- function (x, na.rm=T) {
+  x <- x[x >= 0]
+  ifelse(length(x) == 0, NA, closest(x, na.rm=na.rm))
+}
+
 #' Recode values to missing.
 #' @param x A vector of inputs.
 #' @param cases Cases in x to convert to NA.
