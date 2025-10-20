@@ -100,6 +100,19 @@ setMethod('labelStrings', signature('character', 'character', 'character', 'ANY'
 #' @rdname labelStrings
 setMethod('labelStrings', signature('character','character','character', 'missing'),
           function (strings, sets,labels) labelStrings(strings,sets,labels,F))
+#' @rdname labelStrings
+setMethod('labelStrings', signature('character', 'list'),
+          function (strings, sets) {
+            labels <- names(sets)
+            strs <- sapply(sets, FUN=function(x) x$sets)
+            labels <- sapply(labels, function (x) rep(x, ncol(strs)))
+            strs <- c(strs)
+            labels <- c(labels)
+            exclude <- sapply(sets, FUN=function(x) x$exclude)
+            strs <- unlist(strs, use.names=F)
+            exclude <- unlist(exclude, use.names=F)
+            labelStrings(strings, strs, labels, exclude)
+          })
 
 #' Get the number(s) in a vector that are closest to another number.
 #' @export

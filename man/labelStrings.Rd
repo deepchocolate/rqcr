@@ -4,6 +4,7 @@
 \alias{labelStrings}
 \alias{labelStrings,character,character,character,ANY-method}
 \alias{labelStrings,character,character,character,missing-method}
+\alias{labelStrings,character,list,ANY,ANY-method}
 \title{Match a vector against another character set and label matches.}
 \usage{
 labelStrings(strings, sets, labels, exclude)
@@ -11,6 +12,8 @@ labelStrings(strings, sets, labels, exclude)
 \S4method{labelStrings}{character,character,character,ANY}(strings, sets, labels, exclude)
 
 \S4method{labelStrings}{character,character,character,missing}(strings, sets, labels)
+
+\S4method{labelStrings}{character,list,ANY,ANY}(strings, sets)
 }
 \arguments{
 \item{strings}{A vector of strings.}

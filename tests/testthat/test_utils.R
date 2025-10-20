@@ -43,6 +43,10 @@ test_that('labelStrings', {
                'sets contain duplicate patterns')
   expect_error(labelStrings(c('A', 'Bb', 'D'), c('A', 'B', 'F'), c('LabA', 'LabB', 'LabF'), c('Bb', 'C')),
                'exclude needs to be length 1 or equal to sets')
+  # Using a list
+  grps <- list(LabA=list(sets=c('A', 'aa'), exclude=c('Ab')),
+               LabB=list(sets=c('B', 'BB')))
+  expect_equal(labelStrings(c('A', 'aa', 'Ab', 'B'), grps), c('LabA', 'LabA', '', 'LabB'))
 })
 
 test_that('Test recodeToNA', {
