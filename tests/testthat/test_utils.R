@@ -20,6 +20,17 @@ test_that('Test createIntervals', {
   expect_equal(as.character(intsFac), c('0-4','10-14', '15-19', '90-', NA))
 })
 
+test_that('diffYears', {
+  d <- diffYears('2024-01-01', '2025-01-01')
+  expect_equal(d, 1)
+  d <- diffYears('20240101', '20250101')
+  expect_equal(d, 1)
+  d <- diffYears(c('20240101', '20250101','20260210'), '20250101')
+  expect_equal(d, c(1,0,-1.11), tolerance=0.01)
+  d <- diffYears(c('20240101', '20250101','20260210'), c('20240101', '20250101','20260210'))
+  expect_equal(d, c(0,0,0))
+})
+
 test_that('labelStrings', {
   dta <- data.frame(id=c(1,1,2,2,3),
                     str=c('A','B', 'AA', 'BB', 'CA'),

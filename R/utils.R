@@ -19,6 +19,15 @@ createIntervalsAge <- function (x, by, from=0, to=90, sep='-') {
   cut(x, breaks=c(ageL, Inf), labels=lab, include.lowest=T, right=F)
 }
 
+#' Calculate difference between dates in years.
+#' @export
+#' @param datesA A date/vector of dates.
+#' @param datesB A date/vector of dates.
+#' @import lubridate
+diffYears <- function (datesA, datesB) {
+  interval(datesA, datesB)/years(1)
+}
+
 #' Count frequencies of discrete values.
 #' @param dta Any data accepted by dplyr.
 #' @param col Column in dta to count values.
