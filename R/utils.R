@@ -42,6 +42,7 @@ frequencyCountDistinct <- function (dta, col, ...) {
 }
 
 #' Test if a vector is equal to the intersection of other vectors.
+#' @export
 #' @param x A vector.
 #' @param ... Vectors to intersect.
 intersectEquals <- function (x, ...) {
@@ -50,6 +51,7 @@ intersectEquals <- function (x, ...) {
 }
 
 #' Test if x is a date
+#' @export
 #' @param x Anything
 #' @param format If any other format than specified by as.Date
 isDate <- function (x, format) {
