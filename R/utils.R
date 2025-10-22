@@ -19,6 +19,16 @@ createIntervalsAge <- function (x, by, from=0, to=90, sep='-') {
   cut(x, breaks=c(ageL, Inf), labels=lab, include.lowest=T, right=F)
 }
 
+#' Calculate age.
+#' @export
+#' @importFrom lubridate today
+#' @param Birth date.
+#' @param Date when age is to be calculated.
+calculateAge <- function (dateBirth, when=today()) {
+  if (length(dateBirth) != length(when) & length(when) > 1) stop('when has to be either a single date or a vector of length equal to dateBirth')
+  diffYears(dateBirth, when)
+}
+
 #' Calculate difference between dates in years.
 #' @export
 #' @param datesA A date/vector of dates.

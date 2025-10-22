@@ -1,3 +1,8 @@
+test_that('calculateAge', {
+  d <- calculateAge(c('20240101', '20260101'), '20250101')
+  expect_equal(d, c(1, -1))
+  expect_error(calculateAge('20240101', c('20240101', '20250101')))
+})
 test_that('closest', {
   expect_equal(closest(1:3), 1)
   expect_equal(closest(c(-2,-1,1,3)), c(-1,1))
