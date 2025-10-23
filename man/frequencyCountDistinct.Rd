@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{frequencyCountDistinct}
 \alias{frequencyCountDistinct}
-\title{Count frequencies of discrete values.}
+\title{Count frequencies of unique values}
 \usage{
 frequencyCountDistinct(dta, col, ...)
 }
@@ -13,13 +13,21 @@ frequencyCountDistinct(dta, col, ...)
 
 \item{...}{Columns to select in data.}
 }
+\value{
+A tibble with columns in \code{col}, and and columns \code{N} four counts
+and \code{Percent} for percentage of values.
+}
 \description{
-Count frequencies of discrete values.
+Count frequencies of unique values
 }
 \details{
-Count frequencies
 Without any columns passed in (...) this function simply returns the distinct
-values, counts and percent of these values. By passing other
-columns through ... the function performs this operation over these columns so
-that each value is only counted once for each group.
+values, counts and percent of these values. This behaviour is the same as \code{unique},
+with a count for each value and a parecent. However, by passing other
+columns through \code{...} the function performs this operation over these columns so
+that each value is only counted once for each group defined as the unique combination
+of values in these columns.
+}
+\seealso{
+\code{\link[=frequencyCountDiscrete]{frequencyCountDiscrete()}}
 }

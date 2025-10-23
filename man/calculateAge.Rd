@@ -7,9 +7,9 @@
 calculateAge(dateBirth, when = today())
 }
 \arguments{
-\item{Birth}{date.}
+\item{dateBirth}{Birth date.}
 
-\item{Date}{when age is to be calculated.}
+\item{when}{Date when age is to be calculated.}
 }
 \description{
 Calculate age.

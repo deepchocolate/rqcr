@@ -22,8 +22,8 @@ createIntervalsAge <- function (x, by, from=0, to=90, sep='-') {
 #' Calculate age.
 #' @export
 #' @importFrom lubridate today
-#' @param Birth date.
-#' @param Date when age is to be calculated.
+#' @param dateBirth Birth date.
+#' @param when Date when age is to be calculated.
 calculateAge <- function (dateBirth, when=today()) {
   if (length(dateBirth) != length(when) & length(when) > 1) stop('when has to be either a single date or a vector of length equal to dateBirth')
   diffYears(dateBirth, when)
@@ -38,18 +38,22 @@ diffYears <- function (datesA, datesB) {
   interval(datesA, datesB)/years(1)
 }
 
-#' Count frequencies of discrete values.
+#' Count frequencies of unique values
+#' @import dplyr
+#' @export
+#' @details
+#' Without any columns passed in (...) this function simply returns the distinct
+#' values, counts and percent of these values. This behaviour is the same as `unique`,
+#' with a count for each value and a parecent. However, by passing other
+#' columns through `...` the function performs this operation over these columns so
+#' that each value is only counted once for each group defined as the unique combination
+#' of values in these columns.
+#' @seealso [frequencyCountDiscrete()]
 #' @param dta Any data accepted by dplyr.
 #' @param col Column in dta to count values.
 #' @param ... Columns to select in data.
-#' @details
-#' Count frequencies
-#' Without any columns passed in (...) this function simply returns the distinct
-#' values, counts and percent of these values. By passing other
-#' columns through ... the function performs this operation over these columns so
-#' that each value is only counted once for each group.
-#' @import dplyr
-#' @export
+#' @return A tibble with columns in `col`, and and columns `N` four counts
+#' and `Percent` for percentage of values.
 frequencyCountDistinct <- function (dta, col, ...) {
   dta <- dta %>% select(..., all_of(col)) %>% distinct() %>% select(all_of(col)) %>% collect() %>% count(pick(all_of(col)), name='n') %>%
     arrange(!!as.name(col))
@@ -58,6 +62,23 @@ frequencyCountDistinct <- function (dta, col, ...) {
   dta$Percent <-  100*dta$n/n
   colnames(dta) <- c(col, 'N', 'Percent')
   dta
+}
+
+#' Count frequencies of discrete values
+#' @details
+#' Counting is performed by counting rows in data which forms combinations
+#' of unique values by the specified columns in `...`.
+#'
+#' @export
+#' @import dplyr
+#' @param dta Any data accepted by dplyr.
+#' @param ... Column(s) to form discrete values in `dta`.
+#' @return A tibble with columns in `...` and columns for counts (`N`) and percent.
+frequencyCountDiscrete <- function (dta, ...) {
+  grps <- c(...)
+  if (length(grps) == 0) stop('No column(s) to count in provided.')
+  dta %>% select(all_of(grps)) %>% collect() %>% summarise(N=n(), .by=all_of(grps)) %>%
+    mutate(Percent=100*.data$N/sum(.data$N))
 }
 
 #' Test if a vector is equal to the intersection of other vectors.
