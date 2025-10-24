@@ -40,7 +40,7 @@ compareDrugFrequencies <- function (df.local, df.public) {
     stop('Required columns not present in input data: ',paste(cols, collapse=','))
   df.local$age <- createIntervalsAge(df.local$age, by=5, sep=' - ')
   atc.local <- frequencyCountDistinct(df.local, cols, 'lopenr')
-  dtaComp <- merge(df.public, atc.local, by.x=cols, by.y=cols)
+  dtaComp <- merge(df.public, atc.local, by.x=cols, by.y=cols, all.y=T)
   dtaComp <- dtaComp[,c('atc','age','year','sex','individuals', 'N')]
   colnames(dtaComp) <- c('ATC', 'Age', 'Year', 'Sex', 'Public', 'Local')
   dtaComp$Difference <- with(dtaComp, Public - Local)
