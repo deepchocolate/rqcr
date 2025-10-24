@@ -27,6 +27,8 @@ processDrugRegister <- function(fileInput, fileOutput, formatInput='csv', format
 #' @param df.public Raw data downloaded from statistikk.fhi.no.
 #' @return A dataframe with ATC code, age group, year, sex, and columns Public,
 #' Local, their difference nominally (Public - Local) and in percent Public/Local.
+#' By default all data in `df.public` are kept and data not available in `df.local`
+#' will be `NA` on all statistics.
 compareDrugFrequencies <- function (df.local, df.public) {
   cols <- c('atc', 'age','year', 'sex')
   if (!base::requireNamespace("getStatisticsFHI", quietly = TRUE)) {
@@ -40,7 +42,7 @@ compareDrugFrequencies <- function (df.local, df.public) {
     stop('Required columns not present in input data: ',paste(cols, collapse=','))
   df.local$age <- createIntervalsAge(df.local$age, by=5, sep=' - ')
   atc.local <- frequencyCountDistinct(df.local, cols, 'lopenr')
-  dtaComp <- merge(df.public, atc.local, by.x=cols, by.y=cols, all.y=T)
+  dtaComp <- merge(df.public, atc.local, by.x=cols, by.y=cols, all.x=T)
   dtaComp <- dtaComp[,c('atc','age','year','sex','individuals', 'N')]
   colnames(dtaComp) <- c('ATC', 'Age', 'Year', 'Sex', 'Public', 'Local')
   dtaComp$Difference <- with(dtaComp, Public - Local)

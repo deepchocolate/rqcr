@@ -23,13 +23,13 @@ test_that('Compare drug frequencies', {
   dtaLoc$sex <- 'Females'
   # Compare
   res <- compareDrugFrequencies(dtaLoc, dtaApi)
-  resExp <- data.frame(ATC=c("A01AA", "A01AA", "A01AA", "A01AA01", "N06BA01", "N06BA01", "N06BA02"),
-                       Age=c("10 - 14", "25 - 29", "35 - 39", "25 - 29", "15 - 19", "40 - 44", "40 - 44"),
-                       Year=c(2016, 2009, 2020, 2006, 2024, 2025, 2025),
-                       Sex=rep('Females',7),
-                       Public=c(106, rep(NA,6)),
-                       Local=1, Difference=c(105,rep(NA,6)),
-                       Percent=c(10500, rep(NA,6)))
+  resExp <- data.frame(ATC=c("A01AA", "A01AA", "A01AA","A01AA","A01AA","A01AA", "A01AA01", "A01AA01", "A01AA01", "A01AA01"),
+                       Age=c("10 - 14", "40 - 44","5 - 9","50 - 54","60 - 64","80 - 84","40 - 44","45 - 49","45 - 49","65 - 69"),
+                       Year=c(2016,2013,2006,2006,2016,2013,2009,2015,2020,2011),
+                       Sex=c( "Females","Males","Females","Both","Both","Both","Females","Females","Females","Both"),
+                       Public=c(106,379,0,38,2094,959,27,956,1999,390),
+                       Local=c(1, rep(NA,9)), Difference=c(105,rep(NA,9)),
+                       Percent=c(10500, rep(NA,9)))
   expect_equal(res, resExp)
 })
 
