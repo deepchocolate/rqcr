@@ -1,6 +1,8 @@
 test_that('calculateAge', {
   d <- calculateAge(c('20240101', '20260101'), '20250101')
   expect_equal(d, c(1, -1))
+  d <- calculateAge(c('20240101', '20260101'), c('20250101','20270101'))
+  expect_equal(d, c(1, 1))
   d <- calculateAge(c('20240101', '20260101', NA), '20250101')
   expect_equal(d, c(1, -1, NA))
   expect_error(calculateAge('20240101', c('20240101', '20250101')))
