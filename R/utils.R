@@ -125,6 +125,18 @@ labelString <- function (string, stringSets, labels, exclude, FUN=startsWith) {
 #' Match a vector against another character set and label matches.
 #' @name labelStrings
 #' @export
+#' @details
+#' `labelStrings` work similar to performing a left join, e.g., using `merge(x,y,all.x=T,...)`
+#' if `y` is some data containing a label for a column existing in both `x` and `y`.
+#' The difference is that this function allows for flexible matching (currently only
+#' the starting characters in string), and allows for excluding patterns
+#' For example, if all strings starting with "A" should have some label "Group A", but
+#' not strings starting with "AB", "AB could be added as an exclusion pattern
+#' (see example).
+#' @examples
+#' x <- c("A", "ABC", "DEF")
+#' labelStrings(x, "A", "Group A", "AB")
+#'
 #' @param strings A vector of strings.
 #' @param sets A vector of strings to match against.
 #' @param labels A vector of labels to assign to matches.

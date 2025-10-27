@@ -14,6 +14,8 @@ compareDrugFrequencies(df.local, df.public)
 \value{
 A dataframe with ATC code, age group, year, sex, and columns Public,
 Local, their difference nominally (Public - Local) and in percent Public/Local.
+By default all data in \code{df.public} are kept and data not available in \code{df.local}
+will be \code{NA} on all statistics.
 }
 \description{
 Compare statistics between the Norwegian drug register and public data.

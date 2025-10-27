@@ -27,3 +27,17 @@ labelStrings(strings, sets, labels, exclude)
 \description{
 Match a vector against another character set and label matches.
 }
+\details{
+\code{labelStrings} work similar to performing a left join, e.g., using \code{merge(x,y,all.x=T,...)}
+if \code{y} is some data containing a label for a column existing in both \code{x} and \code{y}.
+The difference is that this function allows for flexible matching (currently only
+the starting characters in string), and allows for excluding patterns
+For example, if all strings starting with "A" should have some label "Group A", but
+not strings starting with "AB", "AB could be added as an exclusion pattern
+(see example).
+}
+\examples{
+x <- c("A", "ABC", "DEF")
+labelStrings(x, "A", "Group A", "AB")
+
+}
