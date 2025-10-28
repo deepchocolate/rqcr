@@ -2,22 +2,30 @@
 % Please edit documentation in R/utils-registers.R
 \name{renameColumns}
 \alias{renameColumns}
-\alias{renameColumns,ANY,data.frame,logical-method}
-\alias{renameColumns,ANY,data.frame,missing-method}
+\alias{renameColumns,ANY,data.frame,logical,logical-method}
+\alias{renameColumns,ANY,data.frame,missing,missing-method}
+\alias{renameColumns,ANY,data.frame,logical,missing-method}
+\alias{renameColumns,ANY,data.frame,missing,logical-method}
 \title{Rename columns from delivery to new names}
 \usage{
-renameColumns(dta, dtaCols, english = F)
+renameColumns(dta, dtaCols, english = F, verbose = T)
 
-\S4method{renameColumns}{ANY,data.frame,logical}(dta, dtaCols, english = F)
+\S4method{renameColumns}{ANY,data.frame,logical,logical}(dta, dtaCols, english = F, verbose = T)
 
-\S4method{renameColumns}{ANY,data.frame,missing}(dta, dtaCols, english = F)
+\S4method{renameColumns}{ANY,data.frame,missing,missing}(dta, dtaCols, english = F, verbose = T)
+
+\S4method{renameColumns}{ANY,data.frame,logical,missing}(dta, dtaCols, english = F, verbose = T)
+
+\S4method{renameColumns}{ANY,data.frame,missing,logical}(dta, dtaCols, english = F, verbose = T)
 }
 \arguments{
 \item{dta}{A table with column names, e.g. data.frame.}
 
-\item{dtaCols}{A data frame of column names}
+\item{dtaCols}{A data frame of column names.}
 
-\item{english}{Whether to translate column names to English}
+\item{english}{Whether to translate column names to English.}
+
+\item{verbose}{Whether to print how columns have been renamed.}
 }
 \description{
 Rename columns from delivery to new names
