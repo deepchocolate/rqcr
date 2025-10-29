@@ -41,6 +41,15 @@ test_that('diffYears', {
   expect_equal(d, c(0,0,0))
 })
 
+test_that('indexAlong', {
+  dta <- data.frame(A=c('A','A','B'), B=1:3)
+  expect_equal(indexAlong(dta), 1:3)
+  expect_equal(indexAlong(dta, 'A'), c(1,2,1))
+  expect_equal(indexAlong(dta, 'A', 'B'), c(1,1,1))
+  expect_equal(indexAlongUnique(dta, 'A'), c(1,1,2))
+  expect_equal(indexAlongUnique(dta, 'A', 'A'), c(1,1,1))
+})
+
 test_that('labelStrings', {
   dta <- data.frame(id=c(1,1,2,2,3),
                     str=c('A','B', 'AA', 'BB', 'CA'),

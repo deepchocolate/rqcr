@@ -81,6 +81,40 @@ frequencyCountDiscrete <- function (dta, ...) {
     mutate(Percent=100*.data$N/sum(.data$N))
 }
 
+#' Index observations over grouped data
+#' @export
+#' @details
+#' Without passing any groups provided, this function just returns an index
+#' (row number) of the data.
+#' @seealso [indexAlongUnique()]
+#' @importFrom stats ave
+#' @param dta A data frame or similar.
+#' @param ... Columns in `dta` defining the groups.
+indexAlong <- function (dta, ...) {
+  grps <- c(...)
+  if (length(grps) == 0) return(1:nrow(dta))
+  as.integer(ave(dta[,1], dta[,grps], FUN=function (x) 1:length(x)))
+}
+
+#' Index unique observations
+#' @export
+#' @seealso [indexAlong()]
+#' @importFrom stats ave
+#' @param dta A data frame or similar.
+#' @param col The column to index
+#' @param ... Columns in `dta` defining
+indexAlongUnique <- function (dta, col, ...) {
+  grps <- c(...)
+  if (length(grps) == 0) {
+    o <- as.integer(factor(dta[,col], labels=1:length(unique(dta[,col]))))
+    return(o)
+  }
+  as.integer(ave(dta[,col], dta[,grps], FUN=function (x) {
+    o <- factor(x, labels=1:length(unique(x)))
+    as.integer(o)
+  }))
+}
+
 #' Test if a vector is equal to the intersection of other vectors.
 #' @export
 #' @param x A vector.
