@@ -19,7 +19,7 @@ createIntervalsAge <- function (x, by, from=0, to=90, sep='-') {
   cut(x, breaks=c(ageL, Inf), labels=lab, include.lowest=T, right=F)
 }
 
-#' Calculate age.
+#' Calculate age based on YYYY-MM-DD.
 #' @export
 #' @importFrom lubridate today
 #' @param dateBirth Birth date.
