@@ -177,17 +177,11 @@ labelString <- function (string, stringSets, labels, exclude, FUN=startsWith) {
 #' @param exclude A vector of strings to exclude. Either one for all sets or one per set.
 setGeneric('labelStrings', function (strings, sets, labels, exclude) standardGeneric('labelStrings'))
 #' @rdname labelStrings
-setMethod('labelStrings', signature('character', 'character', 'character', 'ANY'),
-          function (strings, sets, labels, exclude) {
-            if (length(sets) != length(unique(sets))) stop('sets contain duplicate patterns')
-            if (length(sets) != length(labels)) stop('sets and labels need to be of equal length')
-            lenExclude <- length(exclude)
-            if (lenExclude < length(sets) & lenExclude > 1) stop('exclude needs to be length 1 or equal to sets')
-            sapply(strings, FUN=labelString, stringSets=sets, labels=labels, exclude=exclude, USE.NAMES=F)
-          })
+setMethod('labelStrings', signature('factor', 'character','character','missing'),
+          function (strings, sets, labels) labelStrings(as.character(strings), sets, labels))
 #' @rdname labelStrings
 setMethod('labelStrings', signature('character','character','character', 'missing'),
-          function (strings, sets,labels) labelStrings(strings,sets,labels,F))
+          function (strings, sets, labels) labelStrings(strings,sets,labels,F))
 #' @rdname labelStrings
 setMethod('labelStrings', signature('character', 'list'),
           function (strings, sets) {
@@ -200,6 +194,15 @@ setMethod('labelStrings', signature('character', 'list'),
             strs <- unlist(strs, use.names=F)
             exclude <- unlist(exclude, use.names=F)
             labelStrings(strings, strs, labels, exclude)
+          })
+#' @rdname labelStrings
+setMethod('labelStrings', signature('character', 'character', 'character', 'ANY'),
+          function (strings, sets, labels, exclude) {
+            if (length(sets) != length(unique(sets))) stop('sets contain duplicate patterns')
+            if (length(sets) != length(labels)) stop('sets and labels need to be of equal length')
+            lenExclude <- length(exclude)
+            if (lenExclude < length(sets) & lenExclude > 1) stop('exclude needs to be length 1 or equal to sets')
+            sapply(strings, FUN=labelString, stringSets=sets, labels=labels, exclude=exclude, USE.NAMES=F)
           })
 
 #' Get the number(s) in a vector that are closest to another number.
@@ -254,4 +257,10 @@ recodeSex <- function (x, default=NA) {
                     c('2', 'K')~'F',
                     .default=default
   )
+}
+
+#' @export
+txtNPercent <- function(n, N, strmask='{n} ({percent})') {
+  percent <- round(100*n/N, 3)
+  glue::glue(strmask)
 }

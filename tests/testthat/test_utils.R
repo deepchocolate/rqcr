@@ -56,6 +56,10 @@ test_that('labelStrings', {
                     labExp=c('LabA','LabB','LabA','LabB', ''))
   dta$out <- labelStrings(dta$str, c('A', 'B'), c('LabA', 'LabB'))
   expect_equal(dta$out, dta$labExp)
+  # Applying on factor
+  dta$str <- factor(dta$str)
+  dta$out <- labelStrings(dta$str, c('A','B'), c('LabA', 'LabB'))
+  expect_equal(dta$out, dta$labExp)
   # Using exclusion across all sets
   dta <- data.frame(str=c('A','B', 'AA', 'BB', 'CA', 'BBc'),
                     labExp=c('LabA','LabB','LabA','', '', ''))
@@ -137,4 +141,8 @@ test_that('renameColumns', {
   # No overlap should keep everything as is
   dta3 <- data.frame(A=1,B=2)
   expect_equal(renameColumns(dta3, NO_NAMES$DRUG_REGISTER), dta3)
+})
+
+test_that('txtNPercent', {
+  expect_equal(txtNPercent(1, 10), '1 (10)')
 })
