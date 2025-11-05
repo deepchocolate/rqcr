@@ -259,6 +259,9 @@ recodeSex <- function (x, default=NA) {
   )
 }
 
+#' Create a string with n and percent
+#' @param n A number
+#' @param N Another number
 #' @export
 txtNPercent <- function(n, N, strmask='{n} ({percent})') {
   percent <- round(100*n/N, 3)

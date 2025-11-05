@@ -2,18 +2,21 @@
 % Please edit documentation in R/utils.R
 \name{labelStrings}
 \alias{labelStrings}
-\alias{labelStrings,character,character,character,ANY-method}
+\alias{labelStrings,factor,character,character,missing-method}
 \alias{labelStrings,character,character,character,missing-method}
 \alias{labelStrings,character,list,ANY,ANY-method}
+\alias{labelStrings,character,character,character,ANY-method}
 \title{Match a vector against another character set and label matches.}
 \usage{
 labelStrings(strings, sets, labels, exclude)
 
-\S4method{labelStrings}{character,character,character,ANY}(strings, sets, labels, exclude)
+\S4method{labelStrings}{factor,character,character,missing}(strings, sets, labels)
 
 \S4method{labelStrings}{character,character,character,missing}(strings, sets, labels)
 
 \S4method{labelStrings}{character,list,ANY,ANY}(strings, sets)
+
+\S4method{labelStrings}{character,character,character,ANY}(strings, sets, labels, exclude)
 }
 \arguments{
 \item{strings}{A vector of strings.}
