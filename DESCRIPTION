@@ -26,8 +26,10 @@ Suggests:
     arrow (>= 21.0.0),
     getStatisticsFHI (>= 1.0.1),
     haven,
+    knitr,
     nanoparquet,
     remotes,
+    rmarkdown,
     testthat (>= 3.0.0),
     withr (>= 3.0.0)
 Remotes:
@@ -35,3 +37,4 @@ Remotes:
 Config/testthat/edition: 3
 License: MIT + file LICENSE
 LazyData: true
+VignetteBuilder: knitr
