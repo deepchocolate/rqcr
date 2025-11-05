@@ -19,6 +19,15 @@ test_that('closest', {
   expect_equal(minPositive(-1:-3), NA)
 })
 
+test_that('countUnique', {
+  df <- data.frame(a=c(1,1,2))
+  expect_equal(countUnique(df,a), 2)
+  df <- data.frame(a=c('1','1','2'), b=c('1','1','2'))
+  expect_equal(countUnique(df), 2)
+  df$c <- 1
+  expect_equal(countUnique(df, c), 1)
+  expect_error(countUnique(1:3))
+})
 test_that('Test createIntervals', {
   ints <-  c(0, 10, 15, 99)
   intsFac <- createIntervalsAge(ints, 5, 0, 90)

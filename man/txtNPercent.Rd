@@ -10,6 +10,8 @@ txtNPercent(n, N, strmask = "{n} ({percent})")
 \item{n}{A number}
 
 \item{N}{Another number}
+
+\item{strmask}{The text to put numbers in. Must contain "\{n\}" and "\{percent\}".}
 }
 \description{
 Create a string with n and percent

@@ -1,3 +1,12 @@
+#' Count the unique elements in data
+#' @export
+#' @import dplyr
+#' @param dta A data.frame or similar.
+#' @param ... Columns in `dta`.
+countUnique <- function (dta, ...) {
+  dta %>% distinct(...) %>% nrow()
+}
+
 #' Create age/positive number intervals from a variable.
 #' @param x A vector of numbers.
 #' @param by Width of intervals.
@@ -262,6 +271,7 @@ recodeSex <- function (x, default=NA) {
 #' Create a string with n and percent
 #' @param n A number
 #' @param N Another number
+#' @param strmask The text to put numbers in. Must contain "\{n\}" and "\{percent\}".
 #' @export
 txtNPercent <- function(n, N, strmask='{n} ({percent})') {
   percent <- round(100*n/N, 3)
