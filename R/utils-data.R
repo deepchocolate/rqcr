@@ -86,3 +86,17 @@ mergeDataByRow <- function(..., insertColnames=T, separator=NA) {
   data.frame(out,row.names = NULL)
 }
 
+#' Update values conditionally in tabular data
+#' @details
+#' This function uses dplyr::case_when to perform conditional updates in data, but
+#' by default preserving existing values for rows that do not match.
+#'
+#' @seealso [dplyr::case_when()]
+#' @import dplyr
+#' @importFrom rlang := enquos
+#' @param .data Anything accepted by dplyr (can be piped).
+#' @param col The column to update
+#' @param ... Conditions for updates in the form `Column == "value" ~ Replacement`.
+updateCases <- function (.data, col, ...) {
+  .data %>% mutate( "{{col}}" := case_when(!!!enquos(...), .default = {{ col }}))
+}

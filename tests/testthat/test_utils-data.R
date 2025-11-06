@@ -20,3 +20,11 @@ test_that('splitDataByRow', {
   rownames(dtaExp[[2]]) <- 1
   expect_equal(dtaOut, dtaExp)
 })
+
+test_that('updateCases', {
+  df <- data.frame(colA=c('A', 'B'), colB=c(1,3))
+  # Update colB to 2 where colA equals "B"
+  df2 <- updateCases(df, colB, colA == 'B' ~ 2)
+  df$colB <- 1:2
+  expect_equal(df2, df)
+})
