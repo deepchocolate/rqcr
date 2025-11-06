@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{calculateAge}
 \alias{calculateAge}
-\title{Calculate age.}
+\title{Calculate age based on YYYY-MM-DD.}
 \usage{
 calculateAge(dateBirth, when = today())
 }
@@ -12,5 +12,5 @@ calculateAge(dateBirth, when = today())
 \item{when}{Date when age is to be calculated.}
 }
 \description{
-Calculate age.
+Calculate age based on YYYY-MM-DD.
 }
