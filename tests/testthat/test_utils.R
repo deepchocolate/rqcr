@@ -50,6 +50,21 @@ test_that('diffYears', {
   expect_equal(d, c(0,0,0))
 })
 
+test_that('distanceBetween', {
+  times <- c(1,3,7)
+  states <- c('a', 'b','c')
+  expect_equal(distanceBetween(times, states, 'a', 'c'), c(NA,NA,NA))
+  expect_equal(distanceBetween(times, states, 'b', 'c'), c(NA,NA,4))
+  times <- c(times, 8,8)
+  states <- c(states,'b', 'd')
+  # Multiple destinations
+  expect_equal(distanceBetween(times, states, 'b', c('c', 'd')), c(NA,NA,4,NA,0))
+  # Test with integers
+  expect_equal(distanceBetween(1,1,1,1), NA)
+  expect_equal(distanceBetween(c(10,14), c(1,2), 1, 2), c(NA,4))
+  expect_error(distanceBetween(1:3,1:2, 1, 2), 'times and statest need to have equal length')
+})
+
 test_that('indexAlong', {
   dta <- data.frame(A=c('A','A','B'), B=1:3)
   expect_equal(indexAlong(dta), 1:3)

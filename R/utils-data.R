@@ -92,6 +92,7 @@ mergeDataByRow <- function(..., insertColnames=T, separator=NA) {
 #' by default preserving existing values for rows that do not match.
 #'
 #' @seealso [dplyr::case_when()]
+#' @export
 #' @import dplyr
 #' @importFrom rlang := enquos
 #' @param .data Anything accepted by dplyr (can be piped).

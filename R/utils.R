@@ -47,6 +47,31 @@ diffYears <- function (datesA, datesB) {
   interval(datesA, datesB)/years(1)
 }
 
+#' Calculate temporal distance between a set of states
+#' @details
+#' This function calculates the difference between a set of states in time. The
+#' origin state is only one, but the destinations can be many.
+#'
+#' @export
+#' @param times Observation times for `states`
+#' @param states States corresponing to each time in `times`.
+#' @param from The origin state.
+#' @param to The destination state(s).
+#' @return A sequence of time differences with NA if the origin state is not equal
+#' to `from` or the destination is not present in `to`.
+distanceBetween <- function (times, states, from, to) {
+  len <- length(times)
+  if (len != length(states)) stop('times and statest need to have equal length')
+  if (len == 1) return(NA)
+  stFr <- which(states[-len] %in% from & states[-1] %in% to)
+  stTo <- which(states[-1] %in% to)
+  if (length(stFr) == 0) return(rep(NA, len))
+  dTime <- diff(times)
+  o <- rep(NA, length(dTime))
+  o[stFr] <- dTime[stFr]
+  c(NA, o)
+}
+
 #' Count frequencies of unique values
 #' @import dplyr
 #' @export
