@@ -1,3 +1,14 @@
+test_that('addPredecessor', {
+  df <- data.frame(A=3:1)
+  out <- df %>% addPredecessor(A)
+  df$fromA <- c(NA,3,2)
+  expect_equal(df, out)
+  df <- data.frame(A=3:1)
+  out <- df %>% addPredecessor(A, B)
+  df$B <- c(NA,3,2)
+  expect_equal(out, df)
+})
+
 test_that('getExcelData', {
   dta <- getExcelData(FILE_EXCEL, 'C', 'B', 1, c('A','B'))
   expect_equal(dta, tibble(sheet=c('Sheet A', 'Sheet B'), a=c(3,7), b=c(4,8)))

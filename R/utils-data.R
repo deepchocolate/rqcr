@@ -1,3 +1,16 @@
+#' Add the preceding value of a sequence as a column in data
+#' @export
+#' @import dplyr
+#' @param .data Any tabular data accepted by dplyr
+#' @param colStates The column indicating current state.
+#' @param colName Name of column for the origin state. Defaults to "from`colStates`".
+addPredecessor <- function (.data, colStates, colName=NULL) {
+  colName <- substitute(colName)
+  if (is.null(colName)) colName <- paste0('from', substitute(colStates))
+  else colName <- deparse(colName)
+  .data %>% mutate({{ colName }} := lag({{ colStates }}))
+}
+
 #' Get data from an excelfile by searching through all sheets.
 #' @export
 #' @param file The excel file path.
