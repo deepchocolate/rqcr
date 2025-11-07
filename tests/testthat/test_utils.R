@@ -53,16 +53,34 @@ test_that('diffYears', {
 test_that('distanceBetween', {
   times <- c(1,3,7)
   states <- c('a', 'b','c')
-  expect_equal(distanceBetween(times, states, 'a', 'c'), c(NA,NA,NA))
-  expect_equal(distanceBetween(times, states, 'b', 'c'), c(NA,NA,4))
+  expect_equal(distanceBetween(states, times, 'a', 'c'), c(NA,NA,NA))
+  expect_equal(distanceBetween(states, times, 'b', 'c'), c(NA,NA,4))
   times <- c(times, 8,8)
   states <- c(states,'b', 'd')
   # Multiple destinations
-  expect_equal(distanceBetween(times, states, 'b', c('c', 'd')), c(NA,NA,4,NA,0))
+  expect_equal(distanceBetween(states, times, 'b', c('c', 'd')), c(NA,NA,4,NA,0))
   # Test with integers
   expect_equal(distanceBetween(1,1,1,1), NA)
-  expect_equal(distanceBetween(c(10,14), c(1,2), 1, 2), c(NA,4))
+  expect_equal(distanceBetween(c(1,2),c(10,14), 1, 2), c(NA,4))
   expect_error(distanceBetween(1:3,1:2, 1, 2), 'times and statest need to have equal length')
+})
+
+test_that('whichTransitionsInterval', {
+  df <- data.frame(A=c('a', 'b', 'a', 'b', 'a', 'c'),
+                   B=c(0,1,2,4,5,6))
+  out <- whichTransitionsInterval(df$A, df$B, 'a', 'b')
+  expect_equal(1:4, out)
+  out <- whichTransitionsInterval(df$A, df$B, 'a', 'b', 2,4)
+  expect_equal(3:4, out)
+  out <- whichTransitionsInterval(df$A, df$B, 'a', 'b', 0,1)
+  expect_equal(1:2, out)
+  df$subject <- c('G1','G1','G2','G2','G3','G3')
+  # Illustrate how to integrate when applying function by groups
+  out <- df %>% arrange(subject, B) %>% group_by(subject) %>%
+    filter(row_number() %in% whichTransitionsInterval(A, B, 'a', 'b', 0,1))
+  expect_equal(c('a','b'), out$A)
+  expect_equal(0:1, out$B)
+  expect_equal(c('G1','G1'), out$subject)
 })
 
 test_that('indexAlong', {

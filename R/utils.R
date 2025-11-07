@@ -53,13 +53,13 @@ diffYears <- function (datesA, datesB) {
 #' origin state is only one, but the destinations can be many.
 #'
 #' @export
-#' @param times Observation times for `states`
 #' @param states States corresponing to each time in `times`.
+#' @param times Observation times for `states`
 #' @param from The origin state.
 #' @param to The destination state(s).
 #' @return A sequence of time differences with NA if the origin state is not equal
 #' to `from` or the destination is not present in `to`.
-distanceBetween <- function (times, states, from, to) {
+distanceBetween <- function (states, times, from, to) {
   len <- length(times)
   if (len != length(states)) stop('times and statest need to have equal length')
   if (len == 1) return(NA)
@@ -70,6 +70,20 @@ distanceBetween <- function (times, states, from, to) {
   o <- rep(NA, length(dTime))
   o[stFr] <- dTime[stFr]
   c(NA, o)
+}
+
+#' Find adjacent rows where a state goes from one to the next within a time frame
+#' @export
+#' @param states States corresponing to each time in `times`.
+#' @param times Observation times for `states`
+#' @param from The origin state.
+#' @param to The destination state(s).
+#' @param lower Lower end of interval.
+#' @param upper Upper end of interval.
+whichTransitionsInterval <- function(states, times, from, to, lower=-Inf, upper=Inf) {
+  dTimes <- distanceBetween(states, times, from, to)
+  wTimes <- which(dTimes >= lower & dTimes <= upper)
+  c(rbind(wTimes-1,wTimes))
 }
 
 #' Count frequencies of unique values

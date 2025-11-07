@@ -4,12 +4,12 @@
 \alias{distanceBetween}
 \title{Calculate temporal distance between a set of states}
 \usage{
-distanceBetween(times, states, from, to)
+distanceBetween(states, times, from, to)
 }
 \arguments{
-\item{times}{Observation times for \code{states}}
-
 \item{states}{States corresponing to each time in \code{times}.}
+
+\item{times}{Observation times for \code{states}}
 
 \item{from}{The origin state.}
 
