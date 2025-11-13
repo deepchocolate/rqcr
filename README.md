@@ -13,7 +13,7 @@ devtools::install_github('https://github.com/deepchocolate/rqcr')
 
 Download a release and issue the following in R:
 ```R
-install.packages(pgs='path/rqcr_vX.Y.Z.tar.gz')
+install.packages(pkgs='path/rqcr_vX.Y.Z.tar.gz')
 ```
 
 ### Dependencies
