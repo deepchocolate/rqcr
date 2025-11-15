@@ -4,10 +4,10 @@
 \alias{frequencyCountDiscrete}
 \title{Count frequencies of discrete values}
 \usage{
-frequencyCountDiscrete(dta, ...)
+frequencyCountDiscrete(.data, ...)
 }
 \arguments{
-\item{dta}{Any data accepted by dplyr.}
+\item{.data}{Any data accepted by dplyr.}
 
 \item{...}{Column(s) to form discrete values in \code{dta}.}
 }
@@ -19,5 +19,6 @@ Count frequencies of discrete values
 }
 \details{
 Counting is performed by counting rows in data which forms combinations
-of unique values by the specified columns in \code{...}.
+of unique values by the specified columns in \code{...}. This is what \code{dplyr::count}
+does, but adds a percentage column.
 }

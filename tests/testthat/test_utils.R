@@ -144,14 +144,15 @@ test_that('Test frequencyCount', {
   dta <- arrow::open_dataset(fileIn %s+% '.parquet')
   tmp <- frequencyCountDistinct(dta, 'ATC')
   expect_equal(tmp, tibble(ATC=c('N06BA01', 'N06BA02'), N=c(1,1), Percent=c(50,50)))
-  tmp <- frequencyCountDiscrete(dta, 'ATC')
+  tmp <- frequencyCountDiscrete(dta, ATC)
   expect_equal(tmp, tibble(ATC=c('N06BA01', 'N06BA02'), N=c(3,1), Percent=c(75,25)))
-  expect_error(frequencyCountDiscrete(dta), 'No column\\(s\\) to count in provided.')
+  # This will just be a simple rowcount
+  expect_equal(frequencyCountDiscrete(dta), tibble(N=4, Percent=100))
   # Count over PIN
   tmp <- frequencyCountDistinct(dta, 'ATC', 'lopenr')
   expDta <- data.frame(ATC=c('N06BA01', 'N06BA02'), N=c(2, 1), Percent=c(100*2/3, 100/3))
   expect_equal(as.data.frame(tmp), expDta)
-  tmp <- frequencyCountDiscrete(dta, 'lopenr', 'ATC')
+  tmp <- frequencyCountDiscrete(dta, lopenr, ATC)
   expect_equal(tmp, tibble(lopenr=c('I1','I2','I3'), ATC=c('N06BA01','N06BA02','N06BA01'), N=c(1,1,2), Percent=c(25,25,50)))
   # Counts over two distinct values
   tmp <- frequencyCountDistinct(dta, c('ATC', 'Date'), 'lopenr')
@@ -162,11 +163,11 @@ test_that('Test frequencyCount', {
     Percent=rep(25,4)
   )
   expect_equal(as.data.frame(tmp), expDta)
-  tmp <- frequencyCountDiscrete(dta, 'ATC', 'Date', 'lopenr')
+  tmp <- frequencyCountDiscrete(dta, ATC, Date, lopenr)
   expDta <- collect(dta)[, c('ATC', 'Date', 'lopenr')]
   expDta$N <- 1
   expDta$Percent <- 25
-  expect_equal(tmp, expDta)
+  expect_equal(tmp, expDta %>% arrange(ATC))
 })
 
 test_that('Test intersectEquals', {

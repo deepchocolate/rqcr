@@ -115,17 +115,16 @@ frequencyCountDistinct <- function (dta, col, ...) {
 #' Count frequencies of discrete values
 #' @details
 #' Counting is performed by counting rows in data which forms combinations
-#' of unique values by the specified columns in `...`.
+#' of unique values by the specified columns in `...`. This is what `dplyr::count`
+#' does, but adds a percentage column.
 #'
 #' @export
 #' @import dplyr
-#' @param dta Any data accepted by dplyr.
+#' @param .data Any data accepted by dplyr.
 #' @param ... Column(s) to form discrete values in `dta`.
 #' @return A tibble with columns in `...` and columns for counts (`N`) and percent.
-frequencyCountDiscrete <- function (dta, ...) {
-  grps <- c(...)
-  if (length(grps) == 0) stop('No column(s) to count in provided.')
-  dta %>% select(all_of(grps)) %>% collect() %>% summarise(N=n(), .by=all_of(grps)) %>%
+frequencyCountDiscrete <- function (.data, ...) {
+  .data %>% select(...) %>% collect() %>% count(..., name='N') %>%
     mutate(Percent=100*.data$N/sum(.data$N))
 }
 
