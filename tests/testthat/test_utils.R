@@ -28,6 +28,15 @@ test_that('countUnique', {
   expect_equal(countUnique(df, c), 1)
   expect_error(countUnique(1:3))
 })
+
+test_that('collapseUnique', {
+  a <- c('C','A','A')
+  expect_equal(collapseUnique(a), 'A,C')
+  expect_equal(collapseUnique(a, sort=F), 'C,A')
+  expect_equal(collapseUnique(a, sep='-'), 'A-C')
+  expect_equal(c(), NULL)
+})
+
 test_that('Test createIntervals', {
   ints <-  c(0, 10, 15, 99)
   intsFac <- createIntervalsAge(ints, 5, 0, 90)

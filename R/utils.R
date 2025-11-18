@@ -38,6 +38,17 @@ calculateAge <- function (dateBirth, when=today()) {
   diffYears(dateBirth, when)
 }
 
+#' Collapse unique elements in a vector
+#' @export
+#' @param x A vector.
+#' @param sep A character separating elements.
+#' @param sort Whether to sort elements.
+collapseUnique <- function (x, sep=',', sorted=T) {
+  x <- unique(x)
+  if (sorted) x <- sort(x)
+  paste0(x, collapse=sep)
+}
+
 #' Calculate difference between dates in years.
 #' @export
 #' @param datesA A date/vector of dates.
