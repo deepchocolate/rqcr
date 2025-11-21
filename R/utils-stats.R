@@ -15,13 +15,9 @@
 #' @return A tibble with columns in `col`, and and columns `N` four counts
 #' and `Percent` for percentage of values.
 frequencyCountDistinct <- function (dta, col, ...) {
-  dta <- dta %>% select(..., all_of(col)) %>% distinct() %>% select(all_of(col)) %>% collect() %>% count(pick(all_of(col)), name='n') %>%
+  dta <- dta %>% select(..., all_of(col)) %>% distinct() %>% select(all_of(col)) %>% collect() %>% count(pick(all_of(col)), name='N') %>%
     arrange(!!as.name(col))
-  colnames(dta) <- c(col, 'n')
-  n <- sum(dta$n)
-  dta$Percent <-  100*dta$n/n
-  colnames(dta) <- c(col, 'N', 'Percent')
-  dta
+  dta %>% percent()
 }
 
 #' Count frequencies of discrete values
