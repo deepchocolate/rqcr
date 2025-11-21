@@ -59,6 +59,17 @@ test_that('diffYears', {
   expect_equal(d, c(0,0,0))
 })
 
+test_that('diffDays', {
+  d <- diffDays('2001-01-01', '2000-12-30')
+  expect_equal(d, -2)
+  d <- diffDays('2001-01-01', c('2000-12-30', '20010103'))
+  expect_equal(d, c(-2,2))
+  d <- diffDays(c('2000-12-30', '20010103'), '2001-01-01')
+  expect_equal(d, c(2, -2))
+  d <- diffDays(c('2000-12-30', '20010103'), c('2001-01-01', '2001-01-03'))
+  expect_equal(d, c(2, 0))
+})
+
 test_that('distanceBetween', {
   times <- c(1,3,7)
   states <- c('a', 'b','c')

@@ -58,6 +58,15 @@ diffYears <- function (datesA, datesB) {
   interval(datesA, datesB)/years(1)
 }
 
+#' Calculate difference between dates in days
+#' @export
+#' @param datesA A date/vector of dates.
+#' @param datesB A date/vector of dates.
+#' @import lubridate
+diffDays <- function (datesA, datesB) {
+  interval(datesA, datesB)/days(1)
+}
+
 #' Calculate temporal distance between a set of states
 #' @details
 #' This function calculates the difference between a set of states in time. The
