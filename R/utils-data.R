@@ -50,7 +50,6 @@ getExcelData <- function (file, col, val, skip, colsSelect) {
 splitDataByRow <- function (dta, splitIndicator=NA, header=F) {
   if (is.na(splitIndicator)) whch <- which(apply(is.na(dta),1, all))
   else whch <- which(apply(dta == splitIndicator, 1, all))
-  #whch <- ifelse(is.na(splitIndicator), which(apply(is.na(dta),1, all)), which(apply(dta == splitIndicator, 1, all)))
   out <- list()
   i <- 1
   j <- i
@@ -75,6 +74,8 @@ splitDataByRow <- function (dta, splitIndicator=NA, header=F) {
     }
     out[[j]] <- d
   }
+  rmWhich <- which(sapply(out, FUN=is.null))
+  if (length(rmWhich) > 0) out <- out[-rmWhich]
   out
 }
 

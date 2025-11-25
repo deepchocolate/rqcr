@@ -116,9 +116,8 @@ whichTransitionsInterval <- function(states, times, from, to, lower=-Inf, upper=
 #' @param dta A data frame or similar.
 #' @param ... Columns in `dta` defining the groups.
 indexAlong <- function (dta, ...) {
-  grps <- c(...)
-  if (length(grps) == 0) return(1:nrow(dta))
-  as.integer(ave(dta[,1], dta[,grps], FUN=function (x) 1:length(x)))
+  if (...length() == 0) return(1:nrow(dta))
+  as.integer(ave(dta[,1], dta %>% select(...), FUN=function (x) 1:length(x)))
 }
 
 #' Index unique observations
