@@ -48,7 +48,9 @@ getExcelData <- function (file, col, val, skip, colsSelect) {
 #' @param splitIndicator A value to delineate rows that separate tables in data.
 #' @param header If TRUE, the first row in each dataset are used as a header for the data.
 splitDataByRow <- function (dta, splitIndicator=NA, header=F) {
-  whch <- ifelse(is.na(splitIndicator), which(apply(is.na(dta),1, all)), which(apply(dta == splitIndicator, 1, all)))
+  if (is.na(splitIndicator)) whch <- which(apply(is.na(dta),1, all))
+  else whch <- which(apply(dta == splitIndicator, 1, all))
+  #whch <- ifelse(is.na(splitIndicator), which(apply(is.na(dta),1, all)), which(apply(dta == splitIndicator, 1, all)))
   out <- list()
   i <- 1
   j <- i

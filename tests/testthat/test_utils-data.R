@@ -16,19 +16,22 @@ test_that('getExcelData', {
 
 test_that('splitDataByRow', {
   require(data.table)
-  dta <- data.frame(a=c(1,NA,2), b=c(1,NA,2))
-  dtaExp <- list(data.frame(a=1,b=1), data.frame(a=2,b=2, row.names=3))
+  dta <- data.frame(a=c(1,NA,2,NA,3), b=c(1,NA,2, NA, 3))
+  dtaExp <- list(data.frame(a=1,b=1), data.frame(a=2,b=2, row.names=3), data.frame(a=3,b=3, row.names=3))
   dtaOut <- splitDataByRow(dta)
   rownames(dtaOut[[2]]) <- 3 # Seems impossible to get the type of row.names right when constructing the expected dataframe as above
+  rownames(dtaOut[[3]]) <- 3
   expect_equal(dtaOut, dtaExp)
   # Merge again
-  dtaMerged <- mergeDataByRow(dtaOut[[1]], dtaOut[[2]], insertColnames=F)
+  dtaMerged <- mergeDataByRow(dtaOut[[1]], dtaOut[[2]], dtaOut[[3]], insertColnames=F)
   expect_equal(dtaMerged, dta)
   # Test with data.table
   dtaOut <- splitDataByRow(as.data.table(dta))
   rownames(dtaOut[[2]]) <- 1
+  rownames(dtaOut[[3]]) <- 1
   dtaExp <- lapply(dtaExp, as.data.table)
   rownames(dtaExp[[2]]) <- 1
+  rownames(dtaExp[[3]]) <- 1
   expect_equal(dtaOut, dtaExp)
 })
 
