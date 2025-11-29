@@ -29,4 +29,6 @@ test_that('Test frequencyCount', {
   expDta$N <- 1
   expDta$Percent <- 25
   expect_equal(tmp, expDta %>% arrange(ATC))
+  df <- data.frame(id=c(1,1,1,3,3,3), b=c('a','a','b','c','c','a'))
+  expect_equal(frequencyCountDistinct(df, 'b', id), tibble(b=c('a','b','c'), N=c(2,1,1), Percent=c(50,25, 25)))
 })

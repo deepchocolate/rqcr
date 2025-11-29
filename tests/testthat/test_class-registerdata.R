@@ -1,0 +1,17 @@
+test_that('drugRegister', {
+  a <- drugRegister(FILE_NO_DR)
+  expect_equal(attributes(a)$columns, 'Delivery')
+  expect_equal(getColumn('IID', 'Norwegian'), 'lopenr')
+  expect_equal(getColumn(a, 'IID'), 'Lopenummer_NPR')
+  #print(attributes(a))
+  r <- frequencyATC(a)
+  expect_equal(r$Legemiddel_ATCkode_Niva4, 'N06B')
+  expect_equal(r$N, 4)
+  expect_equal(r$Percent, 100)
+  a <- renameColumns(a, NO_NAMES$DRUG_REGISTER, T, F)
+  # Index observations
+  a <- a %>% indexObservations()
+  expect_equal(a$i, 1:4)
+  a <- a %>% indexObservations(IID)
+  expect_equal(a$i, c(1,1,1,2))
+})
