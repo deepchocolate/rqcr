@@ -1,3 +1,19 @@
+#' Count the unique elements in data
+#' @export
+#' @import dplyr
+#' @param dta A data.frame or similar.
+#' @param ... Columns in `dta`.
+setGeneric('countUnique', function (.data, ...) standardGeneric('countUnique'))
+setMethod('countUnique', signature('data.frame'),
+          function (.data, ...) {
+            .data %>% distinct(...) %>% nrow()
+          }
+)
+setMethod('countUnique', signature('ANY'),
+          function (.data, ...) {
+            length(unique(.data))
+          })
+
 #' Count frequencies of unique values
 #' @import dplyr
 #' @export

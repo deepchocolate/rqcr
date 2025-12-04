@@ -1,3 +1,16 @@
+test_that('countUnique', {
+  df <- data.frame(a=c(1,1,2))
+  expect_equal(countUnique(df,a), 2)
+  df <- data.frame(a=c('1','1','2'), b=c('1','1','2'))
+  expect_equal(countUnique(df), 2)
+  df$c <- 1
+  expect_equal(countUnique(df, c), 1)
+  expect_equal(countUnique(1:3), 3)
+  expect_equal(tibble(a=c(1,1,2)) %>% countUnique(a), 2)
+  expect_equal(countUnique(c(1,1,2)), 2)
+  expect_equal(c('a',1, 1) %>% countUnique(), 2)
+})
+
 test_that('Test frequencyCount', {
   fileIn <- dataPDRCreate()
   dta <- arrow::open_dataset(fileIn %s+% '.parquet')

@@ -1,12 +1,3 @@
-#' Count the unique elements in data
-#' @export
-#' @import dplyr
-#' @param dta A data.frame or similar.
-#' @param ... Columns in `dta`.
-countUnique <- function (dta, ...) {
-  dta %>% distinct(...) %>% nrow()
-}
-
 #' Create age/positive number intervals from a variable.
 #' @param x A vector of numbers.
 #' @param by Width of intervals.
