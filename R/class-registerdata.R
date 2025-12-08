@@ -39,6 +39,8 @@ setMethod('frequencyATC', signature('dataRegister'),
 #' @export
 #' @name indexObservations
 #' @param .data Any data accepted by dplyr.
+#' @param .nameIndex Column name.
+#' @param .nameMax Column name for maximum.
 #' @param ... Variables to group data by.
 setGeneric('indexObservations', function (.data, ...) standardGeneric('indexObservations'))
 #' @rdname indexObservations

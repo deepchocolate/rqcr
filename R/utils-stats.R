@@ -1,14 +1,17 @@
 #' Count the unique elements in data
 #' @export
+#' @name countUnique
 #' @import dplyr
-#' @param dta A data.frame or similar.
+#' @param .data A data.frame or similar.
 #' @param ... Columns in `dta`.
 setGeneric('countUnique', function (.data, ...) standardGeneric('countUnique'))
+#' @rdname countUnique
 setMethod('countUnique', signature('data.frame'),
           function (.data, ...) {
             .data %>% distinct(...) %>% nrow()
           }
 )
+#' @rdname countUnique
 setMethod('countUnique', signature('ANY'),
           function (.data, ...) {
             length(unique(.data))

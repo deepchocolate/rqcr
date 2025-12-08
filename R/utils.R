@@ -33,7 +33,7 @@ calculateAge <- function (dateBirth, when=today()) {
 #' @export
 #' @param x A vector.
 #' @param sep A character separating elements.
-#' @param sort Whether to sort elements.
+#' @param sorted Whether to sort elements.
 collapseUnique <- function (x, sep=',', sorted=T) {
   x <- unique(x)
   if (sorted) x <- sort(x)
@@ -81,6 +81,38 @@ distanceBetween <- function (states, times, from, to) {
   o <- rep(NA, length(dTime))
   o[stFr] <- dTime[stFr]
   c(NA, o)
+}
+
+#' Expand a numerical range embedded in a string
+#' @details
+#' `expandRange` will take strings in the format of "A#-A#" and repeat these
+#' into range.
+#'
+#' @examples
+#' vec <- c("A", "A1-A3")
+#' vec <- expandRange(vec)
+#' # vec is now c("A", "A1", "A2", "A3")
+#'
+#' @export
+#' @importFrom stringi stri_detect stri_extract stri_split
+#' @param x Strings to expand.
+#' @param sep A separator ofr anges
+expandRange <- function (x, sep='-') {
+  o <- which(stri_detect(x, fixed=sep))
+  if (!any(o)) return(x)
+  splts <- stri_split(x[o], fixed=sep)
+  # Letters
+  let <- sapply(splts, FUN=stri_extract, regex='^[A-Z]+')
+  # Numbers
+  splts <- sapply(splts, FUN=stri_extract, regex='([0-9]+)')
+  # Ranges
+  rngs <- apply(splts, MARGIN=2, FUN=function (x) seq(x[[1]], x[[2]]), simplify=F)
+  j <- 1
+  for (i in o) {
+    x[i] <- list(paste0(let[1,j], rngs[[j]]))
+    j <- j + 1
+  }
+  do.call('c', list(x, recursive=T))
 }
 
 #' Find adjacent rows where a state goes from one to the next within a time frame

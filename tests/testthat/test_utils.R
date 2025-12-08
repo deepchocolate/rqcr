@@ -75,6 +75,12 @@ test_that('distanceBetween', {
   expect_error(distanceBetween(1:3,1:2, 1, 2), 'times and statest need to have equal length')
 })
 
+test_that('expandRange', {
+  expect_equal(expandRange(c('A','A1-A3')), c('A','A1','A2','A3'))
+  vec <- c('A', 'A1-A3', 'ABC10-ABC11', 'ABC19','B3-B2')
+  expect_equal(expandRange(vec), c('A', 'A1','A2','A3', 'ABC10','ABC11', 'ABC19', 'B3', 'B2'))
+})
+
 test_that('whichTransitionsInterval', {
   df <- data.frame(A=c('a', 'b', 'a', 'b', 'a', 'c'),
                    B=c(0,1,2,4,5,6))
