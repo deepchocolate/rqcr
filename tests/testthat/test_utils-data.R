@@ -14,7 +14,7 @@ test_that('getExcelData', {
   expect_equal(dta, tibble(sheet=c('Sheet A', 'Sheet B'), a=c(3,7), b=c(4,8)))
 })
 
-test_that('splitDataByRow', {
+test_that('splitDataByRow, mergeDataByRow', {
   require(data.table)
   dta <- data.frame(a=c(1,NA,2,NA,NA,3), b=c(1,NA,2, NA,NA, 3))
   dtaExp <- list(data.frame(a=1,b=1), data.frame(a=2,b=2, row.names=3), data.frame(a=3,b=3, row.names=3))
@@ -27,6 +27,8 @@ test_that('splitDataByRow', {
   dtaExp2 <- dta[-4,]
   rownames(dtaExp2) <- 1:nrow(dtaExp2)
   expect_equal(dtaMerged, dtaExp2)
+  # Split/Merge with colnames
+  dtaMerged <- mergeDataByRow(dtaOut[[1]], dtaOut[[2]], dtaOut[[3]], insertColnames=T)
   # Test with data.table
   dtaOut <- splitDataByRow(as.data.table(dta))
   rownames(dtaOut[[2]]) <- 1
