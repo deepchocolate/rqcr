@@ -85,6 +85,12 @@ test_that('expandRange', {
   expect_equal(expandRange('A08#A09', '#'), c('A8', 'A9'))
 })
 
+test_that('getPrefixMatches', {
+  expect_equal(getPrefixMatches('a', c('aa', 'A', 'bA')), c('aa', 'A'))
+  expect_equal(getPrefixMatches(c(1, 'a'), c('aa', 'A', 'bA')), list(`1`=character(), a=c('aa', 'A')))
+  expect_equal(getPrefixMatches(c(1, 'a'), c(10, 'aa')), c('1'='10', a='aa'))
+})
+
 test_that('whichTransitionsInterval', {
   df <- data.frame(A=c('a', 'b', 'a', 'b', 'a', 'c'),
                    B=c(0,1,2,4,5,6))

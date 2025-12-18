@@ -288,6 +288,21 @@ minPositive <- function (x, na.rm=T) {
   ifelse(length(x) == 0, NA, closest(x, na.rm=na.rm))
 }
 
+#' Get strings that matches a prefix
+#' @name getPrefixMatches
+#' @param prefix One or several prefix.
+#' @param str One or several strings.
+setGeneric('getPrefixMatches', function (prefix, str) standardGeneric('getPrefixMatches'))
+#' @rdname getPrefixMatches
+setMethod('getPrefixMatches', signature('character', 'character'),
+          function(prefix, str) {
+            if (length(prefix) > 1) return(sapply(prefix, FUN=function (x) getPrefixMatches(x, str)))
+            prefix <- as.character(prefix)
+            str <- as.character(str)
+            i <- which(startsWith(tolower(str), tolower(prefix)))
+            str[i]
+          })
+
 #' Recode values to missing.
 #' @param x A vector of inputs.
 #' @param cases Cases in x to convert to NA.
