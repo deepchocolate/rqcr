@@ -4,12 +4,14 @@
 \alias{expandRange}
 \title{Expand a numerical range embedded in a string}
 \usage{
-expandRange(x, sep = "-")
+expandRange(x, sep = "-", align = T)
 }
 \arguments{
 \item{x}{Strings to expand.}
 
-\item{sep}{A separator ofr anges}
+\item{sep}{A separator for ranges}
+
+\item{align}{Whether to align numbers in strings to equal length, eg 1 becomes 01 if range max is within 10-99}
 }
 \description{
 Expand a numerical range embedded in a string

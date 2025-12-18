@@ -28,7 +28,7 @@ dbCreateTypeEnum <- function (con, name, values) {
 #' just use `DBI::dbConnect(duckdb::duckdb()).
 #'
 #' @param dbFile The database file.
-#' @param read_only=T Connect without writing permission?
+#' @param read_only Connect without writing permission?
 #' @param ... Further arguments passed to `duckdb::duckdb()`.
 dbDuckConnect <- function(dbFile, read_only=T, ...) {
   DBI::dbConnect(duckdb::duckdb(dbdir=dbFile, read_only=read_only, ...))
