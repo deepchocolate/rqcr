@@ -36,12 +36,6 @@ getExcelData <- function (file, col, val, skip, colsSelect) {
   dta
 }
 
-tmpFun <- function (x) {
-  o <- rep(0, length(x))
-  vs <- match(unique(x), x)
-  o[vs] <- 1
-  o
-}
 #' Indicate novel elements in ordered data
 #' @name indicateNovel
 #' @export
