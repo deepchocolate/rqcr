@@ -289,6 +289,7 @@ minPositive <- function (x, na.rm=T) {
 }
 
 #' Get strings that matches a prefix
+#' @export
 #' @name getPrefixMatches
 #' @param prefix One or several prefix.
 #' @param str One or several strings.
