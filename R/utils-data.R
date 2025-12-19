@@ -36,6 +36,37 @@ getExcelData <- function (file, col, val, skip, colsSelect) {
   dta
 }
 
+tmpFun <- function (x) {
+  o <- rep(0, length(x))
+  vs <- match(unique(x), x)
+  o[vs] <- 1
+  o
+}
+#' Indicate novel elements in ordered data
+#' @name indicateNovel
+#' @export
+#' @import dplyr
+#' @param .data Any data object accepted by dplyr.
+setGeneric('indicateNovel', function (.data, ...) standardGeneric('indicateNovel'))
+#' @rdname indicateNovel
+setMethod('indicateNovel', signature('character'),
+          function (.data) {
+            o <- rep(0, length(x))
+            vs <- match(unique(x), x)
+            o[vs] <- 1
+            o
+          })
+#' @rdname indicateNovel
+#' @param times Column referring to the temporal ordering.
+#' @param values Column referring to values to mark as new.
+#' @param ... Grouping factors.
+#' @param .name Name of the column indicating novelty.
+setMethod('indicateNovel', signature('data.frame'),
+          function (.data, times, values, ..., .name='novel') {
+            .data %>% group_by(...) %>% arrange({{ times }}) %>%
+              mutate("{.name}" :=tmpFun({{ values }})) %>% ungroup()
+            })
+
 #' Split data by rows that are equal to some value.
 #' @details
 #' The motivation for this function comes from spreadsheet in which multiple tables
