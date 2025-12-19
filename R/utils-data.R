@@ -51,8 +51,8 @@ setGeneric('indicateNovel', function (.data, ...) standardGeneric('indicateNovel
 #' @rdname indicateNovel
 setMethod('indicateNovel', signature('character'),
           function (.data) {
-            o <- rep(0, length(x))
-            vs <- match(unique(x), x)
+            o <- rep(0, length(.data))
+            vs <- match(unique(.data), .data)
             o[vs] <- 1
             o
           })
@@ -64,7 +64,7 @@ setMethod('indicateNovel', signature('character'),
 setMethod('indicateNovel', signature('data.frame'),
           function (.data, times, values, ..., .name='novel') {
             .data %>% group_by(...) %>% arrange({{ times }}) %>%
-              mutate("{.name}" :=tmpFun({{ values }})) %>% ungroup()
+              mutate("{.name}" :=indicateNovel({{ values }})) %>% ungroup()
             })
 
 #' Split data by rows that are equal to some value.
