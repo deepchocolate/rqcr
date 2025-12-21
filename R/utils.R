@@ -58,6 +58,27 @@ diffDays <- function (datesA, datesB) {
   interval(datesA, datesB)/days(1)
 }
 
+#' Get unique elements in data.
+#' @name elements
+#' @export
+#' @import dplyr
+#' @param .data Any data accepted by dplyr.
+#' @param ... Columns in .data.
+setGeneric('elements', function (.data, ...) standardGeneric('elements'))
+#' @rdname elements
+setMethod('elements', signature('ANY'),
+          function (.data) {
+            if (length(.data) == 0) stop('Input is NULL')
+            unique(.data)
+          })
+#' @rdname elements
+setMethod('elements', signature('data.frame'),
+          function (.data, ...) {
+            o <- .data %>% distinct(...)
+            if (ncol(o) == 1) return(pull(o))
+            o
+          })
+
 #' Calculate temporal distance between a set of states
 #' @details
 #' This function calculates the difference between a set of states in time. The

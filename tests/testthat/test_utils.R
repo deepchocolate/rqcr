@@ -75,6 +75,14 @@ test_that('distanceBetween', {
   expect_error(distanceBetween(1:3,1:2, 1, 2), 'times and statest need to have equal length')
 })
 
+test_that('elements', {
+  df <- data.frame(A=c('A','B','B'), B=c(1,2,2))
+  expect_equal(elements(df, B), c(1,2))
+  expect_equal(elements(df), unique(df))
+  expect_equal(elements(df$A), c('A','B'))
+  expect_error(elements(df$C))
+})
+
 test_that('expandRange', {
   expect_equal(expandRange(c('A','A1-A3'), align=F), c('A','A1','A2','A3'))
   vec <- c('A', 'A1-A3', 'ABC10-ABC11', 'ABC19','B3-B2')
