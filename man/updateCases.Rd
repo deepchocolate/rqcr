@@ -4,7 +4,7 @@
 \alias{updateCases}
 \title{Update values conditionally in tabular data}
 \usage{
-updateCases(.data, col, ...)
+updateCases(.data, col, ..., .warnIfMissing = FALSE)
 }
 \arguments{
 \item{.data}{Anything accepted by dplyr (can be piped).}
@@ -12,6 +12,8 @@ updateCases(.data, col, ...)
 \item{col}{The column to update}
 
 \item{...}{Conditions for updates in the form \code{Column == "value" ~ Replacement}.}
+
+\item{.warnIfMissing}{Throws a warning if the update condition is not identified in .data}
 }
 \description{
 Update values conditionally in tabular data

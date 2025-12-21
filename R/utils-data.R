@@ -135,10 +135,19 @@ mergeDataByRow <- function(..., insertColnames=T, separator=NA) {
 #' @seealso [dplyr::case_when()]
 #' @export
 #' @import dplyr
-#' @importFrom rlang := enquos
+#' @importFrom rlang := enquos quo_get_expr
+#' @importFrom formula.tools lhs
 #' @param .data Anything accepted by dplyr (can be piped).
 #' @param col The column to update
 #' @param ... Conditions for updates in the form `Column == "value" ~ Replacement`.
-updateCases <- function (.data, col, ...) {
+#' @param .warnIfMissing Throws a warning if the update condition is not identified in .data
+updateCases <- function (.data, col, ..., .warnIfMissing=FALSE) {
+  if (.warnIfMissing) {
+    for (frm in enquos(...)) {
+      rows <- lhs(quo_get_expr(frm))
+      nrows <- .data %>% filter(eval(rows)) %>%  nrow()
+      if (nrows == 0) warning('No rows found for ', nrows)
+    }
+  }
   .data %>% mutate( "{{col}}" := case_when(!!!enquos(...), .default = {{ col }}))
 }

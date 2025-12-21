@@ -51,4 +51,7 @@ test_that('updateCases', {
   df2 <- updateCases(df, colB, colA == 'B' ~ 2)
   df$colB <- 1:2
   expect_equal(df2, df)
+  df2 <- updateCases(df, colB, colA == 'B' ~ 2, colA =='A'~ 1, .warnIfMissing = T)
+  expect_equal(df2, df)
+  expect_warning(updateCases(df, colB, colA == 'C' ~ 2, .warnIfMissing=T))
 })
