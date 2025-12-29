@@ -60,7 +60,7 @@ frequencyCountDiscrete <- function (.data, ...) {
 #' @param .data Anything accepted by dplyr.
 #' @param .colCount Name of column with counts.
 #' @param ... Grouping variables.
-percent <- function (.data, .colCount='N', ...) {
+percent <- function (.data, ..., .colCount='N') {
   .data %>% group_by(...) %>% mutate(Percent=100*!!as.name(.colCount)/sum(!!as.name(.colCount))) %>%
     ungroup()
 }

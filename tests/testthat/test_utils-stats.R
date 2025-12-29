@@ -45,3 +45,11 @@ test_that('Test frequencyCount', {
   df <- data.frame(id=c(1,1,1,3,3,3), b=c('a','a','b','c','c','a'))
   expect_equal(frequencyCountDistinct(df, 'b', id), tibble(b=c('a','b','c'), N=c(2,1,1), Percent=c(50,25, 25)))
 })
+
+test_that('percent', {
+  df <- data.frame(A=c('A','A','B'),N=c(1,1,2))
+  o <- df %>% percent()
+  expect_equal(o$Percent, c(25,25,50))
+  o <- df %>% percent(A)
+  expect_equal(o$Percent, c(50,50,100))
+})
