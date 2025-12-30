@@ -18,6 +18,9 @@ test_that('indicateNovel', {
   dta <- data.frame(subject=c(rep(1, 4),2,2,2), time=c(1,4,3,2, 1,3, 2), values=c('a', 'c', 'b','b', 'a', 'b', 'a'), stringsAsFactors = F)
   o <- dta %>% indicateNovel(time, values, subject)
   expect_equal(o$novel, c(1,1,1,0,0,1,1))
+  dta$values <- factor(dta$values)
+  o <- dta %>% indicateNovel(time, values, subject)
+  expect_equal(o$novel, c(1,1,1,0,0,1,1))
 })
 
 test_that('splitDataByRow, mergeDataByRow', {

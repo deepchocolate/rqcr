@@ -43,6 +43,11 @@ getExcelData <- function (file, col, val, skip, colsSelect) {
 #' @param .data Any data object accepted by dplyr.
 setGeneric('indicateNovel', function (.data, ...) standardGeneric('indicateNovel'))
 #' @rdname indicateNovel
+setMethod('indicateNovel', signature('factor'),
+          function (.data) {
+            indicateNovel(as.character(.data))
+          })
+#' @rdname indicateNovel
 setMethod('indicateNovel', signature('character'),
           function (.data) {
             o <- rep(0, length(.data))
