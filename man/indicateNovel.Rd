@@ -2,11 +2,14 @@
 % Please edit documentation in R/utils-data.R
 \name{indicateNovel}
 \alias{indicateNovel}
+\alias{indicateNovel,factor-method}
 \alias{indicateNovel,character-method}
 \alias{indicateNovel,data.frame-method}
 \title{Indicate novel elements in ordered data}
 \usage{
 indicateNovel(.data, ...)
+
+\S4method{indicateNovel}{factor}(.data)
 
 \S4method{indicateNovel}{character}(.data)
 

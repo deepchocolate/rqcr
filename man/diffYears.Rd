@@ -11,6 +11,9 @@ diffYears(datesA, datesB)
 
 \item{datesB}{A date/vector of dates.}
 }
+\value{
+\code{dateA}-\code{dateB} in years.
+}
 \description{
 Calculate difference between dates in years.
 }

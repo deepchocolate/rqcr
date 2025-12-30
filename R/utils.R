@@ -26,7 +26,7 @@ createIntervalsAge <- function (x, by, from=0, to=90, sep='-') {
 #' @param when Date when age is to be calculated.
 calculateAge <- function (dateBirth, when=today()) {
   if (length(dateBirth) != length(when) & length(when) > 1) stop('when has to be either a single date or a vector of length equal to dateBirth')
-  diffYears(dateBirth, when)
+  diffYears(when, dateBirth)
 }
 
 #' Collapse unique elements in a vector
@@ -44,18 +44,20 @@ collapseUnique <- function (x, sep=',', sorted=T) {
 #' @export
 #' @param datesA A date/vector of dates.
 #' @param datesB A date/vector of dates.
+#' @return `dateA`-`dateB` in years.
 #' @import lubridate
 diffYears <- function (datesA, datesB) {
-  interval(datesA, datesB)/years(1)
+  interval(datesB, datesA)/years(1)
 }
 
 #' Calculate difference between dates in days
 #' @export
 #' @param datesA A date/vector of dates.
 #' @param datesB A date/vector of dates.
+#' @return `datesA`-`datesB` in days.
 #' @import lubridate
 diffDays <- function (datesA, datesB) {
-  interval(datesA, datesB)/days(1)
+  interval(datesB, datesA)/days(1)
 }
 
 #' Get unique elements in data.
