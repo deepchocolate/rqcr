@@ -4,14 +4,14 @@
 \alias{percent}
 \title{Calculate percent based on counts}
 \usage{
-percent(.data, .colCount = "N", ...)
+percent(.data, ..., .colCount = "N")
 }
 \arguments{
 \item{.data}{Anything accepted by dplyr.}
 
-\item{.colCount}{Name of column with counts.}
-
 \item{...}{Grouping variables.}
+
+\item{.colCount}{Name of column with counts.}
 }
 \description{
 Calculate percent based on counts
