@@ -40,7 +40,6 @@ getExcelData <- function (file, col, val, skip, colsSelect) {
 #' @name indicateNovel
 #' @export
 #' @import dplyr
-#' @param .data Any data object accepted by dplyr.
 setGeneric('indicateNovel', function (.data, ...) standardGeneric('indicateNovel'))
 #' @rdname indicateNovel
 setMethod('indicateNovel', signature('factor'),
@@ -48,7 +47,7 @@ setMethod('indicateNovel', signature('factor'),
             indicateNovel(as.character(.data))
           })
 #' @rdname indicateNovel
-setMethod('indicateNovel', signature('character'),
+setMethod('indicateNovel', signature('ANY'),
           function (.data) {
             o <- rep(0, length(.data))
             vs <- match(unique(.data), .data)
@@ -56,6 +55,7 @@ setMethod('indicateNovel', signature('character'),
             o
           })
 #' @rdname indicateNovel
+#' @param .data Any data object accepted by dplyr
 #' @param times Column referring to the temporal ordering.
 #' @param values Column referring to values to mark as new.
 #' @param ... Grouping factors.
@@ -147,7 +147,7 @@ mergeDataByRow <- function(..., insertColnames=T, separator=NA) {
 #' @param ... Conditions for updates in the form `Column == "value" ~ Replacement`.
 #' @param .warnIfMissing Throws a warning if the update condition is not identified in .data
 updateCases <- function (.data, col, ..., .warnIfMissing=FALSE) {
-  if (.warnIfMissing) {
+  if (.warnIfMissing | configRQCR('updateCases', 'warnings')) {
     for (frm in enquos(...)) {
       rows <- lhs(quo_get_expr(frm))
       nrows <- .data %>% filter(eval(rows)) %>%  nrow()
