@@ -57,4 +57,8 @@ test_that('updateCases', {
   df2 <- updateCases(df, colB, colA == 'B' ~ 2, colA =='A'~ 1, .warnIfMissing = T)
   expect_equal(df2, df)
   expect_warning(updateCases(df, colB, colA == 'C' ~ 2, .warnIfMissing=T))
+  # Do it but provide the optional warning through a configuration
+  # Providing the option argument will be ignored
+  configRQCR('updateCases', 'warnings', T)
+  expect_warning(updateCases(df, colB, colA == 'C' ~ 2, .warnIfMissing=F))
 })
