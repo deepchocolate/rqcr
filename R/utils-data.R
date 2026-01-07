@@ -139,20 +139,26 @@ mergeDataByRow <- function(..., insertColnames=T, separator=NA) {
 #'
 #' @seealso [dplyr::case_when()]
 #' @export
-#' @import dplyr
+#' @import dplyr formula.tools
 #' @importFrom rlang := enquos quo_get_expr
-#' @importFrom formula.tools lhs
 #' @param .data Anything accepted by dplyr (can be piped).
 #' @param col The column to update
 #' @param ... Conditions for updates in the form `Column == "value" ~ Replacement`.
 #' @param .warnIfMissing Throws a warning if the update condition is not identified in .data
 updateCases <- function (.data, col, ..., .warnIfMissing=FALSE) {
-  if (.warnIfMissing | configRQCR('updateCases', 'warnings')) {
+  frms <- list()
     for (frm in enquos(...)) {
-      rows <- lhs(quo_get_expr(frm))
-      nrows <- .data %>% filter(eval(rows)) %>%  nrow()
-      if (nrows == 0) warning('No rows found for ', nrows)
-    }
+      frm <- quo_get_expr(frm)
+      if (typeof(.data %>% pull({{col}})) == 'character') {
+        varRhs <- rhs(frm)
+        if (is.numeric(varRhs)) rhs(frm) <- as.character(varRhs)
+      }
+      if (.warnIfMissing | configRQCR('updateCases', 'warnings')) {
+        rows <- lhs(frm)
+        nrows <- .data %>% filter(eval(rows)) %>%  nrow()
+        if (nrows == 0) warning('No rows found for ', nrows)
+      }
+    frms <- append(frms, frm)
   }
-  .data %>% mutate( "{{col}}" := case_when(!!!enquos(...), .default = {{ col }}))
+  .data %>% mutate( "{{col}}" := case_when(!!!frms, .default = {{ col }}))
 }

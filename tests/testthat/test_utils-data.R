@@ -61,4 +61,6 @@ test_that('updateCases', {
   # Providing the option argument will be ignored
   configRQCR('updateCases', 'warnings', T)
   expect_warning(updateCases(df, colB, colA == 'C' ~ 2, .warnIfMissing=F))
+  # Updating with a number in a text field
+  df2 <- updateCases(df, colA, colA == 'B' ~ 2)
 })
