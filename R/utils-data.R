@@ -132,6 +132,24 @@ mergeDataByRow <- function(..., insertColnames=T, separator=NA) {
   data.frame(out,row.names = NULL)
 }
 
+#' Merge time periods
+#' @export
+#' @param .date Period starting date (YYYY-MM-DD)
+#' @param .days Period length in days
+mergePeriods <- function (.date, .days) {
+  times <- diffDays(.date, first(.date))
+  timesEnd <- times + .days
+  pos <- which(times[-1] > timesEnd[-length(timesEnd)])
+  splts <- splitVector(.days, pos+1)
+  date <- splitVector(.date, pos+1)
+  .date <- unlist(lapply(date, FUN=first))
+  ids <- 1:length(splts)
+  reps <- lapply(splts, FUN=length)
+  ids <- rep(ids, unlist(reps))
+  .days <- c(tapply(.days, factor(ids), FUN=sum), use.names = F)
+  tibble(date=.date, days=.days)
+}
+
 #' Update values conditionally in tabular data
 #' @details
 #' This function uses dplyr::case_when to perform conditional updates in data, but

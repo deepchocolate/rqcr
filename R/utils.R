@@ -191,6 +191,56 @@ indexAlongUnique <- function (dta, col, ...) {
   }))
 }
 
+#' Get adjacent numbers
+#' @export
+#' @param .numbers A vector of numbers
+#' @param .distance Determinant of adjacent numbers.
+adjacent <- function(.numbers, .distance=1) {
+  pos <- positionsAdjacent(.numbers, .distance)
+  .numbers[(pos)]
+}
+
+#' Get positions of adjacent numbers
+#' @export
+#' @param .numbers A vector of numbers
+#' @param .distance Determinant of adjacent numbers.
+positionsAdjacent <- function (.numbers, .distance=1) {
+  pos <- which(abs(diff(.numbers)) <= .distance)
+  c(rbind(pos, pos+1))
+}
+
+#' Get positions of distant numbers
+#' @export
+#' @param .numbers A vector of numbers
+#' @param .distance Determinant of distant numbers.
+positionsDistant <- function (numbers, .distance=1) {
+  pos <- which(abs(diff(numbers)) > .distance)
+  c(rbind(pos, pos+1))
+}
+#' Split a vector at positions
+#' @export
+#' @param .x A vector.
+#' @param .pos Positions to split `.x` by.
+splitVector <- function(.x, .pos) {
+  unname(split(.x, cumsum(seq_along(.x) %in% .pos)))
+}
+
+#' Index a sequence of numbers
+#' @export
+#' @details
+#' `indexAlongDistance` index a sequence of numbers setting the same index to
+#' adjacent numbers. Adjacency is determined by `.distance`.
+#' @param .numbers A vector of numbers.
+#' @param .distance The distance between two numbers to consider them being adjacent.
+indexAlongDistance <- function (.numbers, .distance=1) {
+  dNr <- abs(diff(.numbers))
+  pos <- which(dNr > .distance)
+  splts <- splitVector(.numbers, pos+1)
+  ids <- 1:length(splts)
+  reps <- lapply(splts, FUN=length)
+  rep(ids, unlist(reps))
+}
+
 #' Test if a vector is equal to the intersection of other vectors.
 #' @export
 #' @param x A vector.

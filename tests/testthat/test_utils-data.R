@@ -48,6 +48,14 @@ test_that('splitDataByRow, mergeDataByRow', {
   expect_equal(dtaOut, dtaExp)
 })
 
+test_that('mergePeriods', {
+  dta <- tibble(date=c('2000-01-01', '2000-01-05', '2000-01-10', '2000-02-20','2000-02-22'),
+                days=c(10, 10, 10, 10, 2))
+  dtaExp <- tibble(date=c('2000-01-01', '2000-02-20'),
+                days=c(30, 12))
+  expect_equal(mergePeriods(dta$date, dta$days), dtaExp)
+})
+
 test_that('updateCases', {
   df <- data.frame(colA=c('A', 'B'), colB=c(1,3))
   # Update colB to 2 where colA equals "B"

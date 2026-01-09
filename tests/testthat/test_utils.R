@@ -40,24 +40,24 @@ test_that('Test createIntervals', {
 
 test_that('diffYears', {
   d <- diffYears('2024-01-01', '2025-01-01')
-  expect_equal(d, 1)
+  expect_equal(d, -1)
   d <- diffYears('20240101', '20250101')
-  expect_equal(d, 1)
+  expect_equal(d, -1)
   d <- diffYears(c('20240101', '20250101','20260210'), '20250101')
-  expect_equal(d, c(1,0,-1.11), tolerance=0.01)
+  expect_equal(d, c(-1,0,1.11), tolerance=0.01)
   d <- diffYears(c('20240101', '20250101','20260210'), c('20240101', '20250101','20260210'))
   expect_equal(d, c(0,0,0))
 })
 
 test_that('diffDays', {
   d <- diffDays('2001-01-01', '2000-12-30')
-  expect_equal(d, -2)
+  expect_equal(d, 2)
   d <- diffDays('2001-01-01', c('2000-12-30', '20010103'))
-  expect_equal(d, c(-2,2))
+  expect_equal(d, c(2,-2))
   d <- diffDays(c('2000-12-30', '20010103'), '2001-01-01')
-  expect_equal(d, c(2, -2))
+  expect_equal(d, c(-2, 2))
   d <- diffDays(c('2000-12-30', '20010103'), c('2001-01-01', '2001-01-03'))
-  expect_equal(d, c(2, 0))
+  expect_equal(d, c(-2, 0))
 })
 
 test_that('distanceBetween', {
@@ -124,6 +124,10 @@ test_that('indexAlong', {
   expect_equal(indexAlong(dta, 'A', 'B'), c(1,1,1))
   expect_equal(indexAlongUnique(dta, 'A'), c(1,1,2))
   expect_equal(indexAlongUnique(dta, 'A', 'A'), c(1,1,1))
+  expect_equal(adjacent(c(1,2,5)), 1:2)
+  expect_equal(adjacent(c(10, 1,2,5,6)), c(1:2, 5:6))
+  expect_equal(indexAlongDistance(c(1,2,3,6,8,9)), c(1,1,1,2,3,3))
+  expect_equal(indexAlongDistance(c(1,1,2,3,5)), c(1,1,1,1,2))
 })
 
 test_that('labelStrings', {
