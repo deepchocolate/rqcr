@@ -3,6 +3,11 @@ test_that('drugRegister', {
   expect_equal(attributes(a)$columns, 'Delivery')
   expect_equal(getColumn('IID', 'Norwegian'), 'lopenr')
   expect_equal(getColumn(a, 'IID'), 'Lopenummer_NPR')
+  # Logging
+  expect_equal(getLog(a), NULL)
+  a <- logExclusion(a, 'Individual', 1, 'Dislike')
+  expect_equal(getLog(a), data.frame(action='Exclusion', what='Individual', statistic=1, description='Dislike'))
+  #print(head(a))
   #print(attributes(a))
   r <- frequencyATC(a)
   expect_equal(r$Legemiddel_ATCkode_Niva4, 'N06B')
