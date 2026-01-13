@@ -140,15 +140,23 @@ mergeDataByRow <- function(..., insertColnames=T, separator=NA) {
 mergePeriods <- function (dates, days, maxDistance=0) {
   times <- diffDays(dates, first(dates))
   timesEnd <- times + days
+  # Overlapping periods: Start after end of the preceeding period
   pos <- which(times[-1] > timesEnd[-length(timesEnd)] + maxDistance)
+  # Non-overlapping periods
+  npos <- which(times[-1] <= timesEnd[-length(timesEnd)] + maxDistance)
+  # If there are no non-overlapping, stop
+  if (length(npos) == 0) return(tibble(date=dates, days=days))
+  # Split dates and days where after overlaps
   splts <- splitVector(days, pos+1)
   date <- splitVector(dates, pos+1)
+  # Take the first date of the overlapping periods
   dates <- unlist(lapply(date, FUN=first))
+  # Group and sum the days
   ids <- 1:length(splts)
   reps <- lapply(splts, FUN=length)
   ids <- rep(ids, unlist(reps))
   days <- c(tapply(days, factor(ids), FUN=sum), use.names = F)
-  tibble(date=dates, days=days)
+  mergePeriods(dates, days, maxDistance)
 }
 
 #' Update values conditionally in tabular data

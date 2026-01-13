@@ -59,6 +59,12 @@ test_that('mergePeriods', {
   dtaExp <- tibble(date=c('2000-01-01'),
                    days=c(12))
   expect_equal(mergePeriods(dta$date, dta$days, maxDistance=4), dtaExp)
+  # More complicated
+  dta <- tibble(date=c('2023-09-07','2023-09-29','2023-10-27','2023-12-12','2024-01-23','2024-03-05','2024-04-23','2024-06-11','2024-07-30','2024-09-24','2024-11-19','2025-01-14','2025-03-11'),
+                days=c(60,30,30,60,60,60,30,30,30,30,30,30,30))
+  dtaExp <- tibble(date=c('2023-09-07','2024-11-19','2025-01-14','2025-03-11'),
+                   days=c(420,30,30,30))
+  expect_equal(mergePeriods(dta$date, dta$days), dtaExp)
 })
 
 test_that('updateCases', {

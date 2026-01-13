@@ -206,7 +206,7 @@ adjacent <- function(.numbers, .distance=1) {
 #' @param .distance Determinant of adjacent numbers.
 positionsAdjacent <- function (.numbers, .distance=1) {
   pos <- which(abs(diff(.numbers)) <= .distance)
-  c(rbind(pos, pos+1))
+  unique(c(rbind(pos, pos+1)))
 }
 
 #' Get positions of distant numbers
@@ -215,7 +215,7 @@ positionsAdjacent <- function (.numbers, .distance=1) {
 #' @param .distance Determinant of distant numbers.
 positionsDistant <- function (numbers, .distance=1) {
   pos <- which(abs(diff(numbers)) > .distance)
-  c(rbind(pos, pos+1))
+  unique(c(rbind(pos, pos+1)))
 }
 #' Split a vector at positions
 #' @export

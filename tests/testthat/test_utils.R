@@ -117,14 +117,19 @@ test_that('whichTransitionsInterval', {
   expect_equal(c('G1','G1'), out$subject)
 })
 
-test_that('indexAlong', {
+test_that('indexAlong, adjacent, positionsAdjacent', {
   dta <- data.frame(A=c('A','A','B'), B=1:3)
   expect_equal(indexAlong(dta), 1:3)
   expect_equal(indexAlong(dta, 'A'), c(1,2,1))
   expect_equal(indexAlong(dta, 'A', 'B'), c(1,1,1))
   expect_equal(indexAlongUnique(dta, 'A'), c(1,1,2))
   expect_equal(indexAlongUnique(dta, 'A', 'A'), c(1,1,1))
+  expect_equal(positionsAdjacent(c(1,4,5)), c(2,3))
+  expect_equal(positionsAdjacent(4:6), 1:3)
+  expect_equal(positionsDistant(c(1,4,5)), c(1,2))
+  expect_equal(positionsDistant(4:6), numeric(0))
   expect_equal(adjacent(c(1,2,5)), 1:2)
+  expect_equal(adjacent(1:3), 1:3)
   expect_equal(adjacent(c(10, 1,2,5,6)), c(1:2, 5:6))
   expect_equal(indexAlongDistance(c(1,2,3,6,8,9)), c(1,1,1,2,3,3))
   expect_equal(indexAlongDistance(c(1,1,2,3,5)), c(1,1,1,1,2))
@@ -191,6 +196,11 @@ test_that('renameColumns', {
   # No overlap should keep everything as is
   dta3 <- data.frame(A=1,B=2)
   expect_equal(renameColumns(dta3, NO_NAMES$DRUG_REGISTER), dta3)
+})
+
+test_that('splitVector', {
+  expect_equal(splitVector(1:3, 2), list(1, 2:3))
+  expect_equal(splitVector(1:4, c(2,3)), list(1, 2, 3:4))
 })
 
 test_that('txtNPercent', {
