@@ -150,7 +150,7 @@ mergePeriods <- function (dates, days, maxDistance=0) {
   splts <- splitVector(days, pos+1)
   date <- splitVector(dates, pos+1)
   # Take the first date of the overlapping periods
-  dates <- unlist(lapply(date, FUN=first))
+  dates <- do.call(c, lapply(date, FUN=first))
   # Group and sum the days
   ids <- 1:length(splts)
   reps <- lapply(splts, FUN=length)
