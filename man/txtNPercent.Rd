@@ -4,12 +4,14 @@
 \alias{txtNPercent}
 \title{Create a string with n and percent}
 \usage{
-txtNPercent(n, N, strmask = "{n} ({percent})")
+txtNPercent(n, N, ..., strmask = "{n} ({percent})")
 }
 \arguments{
 \item{n}{A number}
 
 \item{N}{Another number}
+
+\item{...}{Arguments to \code{format}}
 
 \item{strmask}{The text to put numbers in. Must contain "\{n\}" and "\{percent\}".}
 }

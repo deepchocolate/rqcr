@@ -54,6 +54,11 @@ test_that('mergePeriods', {
   dtaExp <- tibble(date=c('2000-01-01', '2000-02-20'),
                 days=c(30, 12))
   expect_equal(mergePeriods(dta$date, dta$days), dtaExp)
+  dta <- tibble(date=c('2000-01-01', '2000-01-05', '2000-01-10'),
+                days=c(4, 4, 4))
+  dtaExp <- tibble(date=c('2000-01-01'),
+                   days=c(12))
+  expect_equal(mergePeriods(dta$date, dta$days, maxDistance=4), dtaExp)
 })
 
 test_that('updateCases', {

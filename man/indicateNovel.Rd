@@ -3,7 +3,7 @@
 \name{indicateNovel}
 \alias{indicateNovel}
 \alias{indicateNovel,factor-method}
-\alias{indicateNovel,character-method}
+\alias{indicateNovel,ANY-method}
 \alias{indicateNovel,data.frame-method}
 \title{Indicate novel elements in ordered data}
 \usage{
@@ -11,12 +11,12 @@ indicateNovel(.data, ...)
 
 \S4method{indicateNovel}{factor}(.data)
 
-\S4method{indicateNovel}{character}(.data)
+\S4method{indicateNovel}{ANY}(.data)
 
 \S4method{indicateNovel}{data.frame}(.data, times, values, ..., .name = "novel")
 }
 \arguments{
-\item{.data}{Any data object accepted by dplyr.}
+\item{.data}{Any data object accepted by dplyr}
 
 \item{...}{Grouping factors.}
 

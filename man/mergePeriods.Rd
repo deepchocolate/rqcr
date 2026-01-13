@@ -4,12 +4,14 @@
 \alias{mergePeriods}
 \title{Merge time periods}
 \usage{
-mergePeriods(.date, .days)
+mergePeriods(dates, days, maxDistance = 0)
 }
 \arguments{
-\item{.date}{Period starting date (YYYY-MM-DD)}
+\item{dates}{Period starting date (YYYY-MM-DD)}
 
-\item{.days}{Period length in days}
+\item{days}{Period length in days}
+
+\item{maxDistance}{Maximum distance between end and start of two periods for merging.}
 }
 \description{
 Merge time periods

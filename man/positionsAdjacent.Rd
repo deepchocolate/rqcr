@@ -4,12 +4,12 @@
 \alias{positionsAdjacent}
 \title{Get positions of adjacent numbers}
 \usage{
-positionsAdjacent(numbers, .distance = 1)
+positionsAdjacent(.numbers, .distance = 1)
 }
 \arguments{
-\item{.distance}{Determinant of adjacent numbers.}
-
 \item{.numbers}{A vector of numbers}
+
+\item{.distance}{Determinant of adjacent numbers.}
 }
 \description{
 Get positions of adjacent numbers

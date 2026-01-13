@@ -11,6 +11,9 @@ diffDays(datesA, datesB)
 
 \item{datesB}{A date/vector of dates.}
 }
+\value{
+\code{datesA}-\code{datesB} in days.
+}
 \description{
 Calculate difference between dates in days
 }

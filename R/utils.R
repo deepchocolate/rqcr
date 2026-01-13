@@ -211,7 +211,7 @@ positionsAdjacent <- function (.numbers, .distance=1) {
 
 #' Get positions of distant numbers
 #' @export
-#' @param .numbers A vector of numbers
+#' @param numbers A vector of numbers
 #' @param .distance Determinant of distant numbers.
 positionsDistant <- function (numbers, .distance=1) {
   pos <- which(abs(diff(numbers)) > .distance)
@@ -404,9 +404,12 @@ recodeSex <- function (x, default=NA) {
 #' Create a string with n and percent
 #' @param n A number
 #' @param N Another number
+#' @param ... Arguments to `format`
 #' @param strmask The text to put numbers in. Must contain "\{n\}" and "\{percent\}".
 #' @export
-txtNPercent <- function(n, N, strmask='{n} ({percent})') {
-  percent <- round(100*n/N, 3)
+txtNPercent <- function(n, N, ..., strmask='{n} ({percent})') {
+  percent <- 100*n/N
+  if (length(c(...)) == 0) percent <- format(percent, digits=3)
+  else percent <- format(percent, ...)
   glue::glue(strmask)
 }

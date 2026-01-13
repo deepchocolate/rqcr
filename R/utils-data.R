@@ -134,20 +134,21 @@ mergeDataByRow <- function(..., insertColnames=T, separator=NA) {
 
 #' Merge time periods
 #' @export
-#' @param .date Period starting date (YYYY-MM-DD)
-#' @param .days Period length in days
-mergePeriods <- function (.date, .days) {
-  times <- diffDays(.date, first(.date))
-  timesEnd <- times + .days
-  pos <- which(times[-1] > timesEnd[-length(timesEnd)])
-  splts <- splitVector(.days, pos+1)
-  date <- splitVector(.date, pos+1)
-  .date <- unlist(lapply(date, FUN=first))
+#' @param dates Period starting date (YYYY-MM-DD)
+#' @param days Period length in days
+#' @param maxDistance Maximum distance between end and start of two periods for merging.
+mergePeriods <- function (dates, days, maxDistance=0) {
+  times <- diffDays(dates, first(dates))
+  timesEnd <- times + days
+  pos <- which(times[-1] > timesEnd[-length(timesEnd)] + maxDistance)
+  splts <- splitVector(days, pos+1)
+  date <- splitVector(dates, pos+1)
+  dates <- unlist(lapply(date, FUN=first))
   ids <- 1:length(splts)
   reps <- lapply(splts, FUN=length)
   ids <- rep(ids, unlist(reps))
-  .days <- c(tapply(.days, factor(ids), FUN=sum), use.names = F)
-  tibble(date=.date, days=.days)
+  days <- c(tapply(days, factor(ids), FUN=sum), use.names = F)
+  tibble(date=dates, days=days)
 }
 
 #' Update values conditionally in tabular data

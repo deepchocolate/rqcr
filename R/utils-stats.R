@@ -58,9 +58,10 @@ frequencyCountDiscrete <- function (.data, ...) {
 #' Calculate percent based on counts
 #' @export
 #' @param .data Anything accepted by dplyr.
+#' @param .name Percent column name.
 #' @param .colCount Name of column with counts.
 #' @param ... Grouping variables.
-percent <- function (.data, ..., .colCount='N') {
-  .data %>% group_by(...) %>% mutate(Percent=100*!!as.name(.colCount)/sum(!!as.name(.colCount))) %>%
+percent <- function (.data, ..., .name='Percent', .colCount='N') {
+  .data %>% group_by(...) %>% mutate('{.name}':=100*!!as.name(.colCount)/sum(!!as.name(.colCount))) %>%
     ungroup()
 }
