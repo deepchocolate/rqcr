@@ -205,4 +205,5 @@ test_that('splitVector', {
 
 test_that('txtNPercent', {
   expect_equal(txtNPercent(1, 10), '1 (10)')
+  expect_equal(txtNPercent(1, 3), '1 (33.3)')
 })
