@@ -1,0 +1,10 @@
+test_that('dbConnectMany', {
+  setupDatabases()
+  dbCon <- dbDuckConnectMany(`database_a`=DIR_DB %s+% '/database-a.duckdb', `database_b`=DIR_DB %s+% '/database-b.duckdb')
+  res <- dbGetQuery(dbCon, 'SHOW DATABASES')
+  expect_equal(res$database_name, c('database_a', 'database_b', 'memory'))
+  res <- dbGetQuery(dbCon, 'SELECT * FROM database_a.tableA')
+  expect_equal(res$Var, 'A')
+  res <- dbGetQuery(dbCon, 'SELECT * FROM database_b.tableB')
+  expect_equal(res$Var, 'B')
+})

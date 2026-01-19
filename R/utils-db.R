@@ -29,9 +29,33 @@ dbCreateTypeEnum <- function (con, name, values) {
 #'
 #' @param dbFile The database file.
 #' @param read_only Connect without writing permission?
-#' @param ... Further arguments passed to `duckdb::duckdb()`.
+#' @param ... Further arguments passed to `DBI::dbConnect()`.
 dbDuckConnect <- function(dbFile, read_only=T, ...) {
-  DBI::dbConnect(duckdb::duckdb(dbdir=dbFile, read_only=read_only, ...))
+  DBI::dbConnect(duckdb::duckdb(dbdir=dbFile, read_only=read_only), ...)
+}
+
+#' Connect multiple DuckDB databases
+#' @export
+#' @details
+#' This function sets up a database from multiple DuckDB database files by creating
+#' a "main" in-memory database. Each argument to `...` must be named to give
+#' each database a name.
+#'
+#' @importFrom DBI dbConnect dbExecute
+#' @param ... Named arguments for other databases, `database-name = "database-file"`
+#' @param read_only Whether connections should be in read only mode.
+dbDuckConnectMany <- function (..., read_only=T) {
+  callExp <- match.call()
+  argList <- as.list(callExp[-1])
+  argListNames <- names(argList)
+  if (is.null(argListNames)) stop('Arguments ust be named')
+  rd <- ifelse(read_only, ' (READ_ONLY)', '')
+  dbCon <- dbConnect(duckdb:::duckdb())
+  for (nme in argListNames) {
+    fle <- eval(argList[[nme]])
+    dbExecute(dbCon, glue::glue("ATTACH '{fle}' AS {nme}{rd}"))
+  }
+  dbCon
 }
 
 #' Disconnect from a DuckDB.
