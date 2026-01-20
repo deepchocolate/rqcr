@@ -144,6 +144,21 @@ expandRange <- function (x, sep='-', align=T) {
   do.call('c', list(x, recursive=T))
 }
 
+.collapse_transformer <- function(sep='',...) {
+  function(text, envir) {
+    res <- glue::identity_transformer(text, envir)
+    res <- paste0(res, collapse=sep)
+  }
+}
+
+#' String interpolation with pre-collapsing
+#' @export
+#' @param ... Arguments to `glue::glue`.
+#' @param sep Separator of values.
+glueCollapse <- function (..., sep='') {
+  glue::glue(..., .transformer=.collapse_transformer(sep))
+}
+
 #' Find adjacent rows where a state goes from one to the next within a time frame
 #' @export
 #' @param states States corresponing to each time in `times`.
