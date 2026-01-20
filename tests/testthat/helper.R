@@ -21,12 +21,14 @@ dataPDRCreate <- function (error=F) {
 setupDatabases <- function () {
   require(duckdb)
   require(stringi)
-  dbA <- readr::read_file('data/database-a.sql')
-  dbB <- readr::read_file('data/database-b.sql')
+  require(readr)
+  dbA <- read_file('data/database-a.sql')
+  dbB <- read_file('data/database-b.sql')
   dbConA <- dbConnect(duckdb(DIR_DB %s+% '/database-a.duckdb'))
   dbConB <- dbConnect(duckdb(DIR_DB %s+% '/database-b.duckdb'))
   dbExecute(dbConA, dbA)
   dbExecute(dbConB, dbB)
   dbDisconnect(dbConA)
   dbDisconnect(dbConB)
+  DIR_DB
 }

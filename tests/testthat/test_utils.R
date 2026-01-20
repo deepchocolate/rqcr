@@ -100,8 +100,7 @@ test_that('getPrefixMatches', {
 })
 
 test_that('glueCollapse', {
-  tmp <- c('a','b')
-  expect_equal(glueCollapse('hello {tmp}', sep='-'), 'hello a-b')
+  expect_equal(glueCollapse('hello {tmp}',tmp=c('a','b'), sep='-'), 'hello a-b')
 })
 
 test_that('whichTransitionsInterval', {

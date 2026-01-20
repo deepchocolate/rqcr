@@ -1,6 +1,8 @@
 test_that('dbConnectMany', {
-  setupDatabases()
-  dbCon <- dbDuckConnectMany(`database_a`=DIR_DB %s+% '/database-a.duckdb', `database_b`=DIR_DB %s+% '/database-b.duckdb')
+  dirDB <- setupDatabases()
+  dbA <- dirDB %s+% '/database-a.duckdb'
+  dbB <- dirDB %s+% '/database-b.duckdb'
+  dbCon <- dbDuckConnectMany(`database_a`=dbA, `database_b`=dbB)
   res <- dbGetQuery(dbCon, 'SHOW DATABASES')
   expect_equal(res$database_name, c('database_a', 'database_b', 'memory'))
   res <- dbGetQuery(dbCon, 'SELECT * FROM database_a.tableA')

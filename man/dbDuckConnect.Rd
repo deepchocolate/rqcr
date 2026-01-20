@@ -11,7 +11,7 @@ dbDuckConnect(dbFile, read_only = T, ...)
 
 \item{read_only}{Connect without writing permission?}
 
-\item{...}{Further arguments passed to \code{duckdb::duckdb()}.}
+\item{...}{Further arguments passed to \code{DBI::dbConnect()}.}
 }
 \description{
 Connect to a DuckDB database
