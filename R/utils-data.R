@@ -175,17 +175,17 @@ mergePeriods <- function (dates, days, maxDistance=0) {
 updateCases <- function (.data, col, ..., .warnIfMissing=FALSE) {
   frms <- list()
     for (frm in enquos(...)) {
-      frm <- quo_get_expr(frm)
+      frmQ <- quo_get_expr(frm)
       if (typeof(.data %>% pull({{col}})) == 'character') {
-        varRhs <- rhs(frm)
-        if (is.numeric(varRhs)) rhs(frm) <- as.character(varRhs)
+        varRhs <- rhs(frmQ)
+        if (is.numeric(varRhs)) rhs(frmQ) <- as.character(varRhs)
       }
       if (.warnIfMissing | configRQCR('updateCases', 'warnings')) {
-        rows <- lhs(frm)
+        rows <- lhs(frmQ)
         nrows <- .data %>% filter(eval(rows)) %>%  nrow()
-        if (nrows == 0) warning('No rows found for ', nrows)
+        if (nrows == 0) warning('No rows found for ', frm)
       }
-    frms <- append(frms, frm)
+    frms <- append(frms, frmQ)
   }
   .data %>% mutate( "{{col}}" := case_when(!!!frms, .default = {{ col }}))
 }

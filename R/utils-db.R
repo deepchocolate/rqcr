@@ -45,8 +45,6 @@ dbDuckConnect <- function(dbFile, read_only=T, ...) {
 #' @param ... Named arguments for other databases, `database-name = "database-file"`
 #' @param read_only Whether connections should be in read only mode.
 dbDuckConnectMany <- function (..., read_only=T) {
-  #callExp <- match.call()
-  #argList <- as.list(callExp[-1])
   argList <- list(...)
   argListNames <- names(argList)
   if (is.null(argListNames)) stop('Arguments ust be named')
