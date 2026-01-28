@@ -56,8 +56,12 @@ test_that('diffDays', {
   expect_equal(d, c(2,-2))
   d <- diffDays(c('2000-12-30', '20010103'), '2001-01-01')
   expect_equal(d, c(-2, 2))
-  d <- diffDays(c('2000-12-30', '20010103'), c('2001-01-01', '2001-01-03'))
+  df <- data.frame(A=c('2000-12-30', '20010103'), B=c('2001-01-01', '2001-01-03'))
+  d <- diffDays(df$A, df$B)
   expect_equal(d, c(-2, 0))
+  df <- df %>% addDiffDays(A, B)
+  expect_equal(colnames(df), c('A','B', 'diffDaysAB'))
+  expect_equal(df$diffDaysAB, c(-2, 0))
 })
 
 test_that('distanceBetween', {

@@ -60,6 +60,17 @@ diffDays <- function (datesA, datesB) {
   interval(datesB, datesA)/days(1)
 }
 
+#' Add date difference to data frame
+#' @export
+#' @param .data Anything accepted by dplyr.
+#' @param datesA Date column.
+#' @param datesB Date column.
+#' @param .name Name of the column.
+addDiffDays <- function (.data, datesA, datesB, .name=NULL) {
+  if (is.null(.name)) .name = glue::glue('diffDays{deparse(substitute(datesA))}{deparse(substitute(datesB))}')
+  .data %>% mutate({{.name}} := diffDays({{datesA}}, {{datesB}}))
+}
+
 #' Get unique elements in data.
 #' @name elements
 #' @export
