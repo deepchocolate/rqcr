@@ -159,6 +159,12 @@ mergePeriods <- function (dates, days, maxDistance=0) {
   mergePeriods(dates, days, maxDistance)
 }
 
+setGeneric('standardizeColumns', function (.data, ...) standardGeneric('standardizeColumns'))
+setMethod('standardizeColumns', signature('data.frame'),
+          function (.data, ..., .names=NULL) {
+            .data %>% mutate(across(...,.fns=standardize, .names=.names))
+          })
+
 #' Update values conditionally in tabular data
 #' @details
 #' This function uses dplyr::case_when to perform conditional updates in data, but

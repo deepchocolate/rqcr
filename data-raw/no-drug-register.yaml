@@ -1,0 +1,35 @@
+identifiers:
+ individual: IID
+ date_dispensation: dateDelivery
+rename:
+ Legemiddel_ATCkode_Niva5: atcCode5
+ Legemiddel_ATCkode_Niva4: atcCode4
+ Lopenummer_NPR: IID
+ Pasient_DodsarManed: deceased_yearmonth
+ Pasient_Fodselsar: birthYear
+ Pasient_Kjonn_Verdi: sex
+ Refusjon_Hjemmel_Verdi: hjemmel
+ Refusjon_ICD10kode_Verdi: refICD10
+ Refusjon_ICPC2kode_Verdi: refICPC2
+ Refusjon_Refusjonspunkt_Verdi: refPunkt_verdi
+ Refusjon_Refusjonspunkt_Beskrivelse: refPunkt_beskr
+ Rekvirent_Lopenummer: rekvirent_lopenr
+ Rekvirent_KjentIdentitet: rekvirent_kjent
+ Utlevering_AntallPakninger: utlevantpakninger
+ Utlevering_Dato: dateDelivery
+ Utlevering_DDD: DDD
+ Utlevering_Resepttype_Beskrivelse: resepttype_beskr
+ Utlevering_Resepttype_Verdi: resepttype_verdi
+ Utlevering_Utleveringstype_Verdi: utlevtype_verdi
+ Vare_DDD_Enhet: DDD_unit
+ Vare_DDD_Verdi: DDD_value
+ Vare_Pakningsstorrelse: packageSize
+ Vare_Pakningsstorrelse_Enhet: packageSize_unit
+ Vare_Preparattype_Verdi: preparattype
+ Vare_Registreringstype_Verdi: registreringstype
+ Vare_Reseptgruppe_Verdi: reseptgruppe
+ Vare_Statistikkfaktor: statistikkfaktor
+ Vare_Styrke_Samlet: styrke_samlet
+ Vare_Varegruppe_Verdi: varegruppe
+ Vare_Varenavn: varenavn
+ Vare_Varenummer: varenummer

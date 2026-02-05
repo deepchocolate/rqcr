@@ -2,9 +2,8 @@ utils::globalVariables(c('English', 'atc', 'lopenr','utlevdato'))
 #' Constructor for register class
 #' @param x Tabular data.
 #' @param register The type of register.
-#' @param columns Columns in data.
-dataRegister <- function (x, register, columns) {
-  structure(x, register=register, columns=columns, logs=NULL,
+dataRegister <- function (x, register) {
+  structure(x, register=register, columns=NULL, logs=NULL,
             class=c('dataRegister', 'data.table', 'data.frame'))
 }
 setOldClass('dataRegister')
@@ -49,35 +48,56 @@ setMethod('getLog', signature('dataRegister'),
 #' @name drugRegister
 #' @export
 #' @param x Register input: a file or tabular data.
-#' @param columns Register columns.
-setGeneric('drugRegister', function (x, columns) standardGeneric('drugRegister'))
+#' @param config A configuration file in YAML format.
+setGeneric('drugRegister', function (x, config) standardGeneric('drugRegister'))
 #' @rdname drugRegister
 setMethod('drugRegister', signature('character', 'character'),
-          function (x, columns) {
-            x <- data.table::fread(x)
-            dataRegister(x, 'drugRegister', columns)
+          function (x, config) {
+            x <- drugRegister(x)
+            #cfg <- yaml::read_yaml(config)
+            configure(x, config)
           })
 #' @rdname drugRegister
-setMethod('drugRegister', signature('character'), function (x) drugRegister(x, 'Delivery'))
+setMethod('drugRegister', signature('character', 'missing'),
+          function (x) {
+            x <- data.table::fread(x)
+            dataRegister(x, 'drugRegister');
+            })
 #' @rdname drugRegister
 setMethod('drugRegister', signature('data.frame', 'character'),
-          function (x, columns) {
-            dataRegister(x, 'drugRegister', columns)
+          function (x, config) {
+            #x <- dataRegister(x, 'drugRegister')
+            x <- drugRegister(x)
+            configure(x, config)
           })
 
 #' Get column name using generic name
 #' @import dplyr
+#' @param .data A dataRegister object.
 #' @param name The generic name.
-#' @param type Currently "English" or "Norwegian"
-setGeneric('getColumn', function (name, type) standardGeneric('getColumn'))
+setGeneric('getColumn', function (.data, name) standardGeneric('getColumn'))
 setMethod('getColumn', signature('dataRegister', 'character'),
-          function (name, type) getColumn(type, attributes(name)$columns))
-setMethod('getColumn', signature('character', 'character'),
-          function (name, type) {
-            o <- NO_NAMES$DRUG_REGISTER %>% filter(English == name)
-            col <- o[,type]
-            if (length(col) == 0) stop('Column not found: ', name)
-            col
+          function (.data, name) {
+            cols <- attributes(.data)$columns
+            if (!name %in% names(cols)) stop('Column not found: ', name)
+            cols[[name]]
+          })
+setGeneric('setColumn', function (.data, name, column) standardGeneric('setColumn'))
+setMethod('setColumn', signature('dataRegister', 'character', 'character'),
+          function (.data, name, column) {
+            attributes(.data)$columns[[name]] <- column
+            .data
+          })
+
+setGeneric('configure', function (.data, file) standardGeneric('configure'))
+setMethod('configure', signature('dataRegister', 'character'),
+          function (.data, file) {
+            cfg <- yaml::read_yaml(file)
+            attributes(.data)$columns <- cfg$identifiers
+            if ('rename' %in% names(cfg)) {
+              .data <- renameColumns(.data, data.frame(Delivery=names(cfg$rename), Norwegian=unlist(cfg$rename), row.names=NULL), verbose=F)
+            }
+            .data
           })
 
 #' Calculate frequencies of ATC codes
@@ -106,6 +126,22 @@ setMethod('indexObservations', signature('dataRegister'),
           function (.data, ..., .nameIndex='i', .nameMax=NA) {
             .data[,.nameIndex] <- indexAlong(.data, ...)
             .data
+          })
+
+#' @export
+setGeneric('getMergedPeriods', function (.data, ...) standardGeneric('getMergedPeriods'))
+setMethod('getMergedPeriods', signature('dataRegister'),
+          function (.data, ...) {
+            idCol <- getColumn(.data, 'IID')
+            dateCol <- getColumn(.data, 'dateDelivery')
+            dddCol <- getColumn(.data, 'DDD')
+            .data %>% group_by(!!as.name(idCol)) %>% reframe('{idCol}' := first(!!as.name(idCol)), mergePeriods(.data[,dateCol], .data[,dddCol]))
+          })
+
+setGeneric('renameColumns', function (.data, dtaCols, english, verbose) standardGeneric('renameColumns'))
+setMethod('renameColumns', signature('dataRegister', 'data.frame','logical','logical'),
+          function (.data, dtaCols, english=F, verbose=F) {
+            renameColumnsMap(.data, dtacols, english, verbose=F)
           })
 
 setGeneric('summariseATC', function (x, ...) standardGeneric('summariseATC'))
