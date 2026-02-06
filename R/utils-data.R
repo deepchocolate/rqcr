@@ -159,10 +159,18 @@ mergePeriods <- function (dates, days, maxDistance=0) {
   mergePeriods(dates, days, maxDistance)
 }
 
-setGeneric('standardizeColumns', function (.data, ...) standardGeneric('standardizeColumns'))
+#' Standardize columns in data
+#' @export
+#' @name standardizeColumns
+#' @import dplyr
+#' @param .data Anything accepted by dplyr.
+#' @param ... Columns to standardize.
+#' @param .name Use to name the standardize column see `dplyr::across`, E.g "prefix{.col}".
+setGeneric('standardizeColumns', function (.data, ..., .names=NULL) standardGeneric('standardizeColumns'))
+#' @rdname standardizeColumns
 setMethod('standardizeColumns', signature('data.frame'),
           function (.data, ..., .names=NULL) {
-            .data %>% mutate(across(...,.fns=standardize, .names=.names))
+            .data %>% mutate(across(.cols=c(...), .fns=standardize, .names=.names))
           })
 
 #' Update values conditionally in tabular data

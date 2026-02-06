@@ -38,3 +38,13 @@ test_that('drugRegister', {
   expect_equal(periods, tibble(id=c(1,1,2), date=c('2000-01-01','2000-01-10','2020-12-30'), days=c(8,4,6)))
 
 })
+
+test_that('renameColumns', {
+  fileIn <- dataPDRCreate()
+  dta <- read.csv(FILE_NO_DR)
+  dta2 <- renameColumns(dta, NO_NAMES$DRUG_REGISTER, verbose=F)
+  expect_equal(dta2$lopenr, dta$Lopenummer_NPR)
+  # No overlap should keep everything as is
+  dta3 <- data.frame(A=1,B=2)
+  expect_equal(renameColumns(dta3, NO_NAMES$DRUG_REGISTER), dta3)
+})

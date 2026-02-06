@@ -69,6 +69,14 @@ test_that('mergePeriods', {
   expect_equal(mergePeriods(dta$date, dta$days), dtaExp)
 })
 
+test_that('standardizeColumns', {
+  df <- data.frame(A=1:3, B=1:3, C=4:6)
+  o <- standardizeColumns(df, A, B, C)
+  expect_equal(o, data.frame(A=-1:1, B=-1:1, C=-1:1))
+  df <- standardizeColumns(df, B, C)
+  expect_equal(df, data.frame(A=1:3, B=-1:1, C=-1:1))
+})
+
 test_that('updateCases', {
   df <- data.frame(colA=c('A', 'B'), colB=c(1,3))
   # Update colB to 2 where colA equals "B"

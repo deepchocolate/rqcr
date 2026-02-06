@@ -196,16 +196,6 @@ test_that('Test intersectEquals', {
   expect_false(intersectEquals(c(v, 'C'), c(v, 'c'), c(v, 'A','C')))
 })
 
-test_that('renameColumns', {
-  fileIn <- dataPDRCreate()
-  dta <- read.csv(FILE_NO_DR)
-  dta2 <- renameColumns(dta, NO_NAMES$DRUG_REGISTER, verbose=F)
-  expect_equal(dta2$lopenr, dta$Lopenummer_NPR)
-  # No overlap should keep everything as is
-  dta3 <- data.frame(A=1,B=2)
-  expect_equal(renameColumns(dta3, NO_NAMES$DRUG_REGISTER), dta3)
-})
-
 test_that('splitVector', {
   expect_equal(splitVector(1:3, 2), list(1, 2:3))
   expect_equal(splitVector(1:4, c(2,3)), list(1, 2, 3:4))
