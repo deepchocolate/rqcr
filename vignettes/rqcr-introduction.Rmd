@@ -12,8 +12,20 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+require(yaml)
 ```
 
 ```{r setup}
 library(rqcr)
+#drugRegister('path/to/file', 'drug-register-configuration.yaml')
+```
+
+The `drug-register-configuration.yaml` looks like this:
+```yaml
+identifiers:
+  individual: IID
+  dispensation_date: dateDelivery
+  dispensation_days: DDD
+rename:
+  oldName: newName
 ```

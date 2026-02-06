@@ -4,12 +4,12 @@
 \alias{getColumn}
 \title{Get column name using generic name}
 \usage{
-getColumn(name, type)
+getColumn(.data, name)
 }
 \arguments{
-\item{name}{The generic name.}
+\item{.data}{A dataRegister object.}
 
-\item{type}{Currently "English" or "Norwegian"}
+\item{name}{The generic name.}
 }
 \description{
 Get column name using generic name

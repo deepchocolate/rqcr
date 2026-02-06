@@ -65,3 +65,10 @@ percent <- function (.data, ..., .name='Percent', .colCount='N') {
   .data %>% group_by(...) %>% mutate('{.name}':=100*!!as.name(.colCount)/sum(!!as.name(.colCount))) %>%
     ungroup()
 }
+
+#' Standardize a variable to mean zero and unit variance
+#' @param x A numeric vector.
+#' @param na.rm Whether to remove missing values.
+standardize <- function (x, na.rm=T) {
+  (x - mean(x, na.rm=na.rm))/stats::sd(x, na.rm=na.rm)
+}

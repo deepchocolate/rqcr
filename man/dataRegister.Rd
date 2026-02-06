@@ -4,14 +4,12 @@
 \alias{dataRegister}
 \title{Constructor for register class}
 \usage{
-dataRegister(x, register, columns)
+dataRegister(x, register)
 }
 \arguments{
 \item{x}{Tabular data.}
 
 \item{register}{The type of register.}
-
-\item{columns}{Columns in data.}
 }
 \description{
 Constructor for register class

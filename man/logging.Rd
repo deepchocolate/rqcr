@@ -2,12 +2,25 @@
 % Please edit documentation in R/class-registerdata.R
 \name{logging}
 \alias{logging}
+\alias{logExclusion}
+\alias{logExclusion,dataRegister,character,numeric-method}
 \alias{logCheckpoint}
+\alias{logCheckpoint,dataRegister,character,numeric-method}
+\alias{getLog}
+\alias{getLog,dataRegister-method}
 \title{Logging}
 \usage{
 logExclusion(x, what, statistic, description)
 
+\S4method{logExclusion}{dataRegister,character,numeric}(x, what, statistic, description)
+
 logCheckpoint(x, what, statistic, description)
+
+\S4method{logCheckpoint}{dataRegister,character,numeric}(x, what, statistic, description)
+
+getLog(x)
+
+\S4method{getLog}{dataRegister}(x)
 }
 \arguments{
 \item{x}{A \code{dataRegister} object.}

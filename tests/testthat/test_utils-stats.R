@@ -53,3 +53,8 @@ test_that('percent', {
   o <- df %>% percent(A)
   expect_equal(o$Percent, c(50,50,100))
 })
+
+test_that('standardize', {
+  x <- 1:3
+  expect_equal(standardize(x), -1:1)
+})

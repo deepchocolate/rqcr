@@ -1,3 +1,5 @@
+#' @import dplyr
+NULL
 utils::globalVariables(c('English', 'atc', 'lopenr','utlevdato'))
 #' Constructor for register class
 #' @param x Tabular data.
@@ -15,6 +17,7 @@ logMessage <- function (action, what, statistic, description, df=NULL) {
 
 #' Logging
 #' @name logging
+#' @aliases logExclusion
 #' @export
 #' @description
 #' Functions to log operations on data.
@@ -24,6 +27,7 @@ logMessage <- function (action, what, statistic, description, df=NULL) {
 #' @param statistic Number of exclusions.
 #' @param description A description of the exclusion.
 setGeneric('logExclusion', function (x, what, statistic, description) standardGeneric('logExclusion'))
+#' @rdname logging
 setMethod('logExclusion', signature('dataRegister', 'character', 'numeric', 'ANY'),
           function (x, what, statistic, description) {
             attributes(x)$logs <- logMessage('Exclusion', what, statistic, description, attributes(x)$logs)
@@ -33,12 +37,17 @@ setMethod('logExclusion', signature('dataRegister', 'character', 'numeric', 'ANY
 #' @export
 #' @rdname logging
 setGeneric('logCheckpoint', function (x, what, statistic, description) standardGeneric('logCheckpoint'))
+#' @rdname logging
 setMethod('logCheckpoint', signature('dataRegister', 'character', 'numeric', 'ANY'),
           function (x, what, statistic, description) {
             attributes(x)$logs <- logMessage('Checkpoint', what, statistic, description, attributes(x)$logs)
             x
           })
+
+#' @export
+#' @rdname logging
 setGeneric('getLog', function (x) standardGeneric('getLog'))
+#' @rdname logging
 setMethod('getLog', signature('dataRegister'),
           function (x) {
             attributes(x)$logs
@@ -54,21 +63,24 @@ setGeneric('drugRegister', function (x, config) standardGeneric('drugRegister'))
 setMethod('drugRegister', signature('character', 'character'),
           function (x, config) {
             x <- drugRegister(x)
-            #cfg <- yaml::read_yaml(config)
             configure(x, config)
           })
 #' @rdname drugRegister
 setMethod('drugRegister', signature('character', 'missing'),
           function (x) {
             x <- data.table::fread(x)
-            dataRegister(x, 'drugRegister');
+            drugRegister(x)
             })
 #' @rdname drugRegister
 setMethod('drugRegister', signature('data.frame', 'character'),
           function (x, config) {
-            #x <- dataRegister(x, 'drugRegister')
             x <- drugRegister(x)
             configure(x, config)
+          })
+#' @rdname drugRegister
+setMethod('drugRegister', signature('data.frame', 'missing'),
+          function (x) {
+            dataRegister(x, 'drugRegister')
           })
 
 #' Get column name using generic name
@@ -89,7 +101,13 @@ setMethod('setColumn', signature('dataRegister', 'character', 'character'),
             .data
           })
 
+#' Configure a `dataRegister` object
+#' @export
+#' @name configure
+#' @param .data A `dataRegister` object.
+#' @param file A yaml file with configuration.
 setGeneric('configure', function (.data, file) standardGeneric('configure'))
+#' @rdname configure
 setMethod('configure', signature('dataRegister', 'character'),
           function (.data, file) {
             cfg <- yaml::read_yaml(file)
@@ -128,20 +146,73 @@ setMethod('indexObservations', signature('dataRegister'),
             .data
           })
 
+#' Merge dispensed drugs into non-overlapping treatment periods
 #' @export
+#' @aliases getMergedPeriods
+#' @name mergePeriods
+#' @seealso [mergePeriods()]
+#' @param .data Anything accepted by dplyr.
+#' @param ... arguments to `mergePeriods`.
 setGeneric('getMergedPeriods', function (.data, ...) standardGeneric('getMergedPeriods'))
+#' @rdname mergePeriods
 setMethod('getMergedPeriods', signature('dataRegister'),
           function (.data, ...) {
-            idCol <- getColumn(.data, 'IID')
-            dateCol <- getColumn(.data, 'dateDelivery')
-            dddCol <- getColumn(.data, 'DDD')
-            .data %>% group_by(!!as.name(idCol)) %>% reframe('{idCol}' := first(!!as.name(idCol)), mergePeriods(.data[,dateCol], .data[,dddCol]))
+            idCol <- getColumn(.data, 'individual')
+            dateCol <- getColumn(.data, 'dispensation_date')
+            dddCol <- getColumn(.data, 'dispensation_days')
+            .data %>% group_by(!!as.name(idCol)) %>% reframe('{idCol}' := first(!!as.name(idCol)), mergePeriods(.data[[dateCol]], .data[[dddCol]], ...))
           })
 
-setGeneric('renameColumns', function (.data, dtaCols, english, verbose) standardGeneric('renameColumns'))
-setMethod('renameColumns', signature('dataRegister', 'data.frame','logical','logical'),
+renameColumnsMap <- function (dta, dtaCols, english=F, verbose=T) {
+  cnames <- colnames(dta)
+  # Indices in Delivery
+  overl <- match(cnames, dtaCols$Delivery)
+  # Positions in data columns
+  inx <- 1:length(overl)
+  colMissing <- is.na(overl)
+  # Columns not present in renaming map
+  novel <- inx[colMissing]
+  # Remove positions that are not present in the mapping as they should not be renamed
+  if (any(is.na(overl))) inx <- inx[!colMissing]
+  overl <- stats::na.omit(overl)
+  # If no overlap exists, just return data
+  if (!any(overl)) return(dta)
+  # Choose language
+  if (english) colsNew <- dtaCols$English
+  else colsNew <- dtaCols$Norwegian
+  # Replace any empty entries with their default names (mainly for English)
+  colsEmpty <- colsNew == ''
+  if (any(colsEmpty)) colsNew[colsEmpty] <- dtaCols$Norwegian[colsEmpty]
+  listOldNames <- cnames
+  cnames[inx] <- colsNew[overl]
+  listNewNames <- cnames
+  listNewNames[novel] <- ''
+  listNewNames <- c('CHANGE', listNewNames)
+  listOldNames <- c('COLUMN', listOldNames)
+  mx <- max(nchar(listOldNames))
+  mx2 <- max(nchar(listNewNames))
+  if (verbose) message(stringi::stri_sprintf(paste0('%',mx,'s \t %-',mx2,'s\n'), listOldNames, listNewNames))
+  colnames(dta) <- cnames
+  dta
+}
+
+#' Rename columns in a `dataRegister` object
+#' @export
+#' @rdname renameColumns
+#' @param .data A `dataRegister` object.
+#' @param dtaCols A table with column names.
+#' @param english Whether to use English names.
+#' @param verbose Whether to output information.
+setGeneric('renameColumns', function (.data, dtaCols, english=F, verbose=F) standardGeneric('renameColumns'))
+#' @rdname renameColumns
+setMethod('renameColumns', signature('dataRegister', 'data.frame'),
           function (.data, dtaCols, english=F, verbose=F) {
-            renameColumnsMap(.data, dtacols, english, verbose=F)
+            renameColumnsMap(.data, dtaCols, english=english, verbose=verbose)
+          })
+#' @rdname renameColumns
+setMethod('renameColumns', signature('data.frame', 'data.frame'),
+          function (.data, dtaCols, english=F, verbose=F) {
+            renameColumnsMap(.data, dtaCols, english=english, verbose=verbose)
           })
 
 setGeneric('summariseATC', function (x, ...) standardGeneric('summariseATC'))

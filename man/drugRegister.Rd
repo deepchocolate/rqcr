@@ -3,22 +3,25 @@
 \name{drugRegister}
 \alias{drugRegister}
 \alias{drugRegister,character,character-method}
-\alias{drugRegister,character,ANY-method}
+\alias{drugRegister,character,missing-method}
 \alias{drugRegister,data.frame,character-method}
+\alias{drugRegister,data.frame,missing-method}
 \title{Create object for the drug register}
 \usage{
-drugRegister(x, columns)
+drugRegister(x, config)
 
-\S4method{drugRegister}{character,character}(x, columns)
+\S4method{drugRegister}{character,character}(x, config)
 
-\S4method{drugRegister}{character,ANY}(x)
+\S4method{drugRegister}{character,missing}(x)
 
-\S4method{drugRegister}{data.frame,character}(x, columns)
+\S4method{drugRegister}{data.frame,character}(x, config)
+
+\S4method{drugRegister}{data.frame,missing}(x)
 }
 \arguments{
 \item{x}{Register input: a file or tabular data.}
 
-\item{columns}{Register columns.}
+\item{config}{A configuration file in YAML format.}
 }
 \description{
 Create object for the drug register
