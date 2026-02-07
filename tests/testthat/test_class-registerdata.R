@@ -9,8 +9,7 @@ test_that('drugRegister', {
   expect_equal(getLog(a), NULL)
   a <- logExclusion(a, 'Individual', 1, 'Dislike')
   expect_equal(getLog(a), data.frame(action='Exclusion', what='Individual', statistic=1, description='Dislike'))
-  #print(head(a))
-  #print(attributes(a))
+
   # Error because the atc code identifier (column) is not set
   expect_error(frequencyATC(a))
   a <- setColumn(a, 'atcCode4', 'atcCode4')
@@ -18,7 +17,7 @@ test_that('drugRegister', {
   expect_equal(r$atcCode4, 'N06B')
   expect_equal(r$N, 4)
   expect_equal(r$Percent, 100)
-  a <- renameColumns(a, NO_NAMES$DRUG_REGISTER, T, F)
+  a <- renameColumns(a, NO_NAMES$DRUG_REGISTER$English, NO_NAMES$DRUG_REGISTER$Delivery, F)
   # Index observations
   a <- a %>% indexObservations()
   expect_equal(a$i, 1:4)
@@ -42,9 +41,9 @@ test_that('drugRegister', {
 test_that('renameColumns', {
   fileIn <- dataPDRCreate()
   dta <- read.csv(FILE_NO_DR)
-  dta2 <- renameColumns(dta, NO_NAMES$DRUG_REGISTER, verbose=F)
+  dta2 <- renameColumns(dta, NO_NAMES$DRUG_REGISTER$Norwegian, NO_NAMES$DRUG_REGISTER$Delivery, verbose=F)
   expect_equal(dta2$lopenr, dta$Lopenummer_NPR)
   # No overlap should keep everything as is
   dta3 <- data.frame(A=1,B=2)
-  expect_equal(renameColumns(dta3, NO_NAMES$DRUG_REGISTER), dta3)
+  expect_equal(renameColumns(dta3, NO_NAMES$DRUG_REGISTER$Norwegian, NO_NAMES$DRUG_REGISTER$Delivery), dta3)
 })

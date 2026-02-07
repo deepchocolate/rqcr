@@ -165,7 +165,7 @@ mergePeriods <- function (dates, days, maxDistance=0) {
 #' @import dplyr
 #' @param .data Anything accepted by dplyr.
 #' @param ... Columns to standardize.
-#' @param .name Use to name the standardize column see `dplyr::across`, E.g "prefix{.col}".
+#' @param .names Use to name the standardize column see `dplyr::across`, E.g `"prefix{.col}"`.
 setGeneric('standardizeColumns', function (.data, ..., .names=NULL) standardGeneric('standardizeColumns'))
 #' @rdname standardizeColumns
 setMethod('standardizeColumns', signature('data.frame'),

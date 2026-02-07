@@ -113,7 +113,7 @@ setMethod('configure', signature('dataRegister', 'character'),
             cfg <- yaml::read_yaml(file)
             attributes(.data)$columns <- cfg$identifiers
             if ('rename' %in% names(cfg)) {
-              .data <- renameColumns(.data, data.frame(Delivery=names(cfg$rename), Norwegian=unlist(cfg$rename), row.names=NULL), verbose=F)
+              .data <- renameColumns(.data, unlist(cfg$rename, use.names=F), names(cfg$rename), verbose=F)
             }
             .data
           })
@@ -163,10 +163,15 @@ setMethod('getMergedPeriods', signature('dataRegister'),
             .data %>% group_by(!!as.name(idCol)) %>% reframe('{idCol}' := first(!!as.name(idCol)), mergePeriods(.data[[dateCol]], .data[[dddCol]], ...))
           })
 
-renameColumnsMap <- function (dta, dtaCols, english=F, verbose=T) {
+#' Rename columns in data
+#' @param dta A data.frame.
+#' @param colsName New column names.
+#' @param colsRename Columns to rename.
+#' @param verbose Control information output.
+renameColumnsMap <- function (dta, colsName, colsRename=NULL, verbose=T) {
   cnames <- colnames(dta)
   # Indices in Delivery
-  overl <- match(cnames, dtaCols$Delivery)
+  overl <- match(cnames, colsRename)
   # Positions in data columns
   inx <- 1:length(overl)
   colMissing <- is.na(overl)
@@ -176,13 +181,14 @@ renameColumnsMap <- function (dta, dtaCols, english=F, verbose=T) {
   if (any(is.na(overl))) inx <- inx[!colMissing]
   overl <- stats::na.omit(overl)
   # If no overlap exists, just return data
-  if (!any(overl)) return(dta)
-  # Choose language
-  if (english) colsNew <- dtaCols$English
-  else colsNew <- dtaCols$Norwegian
+  if (!any(overl)) {
+    if (verbose) message('No columns to rename provided')
+    return(dta)
+  }
+  colsNew <- colsName
   # Replace any empty entries with their default names (mainly for English)
   colsEmpty <- colsNew == ''
-  if (any(colsEmpty)) colsNew[colsEmpty] <- dtaCols$Norwegian[colsEmpty]
+  if (any(colsEmpty)) colsNew[colsEmpty] <- cnames[colsEmpty]
   listOldNames <- cnames
   cnames[inx] <- colsNew[overl]
   listNewNames <- cnames
@@ -200,19 +206,19 @@ renameColumnsMap <- function (dta, dtaCols, english=F, verbose=T) {
 #' @export
 #' @rdname renameColumns
 #' @param .data A `dataRegister` object.
-#' @param dtaCols A table with column names.
-#' @param english Whether to use English names.
+#' @param colsNew Vector with new column names.
+#' @param colsRename Vector with column names to change.
 #' @param verbose Whether to output information.
-setGeneric('renameColumns', function (.data, dtaCols, english=F, verbose=F) standardGeneric('renameColumns'))
+setGeneric('renameColumns', function (.data, colsNew, colsRename=NULL, verbose=F) standardGeneric('renameColumns'))
 #' @rdname renameColumns
-setMethod('renameColumns', signature('dataRegister', 'data.frame'),
-          function (.data, dtaCols, english=F, verbose=F) {
-            renameColumnsMap(.data, dtaCols, english=english, verbose=verbose)
+setMethod('renameColumns', signature('dataRegister', 'character', 'character'),
+          function (.data, colsNew, colsRename=NULL, verbose=F) {
+            renameColumnsMap(.data, colsNew, colsRename, verbose=verbose)
           })
 #' @rdname renameColumns
-setMethod('renameColumns', signature('data.frame', 'data.frame'),
-          function (.data, dtaCols, english=F, verbose=F) {
-            renameColumnsMap(.data, dtaCols, english=english, verbose=verbose)
+setMethod('renameColumns', signature('data.frame', 'character', 'character'),
+          function (.data, colsNew, colsRename=NULL, verbose=F) {
+            renameColumnsMap(.data, colsNew, colsRename, verbose=verbose)
           })
 
 setGeneric('summariseATC', function (x, ...) standardGeneric('summariseATC'))

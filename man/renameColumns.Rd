@@ -2,22 +2,22 @@
 % Please edit documentation in R/class-registerdata.R
 \name{renameColumns}
 \alias{renameColumns}
-\alias{renameColumns,dataRegister,data.frame-method}
-\alias{renameColumns,data.frame,data.frame-method}
+\alias{renameColumns,dataRegister,character,character-method}
+\alias{renameColumns,data.frame,character,character-method}
 \title{Rename columns in a \code{dataRegister} object}
 \usage{
-renameColumns(.data, dtaCols, english = F, verbose = F)
+renameColumns(.data, colsNew, colsRename = NULL, verbose = F)
 
-\S4method{renameColumns}{dataRegister,data.frame}(.data, dtaCols, english = F, verbose = F)
+\S4method{renameColumns}{dataRegister,character,character}(.data, colsNew, colsRename = NULL, verbose = F)
 
-\S4method{renameColumns}{data.frame,data.frame}(.data, dtaCols, english = F, verbose = F)
+\S4method{renameColumns}{data.frame,character,character}(.data, colsNew, colsRename = NULL, verbose = F)
 }
 \arguments{
 \item{.data}{A \code{dataRegister} object.}
 
-\item{dtaCols}{A table with column names.}
+\item{colsNew}{Vector with new column names.}
 
-\item{english}{Whether to use English names.}
+\item{colsRename}{Vector with column names to change.}
 
 \item{verbose}{Whether to output information.}
 }
