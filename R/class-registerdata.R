@@ -8,7 +8,7 @@ dataRegister <- function (x, register) {
   structure(x, register=register, columns=NULL, logs=NULL,
             class=c('dataRegister', 'data.table', 'data.frame'))
 }
-setOldClass('dataRegister')
+setOldClass(c('dataRegister', 'data.table','data.frame'))
 
 logMessage <- function (action, what, statistic, description, df=NULL) {
   rbind(df,
