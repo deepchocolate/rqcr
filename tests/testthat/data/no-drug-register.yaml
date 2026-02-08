@@ -2,6 +2,7 @@ identifiers:
  individual: IID
  dispensation_date: dateDelivery
  dispensation_days: DDD
+ code_atc: atcCode4
 
 rename:
  Legemiddel_ATCkode_Niva5: atcCode5

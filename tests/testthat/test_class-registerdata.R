@@ -10,9 +10,15 @@ test_that('drugRegister', {
   a <- logExclusion(a, 'Individual', 1, 'Dislike')
   expect_equal(getLog(a), data.frame(action='Exclusion', what='Individual', statistic=1, description='Dislike'))
 
-  # Error because the atc code identifier (column) is not set
+  # Exclusions
+  expect_equal(getExclusions(a), NULL)
+  a <- addExclusion(a, 'IID', 'I1', 'Test')
+  expect_equal(getExclusions(a), tibble(column='IID', value='I1', description='Test'))
+
+  # Error because the atc code identifier (column) is misset
+  a <- setColumn(a, 'code_atc', 'atcCode')
   expect_error(frequencyATC(a))
-  a <- setColumn(a, 'atcCode4', 'atcCode4')
+  a <- setColumn(a, 'code_atc', 'atcCode4')
   r <- frequencyATC(a)
   expect_equal(r$atcCode4, 'N06B')
   expect_equal(r$N, 4)

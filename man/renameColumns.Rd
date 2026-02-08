@@ -2,13 +2,10 @@
 % Please edit documentation in R/class-registerdata.R
 \name{renameColumns}
 \alias{renameColumns}
-\alias{renameColumns,dataRegister,character,character-method}
 \alias{renameColumns,data.frame,character,character-method}
 \title{Rename columns in a \code{dataRegister} object}
 \usage{
 renameColumns(.data, colsNew, colsRename = NULL, verbose = F)
-
-\S4method{renameColumns}{dataRegister,character,character}(.data, colsNew, colsRename = NULL, verbose = F)
 
 \S4method{renameColumns}{data.frame,character,character}(.data, colsNew, colsRename = NULL, verbose = F)
 }

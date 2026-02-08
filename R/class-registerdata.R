@@ -5,7 +5,7 @@ utils::globalVariables(c('English', 'atc', 'lopenr','utlevdato'))
 #' @param x Tabular data.
 #' @param register The type of register.
 dataRegister <- function (x, register) {
-  structure(x, register=register, columns=NULL, logs=NULL,
+  structure(x, register=register, columns=NULL, logs=NULL, exclusion=NULL,
             class=c('dataRegister', 'data.table', 'data.frame'))
 }
 setOldClass(c('dataRegister', 'data.table','data.frame'))
@@ -14,6 +14,32 @@ logMessage <- function (action, what, statistic, description, df=NULL) {
   rbind(df,
         data.frame(action=action, what=what, statistic=statistic, description=description))
 }
+
+#' Add exclusion
+#' @export
+#' @import tibble
+#'
+#' @param .data A data frame.
+#' @param column Column with values to exclude.
+#' @param value Values in `column` to exclude.
+#' @param description A description of the exclusion
+setGeneric('addExclusion', function (.data, column, value, description=NULL) standardGeneric('addExclusion'))
+setMethod('addExclusion', signature('dataRegister'),
+          function (.data, column, value, description=NULL) {
+            tmp <- attributes(.data)$exclusion
+            tmp <- tibble(column=column, value=value, description=description) %>% bind_rows(tmp)
+            attributes(.data)$exclusion <- tmp
+            .data
+          })
+
+#' Get exclusions
+#'
+#' @param .data A data frame.
+setGeneric('getExclusions', function (.data) standardGeneric('getExclusions'))
+setMethod('getExclusions', signature('dataRegister'),
+          function (.data) {
+            attributes(.data)$exclusion
+          })
 
 #' Logging
 #' @name logging
@@ -127,7 +153,7 @@ setGeneric('frequencyATC', function (x, ...) standardGeneric('frequencyATC'))
 #' @rdname frequencyATC
 setMethod('frequencyATC', signature('dataRegister'),
           function (x, ...) {
-            col <- getColumn(x, 'atcCode4')
+            col <- getColumn(x, 'code_atc')
             x %>% frequencyCountDiscrete( !!as.name(col), ... )
           })
 
@@ -210,11 +236,6 @@ renameColumnsMap <- function (dta, colsName, colsRename=NULL, verbose=T) {
 #' @param colsRename Vector with column names to change.
 #' @param verbose Whether to output information.
 setGeneric('renameColumns', function (.data, colsNew, colsRename=NULL, verbose=F) standardGeneric('renameColumns'))
-#' @rdname renameColumns
-setMethod('renameColumns', signature('dataRegister', 'character', 'character'),
-          function (.data, colsNew, colsRename=NULL, verbose=F) {
-            renameColumnsMap(.data, colsNew, colsRename, verbose=verbose)
-          })
 #' @rdname renameColumns
 setMethod('renameColumns', signature('data.frame', 'character', 'character'),
           function (.data, colsNew, colsRename=NULL, verbose=F) {
