@@ -6,9 +6,9 @@ utils::globalVariables(c('English', 'atc', 'lopenr','utlevdato'))
 #' @param register The type of register.
 dataRegister <- function (x, register) {
   structure(x, register=register, columns=NULL, logs=NULL, exclusion=NULL,
-            class=c('dataRegister', 'data.table', 'data.frame'))
+            class=c('dataRegister', class(x)))
 }
-setOldClass(c('dataRegister', 'data.table','data.frame'))
+setOldClass(c('dataRegister', 'data.table','data.frame', 'tibble'))
 
 logMessage <- function (action, what, statistic, description, df=NULL) {
   rbind(df,
@@ -39,6 +39,13 @@ setGeneric('getExclusions', function (.data) standardGeneric('getExclusions'))
 setMethod('getExclusions', signature('dataRegister'),
           function (.data) {
             attributes(.data)$exclusion
+          })
+
+setGeneric('applyExclusions', function (.data) standardGeneric('applyExclusions'))
+setMethod('getExclusions', signature('dataRegister'),
+          function (.data) {
+            tmp <- attributes(.data)$exclusion
+            #pivot_wider
           })
 
 #' Logging
