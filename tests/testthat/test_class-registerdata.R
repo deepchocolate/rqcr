@@ -42,6 +42,20 @@ test_that('drugRegister', {
   periods <- getMergedPeriods(a)
   expect_equal(periods, tibble(id=c(1,1,2), date=c('2000-01-01','2000-01-10','2020-12-30'), days=c(8,4,6)))
 
+  ### Illustrate some issues with certain operations, notable change of class when grouping in dplyr
+  # Class is preserved with bind_rows
+  a <- drugRegister(tibble(A=1:3, B=1))
+  expect_equal(class(a), c('dataRegister', 'tbl_df', 'tbl', 'data.frame'))
+  a <- a %>% bind_rows(data.frame(A=4,B=2))
+  expect_equal(class(a), c('dataRegister', 'tbl_df', 'tbl', 'data.frame'))
+  a <- data.frame(A=1:3, B=1)
+  a <- drugRegister(a)
+  a <- logCheckpoint(a, 'Test', 1, 'Test')
+  expect_equal(class(a), c('dataRegister', 'data.frame'))
+  # Class and its attributes is lost when using group by
+  a <- a %>% arrange(A) %>% group_by(A) %>% ungroup()
+  expect_equal(class(a), c('tbl_df', 'tbl', 'data.frame'))
+  expect_error(getLog(a))
 })
 
 test_that('renameColumns', {
