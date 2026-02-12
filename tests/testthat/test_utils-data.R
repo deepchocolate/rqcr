@@ -49,11 +49,14 @@ test_that('splitDataByRow, mergeDataByRow', {
 })
 
 test_that('mergePeriods', {
-  dta <- tibble(date=c('2000-01-01', '2000-01-05', '2000-01-10', '2000-02-20','2000-02-22'),
-                days=c(10, 10, 10, 10, 2))
-  dtaExp <- tibble(date=c('2000-01-01', '2000-02-20'),
-                days=c(30, 12))
+  dta <- tibble(date=c('2000-01-01', '2000-01-05', '2000-01-10', '2000-02-20','2000-02-22', '2000-04-01','2000-04-01'),
+                days=c(10, 10, 10, 10, 2, 4, 3))
+  dtaExp <- tibble(date=c('2000-01-01', '2000-02-20', '2000-04-01'),
+                days=c(30, 12, 7))
   expect_equal(mergePeriods(dta$date, dta$days), dtaExp)
+  # With option reset=T
+  dtaExp <- tibble(date=c('2000-01-01', '2000-02-20', '2000-04-01'), days=c(19, 4, 3.5))
+  expect_equal(mergePeriods(dta$date, dta$days, reset=T), dtaExp)
   dta <- tibble(date=c('2000-01-01', '2000-01-05', '2000-01-10'),
                 days=c(4, 4, 4))
   dtaExp <- tibble(date=c('2000-01-01'),

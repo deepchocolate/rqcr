@@ -137,12 +137,19 @@ mergeDataByRow <- function(..., insertColnames=T, separator=NA) {
 #' @param dates Period starting date (YYYY-MM-DD)
 #' @param days Period length in days
 #' @param maxDistance Maximum distance between end and start of two periods for merging.
-mergePeriods <- function (dates, days, maxDistance=0) {
+#' @param reset Whether to add the overlapping time between two periods at then end of the merged period.
+mergePeriods <- function (dates, days, maxDistance=0, reset=F, resetFun=mean) {
   times <- diffDays(dates, first(dates))
   timesEnd <- times + days
-  # Overlapping periods: Start after end of the preceeding period
+  # Reset days for overlapping periods (except the end): No stockpiling
+  if (reset == T) {
+    pos <- which(timesEnd[-length(timesEnd)] > times[-1])
+    timesEnd[pos] <- diff(times)[pos]
+    days[pos] <- diff(times)[pos]
+  }
+  # Split positions for Overlapping periods: Start before end of the preceeding period
   pos <- which(times[-1] > timesEnd[-length(timesEnd)] + maxDistance)
-  # Non-overlapping periods
+  # Split positions for non-overlapping periods
   npos <- which(times[-1] <= timesEnd[-length(timesEnd)] + maxDistance)
   # If there are no non-overlapping, stop
   if (length(npos) == 0) return(tibble(date=dates, days=days))
@@ -156,7 +163,7 @@ mergePeriods <- function (dates, days, maxDistance=0) {
   reps <- lapply(splts, FUN=length)
   ids <- rep(ids, unlist(reps))
   days <- c(tapply(days, factor(ids), FUN=sum), use.names = F)
-  mergePeriods(dates, days, maxDistance)
+  mergePeriods(dates, days, maxDistance, reset)
 }
 
 #' Standardize columns in data
