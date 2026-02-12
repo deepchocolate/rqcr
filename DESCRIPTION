@@ -16,7 +16,7 @@ Imports:
     formula.tools (>= 1.7.0),
     glue (>= 1.8.0),
     lubridate (>= 1.9.0),
-    methods (>= 4.5.0),
+    methods (>= 4.4.0),
     readxl (>= 1.4.0),
     rio (>= 1.2.0),
     rlang (>= 1.1.0),
