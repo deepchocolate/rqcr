@@ -126,13 +126,15 @@ test_that('whichTransitionsInterval', {
 })
 
 test_that('indexAlong, adjacent, positionsAdjacent', {
-  dta <- data.frame(A=c('A','A','B'), B=1:3)
-  expect_equal(indexAlong(dta), 1:3)
+  dta <- data.frame(A=c('A','A','B'), B=1:3, C=c('a','b', 'c'))
   expect_equal(indexAlong(dta), 1:3)
   expect_equal(indexAlong(tibble(dta), 'A'), c(1,2,1))
   expect_equal(indexAlong(dta, 'A', 'B'), c(1,1,1))
-  expect_equal(indexAlongUnique(dta, 'A'), c(1,1,2))
-  expect_equal(indexAlongUnique(dta, 'A', 'A'), c(1,1,1))
+  # indexAlongUnique
+  expect_equal(indexAlongUnique(dta, A), c(1,1,2))
+  expect_equal(indexAlongUnique(dta, A, A), c(1,1,1))
+  expect_equal(indexAlongUnique(dta, B, A), c(1,2,1))
+  # positions ...
   expect_equal(positionsAdjacent(c(1,4,5)), c(2,3))
   expect_equal(positionsAdjacent(4:6), 1:3)
   expect_equal(positionsDistant(c(1,4,5)), c(1,2))

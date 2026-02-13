@@ -202,20 +202,32 @@ indexAlong <- function (dta, ...) {
 #' @export
 #' @seealso [indexAlong()]
 #' @importFrom stats ave
-#' @param dta A data frame or similar.
-#' @param col The column to index
-#' @param ... Columns in `dta` to group over.
-indexAlongUnique <- function (dta, col, ...) {
-  grps <- c(...)
-  if (length(grps) == 0) {
-    o <- as.integer(factor(dta[,col], labels=1:length(unique(dta[,col]))))
-    return(o)
-  }
-  as.integer(ave(dta[,col], dta[,grps], FUN=function (x) {
-    o <- factor(x, labels=1:length(unique(x)))
-    as.integer(o)
-  }))
-}
+#' @details
+#' `indexAlongUnique` creates an integer index for each unique observation in a
+#' vector of values. The operation can be performed within groups by passing the
+#' columns forming groups in `...`.
+#'
+#' @examples
+#' a <- data.frame(A=c('A','A', 'B'), B=1:3)
+#' indexAlongUnique(a, A)
+#' # 1, 1, 2
+#' indexAlongUnique(a, B, A)
+#' # 1, 2, 1
+#'
+#' @param .data A data frame or similar.
+#' @param col The column to index unique elements in.
+#' @param ... Columns in `.data` to group over.
+setGeneric('indexAlongUnique', function (.data, col, ...) standardGeneric('indexAlongUnique'))
+setMethod('indexAlongUnique', signature('integer'), function (.data) indexAlongUnique(as.character(.data)))
+setMethod('indexAlongUnique', signature('character'),
+          function (.data) as.integer(factor(.data, labels=1:length(unique(.data)))))
+setMethod('indexAlongUnique', signature('data.frame'),
+          function (.data, col, ...) {
+            col <- deparse(substitute(col))
+            if (...length() == 0) grps <- 1
+            else grps <- .data %>% select(...)
+            as.integer(ave(.data[,col], grps, FUN=indexAlongUnique))
+          })
 
 #' Get adjacent numbers
 #' @export

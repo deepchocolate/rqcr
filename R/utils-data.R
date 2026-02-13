@@ -138,7 +138,16 @@ mergeDataByRow <- function(..., insertColnames=T, separator=NA) {
 #' @param days Period length in days
 #' @param maxDistance Maximum distance between end and start of two periods for merging.
 #' @param reset Whether to add the overlapping time between two periods at then end of the merged period.
+#' @param resetFun A callable to use for dates with multiple days provided.
 mergePeriods <- function (dates, days, maxDistance=0, reset=F, resetFun=mean) {
+  if (reset == T) {
+    posSameDates <- which(dates[-length(dates)] == dates[-1])
+    if (length(posSameDates) > 0) {
+      days <- ave(days, dates, FUN=resetFun)
+      dates <- dates[-(posSameDates+1)]
+      days <- days[-(posSameDates + 1)]
+    }
+  }
   times <- diffDays(dates, first(dates))
   timesEnd <- times + days
   # Reset days for overlapping periods (except the end): No stockpiling
@@ -163,7 +172,7 @@ mergePeriods <- function (dates, days, maxDistance=0, reset=F, resetFun=mean) {
   reps <- lapply(splts, FUN=length)
   ids <- rep(ids, unlist(reps))
   days <- c(tapply(days, factor(ids), FUN=sum), use.names = F)
-  mergePeriods(dates, days, maxDistance, reset)
+  mergePeriods(dates, days, maxDistance, reset, resetFun)
 }
 
 #' Standardize columns in data
