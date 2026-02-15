@@ -1,7 +1,6 @@
 test_that('drugRegister', {
   a <- drugRegister(FILE_NO_DR)
-  expect_equal(attributes(a)$columns, NULL)
-  #expect_equal(getColumn('IID', 'Norwegian'), 'lopenr')
+
   expect_error(getColumn(a, 'IID'))
   a <- configure(a, 'data/no-drug-register.yaml')
   expect_equal(getColumn(a, 'individual'), 'IID')
@@ -14,6 +13,8 @@ test_that('drugRegister', {
   expect_equal(getExclusions(a), NULL)
   a <- addExclusion(a, 'IID', 'I1', 'Test')
   expect_equal(getExclusions(a), tibble(column='IID', value='I1', description='Test'))
+  b <- applyExclusions(a, F)
+  expect_equal(nrow(b), nrow(a) - 1)
 
   # Error because the atc code identifier (column) is misset
   a <- setColumn(a, 'code_atc', 'atcCode')
@@ -23,11 +24,12 @@ test_that('drugRegister', {
   expect_equal(r$atcCode4, 'N06B')
   expect_equal(r$N, 4)
   expect_equal(r$Percent, 100)
+
   a <- renameColumns(a, NO_NAMES$DRUG_REGISTER$English, NO_NAMES$DRUG_REGISTER$Delivery, F)
   # Index observations
   a <- a %>% indexObservations()
   expect_equal(a$i, 1:4)
-  a <- a %>% indexObservations(IID)
+  a <- a %>% indexObservations(IID, .nameMax='I')
   expect_equal(a$i, c(1,1,1,2))
   ### Merge periods
   a <- subset(a, dateDelivery != 'x')

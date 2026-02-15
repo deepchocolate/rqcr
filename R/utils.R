@@ -200,6 +200,7 @@ indexAlong <- function (dta, ...) {
 
 #' Index unique observations
 #' @export
+#' @name indexAlongUnique
 #' @seealso [indexAlong()]
 #' @importFrom stats ave
 #' @details
@@ -218,9 +219,12 @@ indexAlong <- function (dta, ...) {
 #' @param col The column to index unique elements in.
 #' @param ... Columns in `.data` to group over.
 setGeneric('indexAlongUnique', function (.data, col, ...) standardGeneric('indexAlongUnique'))
+#' @rdname indexAlongUnique
 setMethod('indexAlongUnique', signature('integer'), function (.data) indexAlongUnique(as.character(.data)))
+#' @rdname indexAlongUnique
 setMethod('indexAlongUnique', signature('character'),
           function (.data) as.integer(factor(.data, labels=1:length(unique(.data)))))
+#' @rdname indexAlongUnique
 setMethod('indexAlongUnique', signature('data.frame'),
           function (.data, col, ...) {
             col <- deparse(substitute(col))

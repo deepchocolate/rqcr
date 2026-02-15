@@ -2,19 +2,41 @@
 % Please edit documentation in R/utils.R
 \name{indexAlongUnique}
 \alias{indexAlongUnique}
+\alias{indexAlongUnique,integer-method}
+\alias{indexAlongUnique,character-method}
+\alias{indexAlongUnique,data.frame-method}
 \title{Index unique observations}
 \usage{
-indexAlongUnique(dta, col, ...)
+indexAlongUnique(.data, col, ...)
+
+\S4method{indexAlongUnique}{integer}(.data)
+
+\S4method{indexAlongUnique}{character}(.data)
+
+\S4method{indexAlongUnique}{data.frame}(.data, col, ...)
 }
 \arguments{
-\item{dta}{A data frame or similar.}
+\item{.data}{A data frame or similar.}
 
-\item{col}{The column to index}
+\item{col}{The column to index unique elements in.}
 
-\item{...}{Columns in \code{dta} defining}
+\item{...}{Columns in \code{.data} to group over.}
 }
 \description{
 Index unique observations
+}
+\details{
+\code{indexAlongUnique} creates an integer index for each unique observation in a
+vector of values. The operation can be performed within groups by passing the
+columns forming groups in \code{...}.
+}
+\examples{
+a <- data.frame(A=c('A','A', 'B'), B=1:3)
+indexAlongUnique(a, A)
+# 1, 1, 2
+indexAlongUnique(a, B, A)
+# 1, 2, 1
+
 }
 \seealso{
 \code{\link[=indexAlong]{indexAlong()}}

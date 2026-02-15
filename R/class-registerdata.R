@@ -1,14 +1,40 @@
 #' @import dplyr
 NULL
-utils::globalVariables(c('English', 'atc', 'lopenr','utlevdato'))
+utils::globalVariables(c('English', 'column'))
+.metaVault <- new.env()
 #' Constructor for register class
 #' @param x Tabular data.
 #' @param register The type of register.
 dataRegister <- function (x, register) {
-  structure(x, register=register, columns=NULL, logs=NULL, exclusion=NULL,
-            class=c('dataRegister', class(x)))
+  o <- structure(x, register=register, class=c('dataRegister', class(x)))
+  setMeta(o, list(identifiers=NULL, logs=NULL, exclusion=NULL))
+  o
 }
 setOldClass(c('dataRegister', 'data.table','data.frame', 'tibble'))
+
+### Functions to interact with the metadata
+# Get object stored under name
+setGeneric('getMeta', function (.data, name=NULL) standardGeneric('getMeta'))
+setMethod('getMeta', signature('dataRegister'),
+          function (.data, name=NULL) {
+            rg <- attr(.data, 'register')
+            if (!is.character(rg)) stop('Register attribute not found')
+            o <- get(rg, envir=.metaVault)
+            if (!is.null(name)) o <- o[[name]]
+            o
+          })
+setGeneric('updateMeta', function (.data, name, value) standardGeneric('updateMeta'))
+setMethod('updateMeta', signature('dataRegister', 'character'),
+          function (.data, name, value) {
+            o <- getMeta(.data)
+            o[[name]] <- value
+            setMeta(.data, o)
+          })
+setGeneric('setMeta', function (.data, value) standardGeneric('setMeta'))
+setMethod('setMeta', signature('dataRegister', 'list'),
+          function (.data, value) {
+            assign(attr(.data, 'register'), value, envir=.metaVault)
+          })
 
 logMessage <- function (action, what, statistic, description, df=NULL) {
   rbind(df,
@@ -18,34 +44,59 @@ logMessage <- function (action, what, statistic, description, df=NULL) {
 #' Add exclusion
 #' @export
 #' @import tibble
+#' @name addExclusion
 #'
 #' @param .data A data frame.
 #' @param column Column with values to exclude.
 #' @param value Values in `column` to exclude.
 #' @param description A description of the exclusion
 setGeneric('addExclusion', function (.data, column, value, description=NULL) standardGeneric('addExclusion'))
+#' @rdname addExclusion
 setMethod('addExclusion', signature('dataRegister'),
           function (.data, column, value, description=NULL) {
-            tmp <- attributes(.data)$exclusion
+            tmp <- getExclusions(.data)
             tmp <- tibble(column=column, value=value, description=description) %>% bind_rows(tmp)
-            attributes(.data)$exclusion <- tmp
+            updateMeta(.data, 'exclusion', tmp)
             .data
           })
 
 #' Get exclusions
 #'
+#' @export
+#' @name getExclusions
 #' @param .data A data frame.
 setGeneric('getExclusions', function (.data) standardGeneric('getExclusions'))
+#' @rdname getExclusions
 setMethod('getExclusions', signature('dataRegister'),
           function (.data) {
-            attributes(.data)$exclusion
+            getMeta(.data, 'exclusion')
           })
 
-setGeneric('applyExclusions', function (.data) standardGeneric('applyExclusions'))
-setMethod('getExclusions', signature('dataRegister'),
-          function (.data) {
-            tmp <- attributes(.data)$exclusion
-            #pivot_wider
+#' Remove observations from data marked to be excluded
+#'
+#' @export
+#' @name applyExclusions
+#' @seealso [addExclusion()]
+#' @seealso [getExclusions()]
+#' @param .data Anything accepted by dplyr.
+#' @param verbose Informative output.
+setGeneric('applyExclusions', function (.data, verbose=T) standardGeneric('applyExclusions'))
+#' @rdname applyExclusions
+setMethod('applyExclusions', signature('dataRegister'),
+          function (.data, verbose=T) {
+            tmp <- getExclusions(.data)
+            if (nrow(tmp) == 0) {
+              message('Exclusion data is empty.')
+              return(.data)
+            }
+            for (x in unique(tmp$column)) {
+              tmp2 <- subset(tmp, column==x)
+              if (verbose) message('Excluding ', nrow(tmp2),' observations from ', x)
+              nBef <- nrow(.data)
+              .data <- .data %>% filter(!(.data[[x]] %in% tmp2$value) )
+              if (verbose) message('Dropped rows: ', nBef - nrow(.data))
+            }
+            .data
           })
 
 #' Logging
@@ -63,7 +114,9 @@ setGeneric('logExclusion', function (x, what, statistic, description) standardGe
 #' @rdname logging
 setMethod('logExclusion', signature('dataRegister', 'character', 'numeric', 'ANY'),
           function (x, what, statistic, description) {
-            attributes(x)$logs <- logMessage('Exclusion', what, statistic, description, attributes(x)$logs)
+            logs <- getMeta(x, 'logs')
+            logs <- logMessage('Exclusion', what, statistic, description, logs)
+            updateMeta(x, 'logs', logs)
             x
           })
 
@@ -73,7 +126,10 @@ setGeneric('logCheckpoint', function (x, what, statistic, description) standardG
 #' @rdname logging
 setMethod('logCheckpoint', signature('dataRegister', 'character', 'numeric', 'ANY'),
           function (x, what, statistic, description) {
-            attributes(x)$logs <- logMessage('Checkpoint', what, statistic, description, attributes(x)$logs)
+            logs <- getMeta(x, 'logs')
+            logs <- logMessage('Checkpoint', what, statistic, description, logs)
+            updateMeta(x, 'logs', logs)
+            #attributes(x)$logs <- logMessage('Checkpoint', what, statistic, description, attributes(x)$logs)
             x
           })
 
@@ -83,7 +139,8 @@ setGeneric('getLog', function (x) standardGeneric('getLog'))
 #' @rdname logging
 setMethod('getLog', signature('dataRegister'),
           function (x) {
-            attributes(x)$logs
+            getMeta(x, 'logs')
+            #attributes(x)$logs
           })
 
 #' Create object for the drug register
@@ -112,9 +169,7 @@ setMethod('drugRegister', signature('data.frame', 'character'),
           })
 #' @rdname drugRegister
 setMethod('drugRegister', signature('data.frame', 'missing'),
-          function (x) {
-            dataRegister(x, 'drugRegister')
-          })
+          function (x) dataRegister(x, 'drugRegister'))
 
 #' Get column name using generic name
 #' @import dplyr
@@ -123,14 +178,16 @@ setMethod('drugRegister', signature('data.frame', 'missing'),
 setGeneric('getColumn', function (.data, name) standardGeneric('getColumn'))
 setMethod('getColumn', signature('dataRegister', 'character'),
           function (.data, name) {
-            cols <- attributes(.data)$columns
+            cols <- getMeta(.data, 'identifiers')
             if (!name %in% names(cols)) stop('Column not found: ', name)
             cols[[name]]
           })
 setGeneric('setColumn', function (.data, name, column) standardGeneric('setColumn'))
 setMethod('setColumn', signature('dataRegister', 'character', 'character'),
           function (.data, name, column) {
-            attributes(.data)$columns[[name]] <- column
+            cols <- getMeta(.data, 'identifiers')
+            cols[[name]] <- column
+            updateMeta(.data, 'identifiers', cols)
             .data
           })
 
@@ -144,7 +201,7 @@ setGeneric('configure', function (.data, file) standardGeneric('configure'))
 setMethod('configure', signature('dataRegister', 'character'),
           function (.data, file) {
             cfg <- yaml::read_yaml(file)
-            attributes(.data)$columns <- cfg$identifiers
+            updateMeta(.data, 'identifiers', cfg$identifiers)
             if ('rename' %in% names(cfg)) {
               .data <- renameColumns(.data, unlist(cfg$rename, use.names=F), names(cfg$rename), verbose=F)
             }
@@ -173,27 +230,32 @@ setMethod('frequencyATC', signature('dataRegister'),
 #' @param ... Variables to group data by.
 setGeneric('indexObservations', function (.data, ...) standardGeneric('indexObservations'))
 #' @rdname indexObservations
-setMethod('indexObservations', signature('dataRegister'),
-          function (.data, ..., .nameIndex='i', .nameMax=NA) {
+setMethod('indexObservations', signature('data.frame'),
+          function (.data, ..., .nameIndex='i', .nameMax=NULL) {
+            rg <- attr(.data, 'register')
             .data[,.nameIndex] <- indexAlong(.data, ...)
+            if (!is.null(.nameMax)) .data <- .data %>% mutate('{.nameMax}' := max({.nameIndex}), .by=c(...))
+            if (is.character(rg)) attr(.data, 'register') <- rg
             .data
           })
 
 #' Merge dispensed drugs into non-overlapping treatment periods
 #' @export
 #' @aliases getMergedPeriods
-#' @name mergePeriods
-#' @seealso [mergePeriods()]
+#' @rdname mergePeriods
 #' @param .data Anything accepted by dplyr.
-#' @param ... arguments to `mergePeriods`.
-setGeneric('getMergedPeriods', function (.data, ...) standardGeneric('getMergedPeriods'))
+#' @param .maxDistance Maximum distance between end and start of two periods for merging.
+#' @param .reset Whether to add the overlapping time between two periods at then end of the merged period.
+#' @param .resetFun A callable to use for dates with multiple days provided.
+setGeneric('getMergedPeriods', function (.data, .maxDistance=0, .reset=F, .resetFun=mean) standardGeneric('getMergedPeriods'))
 #' @rdname mergePeriods
 setMethod('getMergedPeriods', signature('dataRegister'),
-          function (.data, ...) {
+          function (.data, .maxDistance=0, .reset=F, .resetFun=mean) {
             idCol <- getColumn(.data, 'individual')
             dateCol <- getColumn(.data, 'dispensation_date')
             dddCol <- getColumn(.data, 'dispensation_days')
-            .data %>% group_by(!!as.name(idCol)) %>% reframe('{idCol}' := first(!!as.name(idCol)), mergePeriods(.data[[dateCol]], .data[[dddCol]], ...))
+            .data %>% group_by(!!as.name(idCol)) %>%
+              reframe('{idCol}' := first(!!as.name(idCol)), mergePeriods(.data[[dateCol]], .data[[dddCol]], maxDistance=.maxDistance, reset=.reset, resetFun=.resetFun))
           })
 
 #' Rename columns in data
@@ -252,7 +314,10 @@ setMethod('renameColumns', signature('data.frame', 'character', 'character'),
 setGeneric('summariseATC', function (x, ...) standardGeneric('summariseATC'))
 setMethod('summariseATC', signature('dataRegister'),
           function (x) {
-            x %>% group_by(atc) %>% summarise(N=n(), Individuals=length(unique(lopenr)), First=min(utlevdato), Last=max(utlevdato))
+            idCol <- getColumn(.data, 'individual')
+            dateCol <- getColumn(.data, 'dispensation_date')
+            atcCol <- getColumn(.data, 'code_atc')
+            x %>% group_by(!!as.name(atcCol)) %>% summarise(N=n(), Individuals=length(unique(.data[[idCol]])), First=min(.data[[dateCol]]), Last=max(.data[[dateCol]]))
           })
 
 #' Save data to file

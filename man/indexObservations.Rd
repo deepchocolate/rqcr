@@ -2,12 +2,12 @@
 % Please edit documentation in R/class-registerdata.R
 \name{indexObservations}
 \alias{indexObservations}
-\alias{indexObservations,dataRegister-method}
+\alias{indexObservations,data.frame-method}
 \title{Index observations}
 \usage{
 indexObservations(.data, ...)
 
-\S4method{indexObservations}{dataRegister}(.data, ..., .nameIndex = "i", .nameMax = NA)
+\S4method{indexObservations}{data.frame}(.data, ..., .nameIndex = "i", .nameMax = NULL)
 }
 \arguments{
 \item{.data}{Any data accepted by dplyr.}

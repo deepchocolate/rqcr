@@ -134,6 +134,7 @@ mergeDataByRow <- function(..., insertColnames=T, separator=NA) {
 
 #' Merge time periods
 #' @export
+#' @name mergePeriods
 #' @param dates Period starting date (YYYY-MM-DD)
 #' @param days Period length in days
 #' @param maxDistance Maximum distance between end and start of two periods for merging.
