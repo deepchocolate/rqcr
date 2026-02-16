@@ -218,19 +218,20 @@ indexAlong <- function (dta, ...) {
 #' @param .data A data frame or similar.
 #' @param col The column to index unique elements in.
 #' @param ... Columns in `.data` to group over.
-setGeneric('indexAlongUnique', function (.data, col, ...) standardGeneric('indexAlongUnique'))
+setGeneric('indexAlongUnique', function (.data, col, ..., .name='i', .nameMax=NULL) standardGeneric('indexAlongUnique'))
 #' @rdname indexAlongUnique
 setMethod('indexAlongUnique', signature('integer'), function (.data) indexAlongUnique(as.character(.data)))
 #' @rdname indexAlongUnique
 setMethod('indexAlongUnique', signature('character'),
-          function (.data) as.integer(factor(.data, labels=1:length(unique(.data)))))
+          function (.data) data.table::rleid(.data))
 #' @rdname indexAlongUnique
+#' @param .name The column name of the index.
+#' @param .nameMax Column name of maximum index value.
 setMethod('indexAlongUnique', signature('data.frame'),
-          function (.data, col, ...) {
-            col <- deparse(substitute(col))
-            if (...length() == 0) grps <- 1
-            else grps <- .data %>% select(...)
-            as.integer(ave(.data[,col], grps, FUN=indexAlongUnique))
+          function (.data, col, ..., .name='i', .nameMax=NULL) {
+            .data <- .data %>% group_by(...) %>% mutate(!!.name := indexAlongUnique({{ col }}))
+            if (!is.null(.nameMax)) .data <- .data %>% mutate(!!.nameMax := max(!!as.name(.name)))
+            .data %>% ungroup()
           })
 
 #' Get adjacent numbers

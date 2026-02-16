@@ -223,6 +223,8 @@ setMethod('frequencyATC', signature('dataRegister'),
 
 #' Index observations
 #' @export
+#' @seealso [indexAlong()]
+#' @seealso [indexAlongUnique()]
 #' @name indexObservations
 #' @param .data Any data accepted by dplyr.
 #' @param .nameIndex Column name.
