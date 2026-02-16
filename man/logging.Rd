@@ -6,6 +6,8 @@
 \alias{logExclusion,dataRegister,character,numeric-method}
 \alias{logCheckpoint}
 \alias{logCheckpoint,dataRegister,character,numeric-method}
+\alias{logReset}
+\alias{logReset,dataRegister-method}
 \alias{getLog}
 \alias{getLog,dataRegister-method}
 \title{Logging}
@@ -17,6 +19,10 @@ logExclusion(x, what, statistic, description)
 logCheckpoint(x, what, statistic, description)
 
 \S4method{logCheckpoint}{dataRegister,character,numeric}(x, what, statistic, description)
+
+logReset(x)
+
+\S4method{logReset}{dataRegister}(x)
 
 getLog(x)
 

@@ -1,6 +1,8 @@
 test_that('drugRegister', {
   a <- drugRegister(FILE_NO_DR)
   expect_equal(class(a), c("dataRegister", "data.table", "data.frame"))
+  logCheckpoint(a, 'Test', 1, 'Test')
+  logReset(a)
   a <- drugRegister(a)
   expect_equal(class(a), c("dataRegister", "data.table", "data.frame"))
 

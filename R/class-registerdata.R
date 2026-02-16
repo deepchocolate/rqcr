@@ -10,7 +10,8 @@ dataRegister <- function (x, register) {
   cls <- class(x)
   if (!cl %in% cls) cls <- c(cl, cls)
   o <- structure(x, register=register, class=cls)
-  setMeta(o, list(identifiers=NULL, logs=NULL, exclusion=NULL))
+  meta <- getMeta(o)
+  if (!is.list(meta)) setMeta(o, list(identifiers=NULL, logs=NULL, exclusion=NULL))
   o
 }
 setOldClass(c('dataRegister', 'data.table','data.frame', 'tibble'))
@@ -132,6 +133,19 @@ setMethod('logCheckpoint', signature('dataRegister', 'character', 'numeric', 'AN
             logs <- getMeta(x, 'logs')
             logs <- logMessage('Checkpoint', what, statistic, description, logs)
             updateMeta(x, 'logs', logs)
+            invisible(x)
+          })
+
+#' Reset/empty log
+#'
+#' @export
+#' @rdname logging
+#' @param x A `dataRegister` object.
+setGeneric('logReset', function (x) standardGeneric('logReset'))
+#' @rdname logging
+setMethod('logReset', signature('dataRegister'),
+          function (x) {
+            updateMeta(x, 'logs', NULL)
             invisible(x)
           })
 
