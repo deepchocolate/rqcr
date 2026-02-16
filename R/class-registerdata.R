@@ -236,7 +236,7 @@ setMethod('indexObservations', signature('data.frame'),
           function (.data, ..., .nameIndex='i', .nameMax=NULL) {
             rg <- attr(.data, 'register')
             .data[,.nameIndex] <- indexAlong(.data, ...)
-            if (!is.null(.nameMax)) .data <- .data %>% mutate('{.nameMax}' := max({.nameIndex}), .by=c(...))
+            if (!is.null(.nameMax)) .data <- .data %>% mutate(!!.nameMax := max(.data[[.nameIndex]]), .by=c(...))
             if (is.character(rg)) attr(.data, 'register') <- rg
             .data
           })

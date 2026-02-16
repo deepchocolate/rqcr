@@ -31,6 +31,7 @@ test_that('drugRegister', {
   expect_equal(a$i, 1:4)
   a <- a %>% indexObservations(IID, .nameMax='I')
   expect_equal(a$i, c(1,1,1,2))
+  expect_equal(a$I, c(1,1,2,2))
   ### Merge periods
   a <- subset(a, dateDelivery != 'x')
   expect_equal(getMergedPeriods(a), tibble(IID=c('I1','I2','I3'), date=c('2024-12-31','2025-01-03','2025-01-03'), days=c(1,2,-1)))
