@@ -21,3 +21,8 @@ indexObservations(.data, ...)
 \description{
 Index observations
 }
+\seealso{
+\code{\link[=indexAlong]{indexAlong()}}
+
+\code{\link[=indexAlongUnique]{indexAlongUnique()}}
+}

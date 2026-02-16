@@ -34,7 +34,7 @@ countUnique(df, B)
 # 1
 countUnique(df$B)
 # 1
-countUnique(df$B, na.rm=F)
+countUnique(df$B, na.rm=FALSE)
 # 2
 
 }

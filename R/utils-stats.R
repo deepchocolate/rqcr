@@ -12,7 +12,7 @@
 #' # 1
 #' countUnique(df$B)
 #' # 1
-#' countUnique(df$B, na.rm=F)
+#' countUnique(df$B, na.rm=FALSE)
 #' # 2
 #'
 #' @name countUnique
@@ -25,14 +25,14 @@ setGeneric('countUnique', function (.data, ..., na.rm=T) standardGeneric('countU
 setMethod('countUnique', signature('data.frame'),
           function (.data, ..., na.rm=F) {
             if (...length() == 1) return(countUnique(.data %>% pull(...)))
-            if (na.rm == T) .data <- na.omit(.data)
+            if (na.rm == T) .data <- stats::na.omit(.data)
             .data %>% distinct(...) %>% nrow()
           }
 )
 #' @rdname countUnique
 setMethod('countUnique', signature('ANY'),
           function (.data, ..., na.rm=T) {
-            if (na.rm) .data <- na.omit(.data)
+            if (na.rm) .data <- stats::na.omit(.data)
             length(unique(.data))
           })
 

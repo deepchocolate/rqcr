@@ -7,13 +7,13 @@
 \alias{indexAlongUnique,data.frame-method}
 \title{Index unique observations}
 \usage{
-indexAlongUnique(.data, col, ...)
+indexAlongUnique(.data, col, ..., .name = "i", .nameMax = NULL)
 
 \S4method{indexAlongUnique}{integer}(.data)
 
 \S4method{indexAlongUnique}{character}(.data)
 
-\S4method{indexAlongUnique}{data.frame}(.data, col, ...)
+\S4method{indexAlongUnique}{data.frame}(.data, col, ..., .name = "i", .nameMax = NULL)
 }
 \arguments{
 \item{.data}{A data frame or similar.}
@@ -21,6 +21,10 @@ indexAlongUnique(.data, col, ...)
 \item{col}{The column to index unique elements in.}
 
 \item{...}{Columns in \code{.data} to group over.}
+
+\item{.name}{The column name of the index.}
+
+\item{.nameMax}{Column name of maximum index value.}
 }
 \description{
 Index unique observations
