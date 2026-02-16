@@ -1,5 +1,8 @@
 test_that('drugRegister', {
   a <- drugRegister(FILE_NO_DR)
+  expect_equal(class(a), c("dataRegister", "data.table", "data.frame"))
+  a <- drugRegister(a)
+  expect_equal(class(a), c("dataRegister", "data.table", "data.frame"))
 
   expect_error(getColumn(a, 'IID'))
   a <- configure(a, 'data/no-drug-register.yaml')

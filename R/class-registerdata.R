@@ -6,7 +6,10 @@ utils::globalVariables(c('English', 'column'))
 #' @param x Tabular data.
 #' @param register The type of register.
 dataRegister <- function (x, register) {
-  o <- structure(x, register=register, class=c('dataRegister', class(x)))
+  cl <- 'dataRegister'
+  cls <- class(x)
+  if (!cl %in% cls) cls <- c(cl, cls)
+  o <- structure(x, register=register, class=cls)
   setMeta(o, list(identifiers=NULL, logs=NULL, exclusion=NULL))
   o
 }
