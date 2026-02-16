@@ -6,17 +6,35 @@
 \alias{countUnique,ANY-method}
 \title{Count the unique elements in data}
 \usage{
-countUnique(.data, ...)
+countUnique(.data, ..., na.rm = T)
 
-\S4method{countUnique}{data.frame}(.data, ...)
+\S4method{countUnique}{data.frame}(.data, ..., na.rm = F)
 
-\S4method{countUnique}{ANY}(.data, ...)
+\S4method{countUnique}{ANY}(.data, ..., na.rm = T)
 }
 \arguments{
 \item{.data}{A data.frame or similar.}
 
 \item{...}{Columns in \code{dta}.}
+
+\item{na.rm}{Remove missing values?}
 }
 \description{
 Count the unique elements in data
+}
+\details{
+Care should be taken when counting element in data with missing values. These
+are counted in rows of tabular data but not in vectors.
+}
+\examples{
+df <- data.frame(A=1:2, B=c(NA,3))
+countUnique(df)
+# 2
+countUnique(df, B)
+# 1
+countUnique(df$B)
+# 1
+countUnique(df$B, na.rm=F)
+# 2
+
 }

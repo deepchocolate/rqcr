@@ -1,19 +1,38 @@
 #' Count the unique elements in data
 #' @export
+#' @details
+#' Care should be taken when counting element in data with missing values. These
+#' are counted in rows of tabular data but not in vectors.
+#'
+#' @examples
+#' df <- data.frame(A=1:2, B=c(NA,3))
+#' countUnique(df)
+#' # 2
+#' countUnique(df, B)
+#' # 1
+#' countUnique(df$B)
+#' # 1
+#' countUnique(df$B, na.rm=F)
+#' # 2
+#'
 #' @name countUnique
 #' @import dplyr
 #' @param .data A data.frame or similar.
 #' @param ... Columns in `dta`.
-setGeneric('countUnique', function (.data, ...) standardGeneric('countUnique'))
+#' @param na.rm Remove missing values?
+setGeneric('countUnique', function (.data, ..., na.rm=T) standardGeneric('countUnique'))
 #' @rdname countUnique
 setMethod('countUnique', signature('data.frame'),
-          function (.data, ...) {
+          function (.data, ..., na.rm=F) {
+            if (...length() == 1) return(countUnique(.data %>% pull(...)))
+            if (na.rm == T) .data <- na.omit(.data)
             .data %>% distinct(...) %>% nrow()
           }
 )
 #' @rdname countUnique
 setMethod('countUnique', signature('ANY'),
-          function (.data, ...) {
+          function (.data, ..., na.rm=T) {
+            if (na.rm) .data <- na.omit(.data)
             length(unique(.data))
           })
 

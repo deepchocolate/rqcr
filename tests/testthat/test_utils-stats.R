@@ -9,6 +9,12 @@ test_that('countUnique', {
   expect_equal(tibble(a=c(1,1,2)) %>% countUnique(a), 2)
   expect_equal(countUnique(c(1,1,2)), 2)
   expect_equal(c('a',1, 1) %>% countUnique(), 2)
+  # Check with NA
+  expect_equal(c('a',1,NA) %>% countUnique(), 2)
+  dta <- tibble(A=c('a',1,NA), B=c(2,3,4))
+  expect_equal(countUnique(dta), 3)
+  expect_equal(countUnique(dta, na.rm=T), 2)
+  expect_equal(dta %>% countUnique(A), 2)
 })
 
 test_that('Test frequencyCount', {
