@@ -57,7 +57,7 @@ setMethod('addExclusion', signature('dataRegister'),
             tmp <- getExclusions(.data)
             tmp <- tibble(column=column, value=value, description=description) %>% bind_rows(tmp)
             updateMeta(.data, 'exclusion', tmp)
-            .data
+            invisible(.data)
           })
 
 #' Get exclusions
@@ -117,7 +117,7 @@ setMethod('logExclusion', signature('dataRegister', 'character', 'numeric', 'ANY
             logs <- getMeta(x, 'logs')
             logs <- logMessage('Exclusion', what, statistic, description, logs)
             updateMeta(x, 'logs', logs)
-            x
+            invisible(x)
           })
 
 #' @export
@@ -129,8 +129,7 @@ setMethod('logCheckpoint', signature('dataRegister', 'character', 'numeric', 'AN
             logs <- getMeta(x, 'logs')
             logs <- logMessage('Checkpoint', what, statistic, description, logs)
             updateMeta(x, 'logs', logs)
-            #attributes(x)$logs <- logMessage('Checkpoint', what, statistic, description, attributes(x)$logs)
-            x
+            invisible(x)
           })
 
 #' @export
@@ -140,7 +139,6 @@ setGeneric('getLog', function (x) standardGeneric('getLog'))
 setMethod('getLog', signature('dataRegister'),
           function (x) {
             getMeta(x, 'logs')
-            #attributes(x)$logs
           })
 
 #' Create object for the drug register
