@@ -168,6 +168,7 @@ expandRange <- function (x, sep='-', align=T) {
 #' Note that when using this function with variables defined in that function
 #' scope you need to set `.envir=enviornment()`.
 #'
+#' @param .x See documentation for `glue::glue`.
 #' @param ... Arguments to `glue::glue`.
 #' @param sep Separator of values.
 glueCollapse <- function (.x, ..., sep='') {

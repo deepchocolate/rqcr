@@ -7,6 +7,8 @@
 glueCollapse(.x, ..., sep = "")
 }
 \arguments{
+\item{.x}{See documentation for \code{glue::glue}.}
+
 \item{...}{Arguments to \code{glue::glue}.}
 
 \item{sep}{Separator of values.}
