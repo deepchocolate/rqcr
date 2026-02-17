@@ -20,6 +20,8 @@ test_that('drugRegister', {
   expect_equal(getExclusions(a), tibble(column='IID', value='I1', description='Test'))
   b <- applyExclusions(a, F)
   expect_equal(nrow(b), nrow(a) - 1)
+  expect_false('I1' %in% b$IID)
+  expect_contains(b$IID, c('I2', 'I3'))
 
   # Error because the atc code identifier (column) is misset
   a <- setColumn(a, 'code_atc', 'atcCode')
