@@ -186,18 +186,32 @@ setMethod('drugRegister', signature('data.frame', 'character'),
 setMethod('drugRegister', signature('data.frame', 'missing'),
           function (x) dataRegister(x, 'drugRegister'))
 
-#' Get column name using generic name
-#' @import dplyr
+#' Get/set columns for dataRegister methods
+#'
+#' @description
+#' Set and get column identifiers used by `dataRegister` class methods. These identifiers
+#' are internal names that refer to columns in the actual data.
+#'
+#'
+#' @export
+#' @name rqcr-columns
+#' @aliases getColumn
 #' @param .data A dataRegister object.
-#' @param name The generic name.
+#' @param name Name of the column identifier.
 setGeneric('getColumn', function (.data, name) standardGeneric('getColumn'))
+#' @rdname rqcr-columns
 setMethod('getColumn', signature('dataRegister', 'character'),
           function (.data, name) {
             cols <- getMeta(.data, 'identifiers')
             if (!name %in% names(cols)) stop('Column not found: ', name)
             cols[[name]]
           })
+
+#' @export
+#' @rdname rqcr-columns
+#' @param column The column in data.
 setGeneric('setColumn', function (.data, name, column) standardGeneric('setColumn'))
+#' @rdname rqcr-columns
 setMethod('setColumn', signature('dataRegister', 'character', 'character'),
           function (.data, name, column) {
             cols <- getMeta(.data, 'identifiers')
