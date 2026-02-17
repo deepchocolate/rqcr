@@ -105,6 +105,12 @@ test_that('getPrefixMatches', {
 
 test_that('glueCollapse', {
   expect_equal(glueCollapse('hello {tmp}',tmp=c('a','b'), sep='-'), 'hello a-b')
+  # When defining variables inside a function, the .envir needs to limit lookup to the local environment
+  fun <- function () {
+    tmp <- c('a','b')
+    glueCollapse('hello {tmp}', tmp=tmp, sep='-', .envir=environment())
+  }
+  expect_equal(fun(), 'hello a-b')
 })
 
 test_that('whichTransitionsInterval', {

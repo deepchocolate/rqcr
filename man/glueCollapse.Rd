@@ -4,7 +4,7 @@
 \alias{glueCollapse}
 \title{String interpolation with pre-collapsing}
 \usage{
-glueCollapse(..., sep = "")
+glueCollapse(.x, ..., sep = "")
 }
 \arguments{
 \item{...}{Arguments to \code{glue::glue}.}
@@ -13,4 +13,8 @@ glueCollapse(..., sep = "")
 }
 \description{
 String interpolation with pre-collapsing
+}
+\details{
+Note that when using this function with variables defined in that function
+scope you need to set \code{.envir=enviornment()}.
 }

@@ -164,10 +164,14 @@ expandRange <- function (x, sep='-', align=T) {
 
 #' String interpolation with pre-collapsing
 #' @export
+#' @details
+#' Note that when using this function with variables defined in that function
+#' scope you need to set `.envir=enviornment()`.
+#'
 #' @param ... Arguments to `glue::glue`.
 #' @param sep Separator of values.
-glueCollapse <- function (..., sep='') {
-  glue::glue(..., .transformer=.collapse_transformer(sep))
+glueCollapse <- function (.x, ..., sep='') {
+  glue::glue(.x, ..., .transformer=.collapse_transformer(sep))
 }
 
 #' Find adjacent rows where a state goes from one to the next within a time frame
