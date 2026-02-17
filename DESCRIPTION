@@ -1,6 +1,6 @@
 Package: rqcr
 Title: Register QualityControl in R
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: 
     person("Andreas", "Jangmo", , "andreasjangmo@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-6928-4791"))
 Description: RQCR is a collection of functions to automate and reuse common quality control procedures applied to register data.
