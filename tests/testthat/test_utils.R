@@ -88,13 +88,12 @@ test_that('elements', {
 })
 
 test_that('expandRange', {
-  expect_equal(expandRange(c('A','A1-A3'), align=F), c('A','A1','A2','A3'))
+  expect_equal(expandRange(c('A','A1-A3', 'A08')), c('A','A1','A2','A3', 'A08'))
+  expect_equal(expandRange(c('A','A01-A03')), c('A','A01','A02','A03'))
   vec <- c('A', 'A1-A3', 'ABC10-ABC11', 'ABC19','B3-B2')
-  expect_equal(expandRange(vec, align=F), c('A', 'A1','A2','A3', 'ABC10','ABC11', 'ABC19', 'B3', 'B2'))
+  expect_equal(expandRange(vec, leadZeroes=F), c('A', 'A1','A2','A3', 'ABC10','ABC11', 'ABC19', 'B3', 'B2'))
   expect_equal(expandRange('A8#A10', '#'), c('A08', 'A09', 'A10'))
-  expect_equal(expandRange('A8#A10', '#'), c('A08', 'A09', 'A10'))
-  # Here it should be possible to keep the zeroes
-  expect_equal(expandRange('A08#A09', '#'), c('A8', 'A9'))
+  expect_equal(expandRange('A8#A10', '#', leadZeroes=F), c('A8', 'A9', 'A10'))
 })
 
 test_that('getPrefixMatches', {

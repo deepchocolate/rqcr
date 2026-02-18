@@ -131,8 +131,8 @@ distanceBetween <- function (states, times, from, to) {
 #' @importFrom stringi stri_detect stri_extract stri_split
 #' @param x Strings to expand.
 #' @param sep A separator for ranges
-#' @param align Whether to align numbers in strings to equal length, eg 1 becomes 01 if range max is within 10-99
-expandRange <- function (x, sep='-', align=T) {
+#' @param leadZeroes Whether to align numbers in strings to equal length, eg 1 becomes 01 if range max is within 10-99, eg A9-A10
+expandRange <- function (x, sep='-', leadZeroes=T) {
   o <- which(stri_detect(x, fixed=sep))
   if (!any(o)) return(x)
   splts <- stri_split(x[o], fixed=sep)
@@ -142,8 +142,8 @@ expandRange <- function (x, sep='-', align=T) {
   splts <- sapply(splts, FUN=stri_extract, regex='([0-9]+)')
   # Ranges
   rngs <- apply(splts, MARGIN=2, FUN=function (x) seq(x[[1]], x[[2]]), simplify=F)
-  if (align) {
-    nCharMax <- nchar(max(unlist(rngs)))
+  if (leadZeroes) {
+    nCharMax <- max(nchar(unlist(splts)))
     fmt <- '%0' %s+% (nCharMax) %s+% 'd'
     rngs <- lapply(rngs, FUN=function (x) sprintf(fmt, x))
   }
