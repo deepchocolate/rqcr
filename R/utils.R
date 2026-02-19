@@ -117,15 +117,16 @@ distanceBetween <- function (states, times, from, to) {
   c(NA, o)
 }
 
-#' Expand a numerical range embedded in a string
+#' Expand a numerical range embedded in strings
 #' @details
 #' `expandRange` will take strings in the format of "A#-A#" and repeat these
-#' into range.
+#' into their implied range.
 #'
 #' @examples
 #' vec <- c("A", "A1-A3")
-#' vec <- expandRange(vec)
-#' # vec is now c("A", "A1", "A2", "A3")
+#' expandRange(vec)
+#' # Multiple delimiters
+#' expandRange(c('A9/A10', 'B11-B12'), sep=c('/', '-'))
 #'
 #' @export
 #' @importFrom stringi stri_detect stri_extract stri_split
@@ -133,6 +134,10 @@ distanceBetween <- function (states, times, from, to) {
 #' @param sep A separator for ranges
 #' @param leadZeroes Whether to align numbers in strings to equal length, eg 1 becomes 01 if range max is within 10-99, eg A9-A10
 expandRange <- function (x, sep='-', leadZeroes=T) {
+  if (length(sep) > 1) {
+    for (xx in sep) x <- expandRange(x, xx, leadZeroes)
+    return(x)
+  }
   o <- which(stri_detect(x, fixed=sep))
   if (!any(o)) return(x)
   splts <- stri_split(x[o], fixed=sep)
