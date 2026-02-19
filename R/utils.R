@@ -141,12 +141,15 @@ expandRange <- function (x, sep='-', leadZeroes=T) {
   # Numbers
   splts <- sapply(splts, FUN=stri_extract, regex='([0-9]+)')
   # Ranges
-  rngs <- apply(splts, MARGIN=2, FUN=function (x) seq(x[[1]], x[[2]]), simplify=F)
-  if (leadZeroes) {
-    nCharMax <- max(nchar(unlist(splts)))
-    fmt <- '%0' %s+% (nCharMax) %s+% 'd'
-    rngs <- lapply(rngs, FUN=function (x) sprintf(fmt, x))
-  }
+  rngs <- apply(splts, MARGIN=2, FUN=function (x) {
+      o <- seq(x[[1]], x[[2]])
+      if (leadZeroes) {
+        nCharMax <- max(nchar(x))
+        fmt <- '%0' %s+% (nCharMax) %s+% 'd'
+        o <- sprintf(fmt, o)
+      }
+      o
+    }, simplify=F)
   j <- 1
   for (i in o) {
     x[i] <- list(paste0(let[1,j], rngs[[j]]))

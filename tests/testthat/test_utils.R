@@ -88,8 +88,8 @@ test_that('elements', {
 })
 
 test_that('expandRange', {
-  expect_equal(expandRange(c('A','A1-A3', 'A08')), c('A','A1','A2','A3', 'A08'))
-  expect_equal(expandRange(c('A','A01-A03')), c('A','A01','A02','A03'))
+  expect_equal(expandRange(c('A','A1-A3', 'A08','C100-C101')), c('A','A1','A2','A3', 'A08','C100','C101'))
+  expect_equal(expandRange(c('A','A01-A03','B00-B02')), c('A','A01','A02','A03','B00','B01','B02'))
   vec <- c('A', 'A1-A3', 'ABC10-ABC11', 'ABC19','B3-B2')
   expect_equal(expandRange(vec, leadZeroes=F), c('A', 'A1','A2','A3', 'ABC10','ABC11', 'ABC19', 'B3', 'B2'))
   expect_equal(expandRange('A8#A10', '#'), c('A08', 'A09', 'A10'))
