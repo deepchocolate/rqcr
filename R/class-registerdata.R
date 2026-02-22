@@ -186,16 +186,6 @@ setMethod('drugRegister', signature('data.frame', 'character'),
 setMethod('drugRegister', signature('data.frame', 'missing'),
           function (x) dataRegister(x, 'drugRegister'))
 
-<<<<<<< HEAD
-#' Get and set identifiers for columns
-#' @export
-#' @name identifiers
-#' @aliases getColumn
-#' @param .data A dataRegister object.
-#' @param name The identifier column name.
-setGeneric('getColumn', function (.data, name) standardGeneric('getColumn'))
-#' @rdname identifiers
-=======
 #' Get/set columns for dataRegister methods
 #'
 #' @description
@@ -210,7 +200,6 @@ setGeneric('getColumn', function (.data, name) standardGeneric('getColumn'))
 #' @param name Name of the column identifier.
 setGeneric('getColumn', function (.data, name) standardGeneric('getColumn'))
 #' @rdname rqcr-columns
->>>>>>> main
 setMethod('getColumn', signature('dataRegister', 'character'),
           function (.data, name) {
             cols <- getMeta(.data, 'identifiers')
@@ -218,22 +207,11 @@ setMethod('getColumn', signature('dataRegister', 'character'),
             cols[[name]]
           })
 
-<<<<<<< HEAD
-#' Set identifier column name
-#' @export
-#' @rdname identifiers
-#' @param .data A dataRegister object.
-#' @param name The identifier name.
-#' @param column The column name.
-setGeneric('setColumn', function (.data, name, column) standardGeneric('setColumn'))
-#' @rdname identifiers
-=======
 #' @export
 #' @rdname rqcr-columns
 #' @param column The column in data.
 setGeneric('setColumn', function (.data, name, column) standardGeneric('setColumn'))
 #' @rdname rqcr-columns
->>>>>>> main
 setMethod('setColumn', signature('dataRegister', 'character', 'character'),
           function (.data, name, column) {
             cols <- getMeta(.data, 'identifiers')
