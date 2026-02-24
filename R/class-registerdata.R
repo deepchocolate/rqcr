@@ -51,15 +51,14 @@ logMessage <- function (action, what, statistic, description, df=NULL) {
 #' @name addExclusion
 #'
 #' @param .data A data frame.
-#' @param column Column with values to exclude.
-#' @param value Values in `column` to exclude.
+#' @param ... Column-value pairs.
 #' @param description A description of the exclusion
-setGeneric('addExclusion', function (.data, column, value, description=NULL) standardGeneric('addExclusion'))
+setGeneric('addExclusion', function (.data, ..., description=NULL) standardGeneric('addExclusion'))
 #' @rdname addExclusion
 setMethod('addExclusion', signature('dataRegister'),
-          function (.data, column, value, description=NULL) {
+          function (.data, ..., description=NULL) {
             tmp <- getExclusions(.data)
-            tmp <- tibble(column=column, value=value, description=description) %>% bind_rows(tmp)
+            tmp <- c(tmp, list(list(description=description, data=tibble(...))))
             updateMeta(.data, 'exclusion', tmp)
             invisible(.data)
           })
@@ -89,15 +88,14 @@ setGeneric('applyExclusions', function (.data, verbose=T) standardGeneric('apply
 setMethod('applyExclusions', signature('dataRegister'),
           function (.data, verbose=T) {
             tmp <- getExclusions(.data)
-            if (nrow(tmp) == 0) {
+            if (length(tmp) == 0) {
               message('Exclusion data is empty.')
               return(.data)
             }
-            for (x in unique(tmp$column)) {
-              tmp2 <- subset(tmp, column==x)
-              if (verbose) message('Excluding ', nrow(tmp2),' observations from ', x)
+            for (x in tmp) {
+              if (verbose) message('Exclusion: ', x$description)
               nBef <- nrow(.data)
-              .data <- .data %>% filter(!(.data[[x]] %in% tmp2$value) )
+              .data <- .data %>% anti_join(x$data)
               if (verbose) message('Dropped rows: ', nBef - nrow(.data))
             }
             .data

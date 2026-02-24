@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{expandRange}
 \alias{expandRange}
-\title{Expand a numerical range embedded in a string}
+\title{Expand a numerical range embedded in strings}
 \usage{
 expandRange(x, sep = "-", leadZeroes = T)
 }
@@ -14,15 +14,16 @@ expandRange(x, sep = "-", leadZeroes = T)
 \item{leadZeroes}{Whether to align numbers in strings to equal length, eg 1 becomes 01 if range max is within 10-99, eg A9-A10}
 }
 \description{
-Expand a numerical range embedded in a string
+Expand a numerical range embedded in strings
 }
 \details{
 \code{expandRange} will take strings in the format of "A#-A#" and repeat these
-into range.
+into their implied range.
 }
 \examples{
 vec <- c("A", "A1-A3")
-vec <- expandRange(vec)
-# vec is now c("A", "A1", "A2", "A3")
+expandRange(vec)
+# Multiple delimiters
+expandRange(c('A9/A10', 'B11-B12'), sep=c('/', '-'))
 
 }

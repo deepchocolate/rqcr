@@ -5,16 +5,14 @@
 \alias{addExclusion,dataRegister-method}
 \title{Add exclusion}
 \usage{
-addExclusion(.data, column, value, description = NULL)
+addExclusion(.data, ..., description = NULL)
 
-\S4method{addExclusion}{dataRegister}(.data, column, value, description = NULL)
+\S4method{addExclusion}{dataRegister}(.data, ..., description = NULL)
 }
 \arguments{
 \item{.data}{A data frame.}
 
-\item{column}{Column with values to exclude.}
-
-\item{value}{Values in \code{column} to exclude.}
+\item{...}{Column-value pairs.}
 
 \item{description}{A description of the exclusion}
 }

@@ -16,8 +16,9 @@ test_that('drugRegister', {
 
   # Exclusions
   expect_equal(getExclusions(a), NULL)
-  a <- addExclusion(a, 'IID', 'I1', 'Test')
-  expect_equal(getExclusions(a), tibble(column='IID', value='I1', description='Test'))
+  a <- addExclusion(a, IID='I1', description='Test')
+  #print(getExclusions(a))
+  expect_equal(getExclusions(a), list(list(description='Test', data=tibble(IID='I1'))))
   b <- applyExclusions(a, F)
   expect_equal(nrow(b), nrow(a) - 1)
   expect_false('I1' %in% b$IID)
