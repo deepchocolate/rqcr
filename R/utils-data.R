@@ -1,3 +1,5 @@
+#' @import dplyr
+NULL
 #' Add the preceding value of a sequence as a column in data
 #' @export
 #' @import dplyr
@@ -39,7 +41,6 @@ getExcelData <- function (file, col, val, skip, colsSelect) {
 #' Indicate novel elements in ordered data
 #' @name indicateNovel
 #' @export
-#' @import dplyr
 setGeneric('indicateNovel', function (.data, ...) standardGeneric('indicateNovel'))
 #' @rdname indicateNovel
 setMethod('indicateNovel', signature('factor'),
@@ -65,6 +66,26 @@ setMethod('indicateNovel', signature('data.frame'),
             .data %>% group_by(...) %>% arrange({{ times }}) %>%
               mutate("{.name}" :=indicateNovel({{ values }})) %>% ungroup()
             })
+
+#' Merge two datasets and filter using dates
+#' @export
+#' @name mergeEventsWithin
+#' @param .data Anything accepted by dplyr.
+#' @param events Data with events.
+#' @param dateStart Period start date column in `.data`.
+#' @param dateEnd Period end date column in `.data`.
+#' @param dateEvent Event date column in `events`.
+#' @param ... Grouping columns.
+#' @param .slide Integer to shift `dateStart` and `dateEnd` with.
+#' @param .ids Ids for joining, adheres to `dplyr::join_by`.
+setGeneric('mergeEventsWithin', function (.data, events, dateStart, dateEnd, dateEvent, ...,  .slide=0, .ids=NULL) standardGeneric('mergeEventsWithin'))
+#' @rdname mergeEventsWithin
+setMethod('mergeEventsWithin', signature('data.frame', 'data.frame'),
+          function (.data, events, dateStart, dateEnd, dateEvent, ..., .slide=0, .ids=NULL) {
+            .data <- .data %>% inner_join(events, by=join_by({{ .ids }}))
+            .data <- .data %>% mutate(across(c({{dateStart}}, {{dateEnd}}, {{dateEvent}}), lubridate::ymd))
+            .data %>% group_by(...) %>% filter({{dateStart}} + .slide <= {{dateEvent}} & {{dateEnd}} + .slide >= {{dateEvent}}) %>% ungroup()
+          })
 
 #' Split data by rows that are equal to some value.
 #' @details
@@ -179,7 +200,6 @@ mergePeriods <- function (dates, days, maxDistance=0, reset=F, resetFun=mean) {
 #' Standardize columns in data
 #' @export
 #' @name standardizeColumns
-#' @import dplyr
 #' @param .data Anything accepted by dplyr.
 #' @param ... Columns to standardize.
 #' @param .names Use to name the standardize column see `dplyr::across`, E.g `"prefix{.col}"`.
@@ -197,7 +217,7 @@ setMethod('standardizeColumns', signature('data.frame'),
 #'
 #' @seealso [dplyr::case_when()]
 #' @export
-#' @import dplyr formula.tools
+#' @import formula.tools
 #' @importFrom rlang := enquos quo_get_expr
 #' @param .data Anything accepted by dplyr (can be piped).
 #' @param col The column to update

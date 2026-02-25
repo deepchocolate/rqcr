@@ -23,6 +23,20 @@ test_that('indicateNovel', {
   expect_equal(o$novel, c(1,1,1,0,0,1,1))
 })
 
+test_that('mergeEventsWithin', {
+  dta <- data.frame(id=1:2,
+                    A=c('2001-01-01', '2001-02-01'),
+                    B=c('2001-01-03', '2001-02-10'))
+  dtaEv <- data.frame(id=2, dateEv='2001-02-09')
+  o <- mergeEventsWithin(dta, dtaEv, A, B, dateEv, ids=id)
+  expect_equal(nrow(o), 1)
+  dtaEv$dateEv <- '2001-02-11'
+  o <- mergeEventsWithin(dta, dtaEv, A, B, dateEv, ids=id)
+  expect_equal(nrow(o), 0)
+  o <- mergeEventsWithin(dta, dtaEv, A, B, dateEv, ids=id, .slide=1)
+  expect_equal(nrow(o), 1)
+})
+
 test_that('splitDataByRow, mergeDataByRow', {
   require(data.table)
   dta <- data.frame(a=c(1,NA,2,NA,NA,3), b=c(1,NA,2, NA,NA, 3))
