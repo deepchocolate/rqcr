@@ -60,7 +60,6 @@ test_that('drugRegister', {
   a <- a %>% bind_rows(data.frame(A=4,B=2))
   expect_equal(class(a), c('dataRegister', 'tbl_df', 'tbl', 'data.frame'))
   a <- data.frame(A=1:3, B=1)
-  print('hej')
   b <- drugRegister(a)
   b <- left_join(b, tibble(A=1,C=2), join_by(A))
   expect_equal(class(b), c('dataRegister', 'data.frame'))

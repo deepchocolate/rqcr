@@ -22,12 +22,14 @@ dplyr_reconstruct.dataRegister <- function(data, template) {
   data
 }
 
-group_by.dataRegister <- function (x, ...) {
-  o <- NextMethod()
-  class(o) <- c('dataRegister', class(o))
-  o
+#' @exportS3Method dplyr::group_by
+group_by.dataRegister <- function (.data, ..., .add, .drop) {
+  .data <- NextMethod()
+  class(.data) <- c('dataRegister', class(.data))
+  .data
 }
 
+#' @exportS3Method dplyr::ungroup
 ungroup.dataRegister <- function (x, ...) {
   o <- NextMethod()
   class(o) <- c('dataRegister', class(o))
