@@ -38,6 +38,28 @@ getExcelData <- function (file, col, val, skip, colsSelect) {
   dta
 }
 
+#' Merge two datasets and indicate falling within a date range
+#' @export
+#' @name indicateEventsWithin
+#' @param .data Anything accepted by dplyr.
+#' @param events Data with events.
+#' @param dateStart Period start date column in `.data`.
+#' @param dateEnd Period end date column in `.data`.
+#' @param dateEvent Event date column in `events`.
+#' @param .by Grouping columns.
+#' @param .slide Integer to shift `dateStart` and `dateEnd` with.
+#' @param .ids Ids for joining, adheres to `dplyr::join_by`.
+#' @param .name Column name for event indicator.
+setGeneric('indicateEventsWithin', function (.data, events, dateStart, dateEnd, dateEvent, .by=NULL, .slide=0, .ids=NULL, .name='event') standardGeneric('indicateEventsWithin'))
+#' @rdname indicateEventsWithin
+setMethod('indicateEventsWithin', signature('data.frame', 'data.frame'),
+          function (.data, events, dateStart, dateEnd, dateEvent, .by, .slide=0, .ids=NULL, .name='event') {
+            .data <- .data %>% left_join(events, by=join_by({{ .ids }}))
+            .data <- .data %>% mutate(across(c({{dateStart}}, {{dateEnd}}, {{dateEvent}}), lubridate::ymd))
+            .data %>% group_by({{ .by }}) %>% mutate('{.name}' := {{dateStart}} + .slide <= {{dateEvent}} & {{dateEnd}} + .slide >= {{dateEvent}}) %>%
+              mutate('{.name}' := tidyr::replace_na(.data[[.name]], 0)) %>% ungroup()
+          })
+
 #' Indicate novel elements in ordered data
 #' @name indicateNovel
 #' @export
@@ -66,26 +88,6 @@ setMethod('indicateNovel', signature('data.frame'),
             .data %>% group_by(...) %>% arrange({{ times }}) %>%
               mutate("{.name}" :=indicateNovel({{ values }})) %>% ungroup()
             })
-
-#' Merge two datasets and filter using dates
-#' @export
-#' @name mergeEventsWithin
-#' @param .data Anything accepted by dplyr.
-#' @param events Data with events.
-#' @param dateStart Period start date column in `.data`.
-#' @param dateEnd Period end date column in `.data`.
-#' @param dateEvent Event date column in `events`.
-#' @param ... Grouping columns.
-#' @param .slide Integer to shift `dateStart` and `dateEnd` with.
-#' @param .ids Ids for joining, adheres to `dplyr::join_by`.
-setGeneric('mergeEventsWithin', function (.data, events, dateStart, dateEnd, dateEvent, ...,  .slide=0, .ids=NULL) standardGeneric('mergeEventsWithin'))
-#' @rdname mergeEventsWithin
-setMethod('mergeEventsWithin', signature('data.frame', 'data.frame'),
-          function (.data, events, dateStart, dateEnd, dateEvent, ..., .slide=0, .ids=NULL) {
-            .data <- .data %>% inner_join(events, by=join_by({{ .ids }}))
-            .data <- .data %>% mutate(across(c({{dateStart}}, {{dateEnd}}, {{dateEvent}}), lubridate::ymd))
-            .data %>% group_by(...) %>% filter({{dateStart}} + .slide <= {{dateEvent}} & {{dateEnd}} + .slide >= {{dateEvent}}) %>% ungroup()
-          })
 
 #' Split data by rows that are equal to some value.
 #' @details

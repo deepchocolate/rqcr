@@ -1,4 +1,4 @@
-#' @import dplyr
+#' @import dplyr methods
 NULL
 utils::globalVariables(c('English', 'column'))
 .metaVault <- new.env()
