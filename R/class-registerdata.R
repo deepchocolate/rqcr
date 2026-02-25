@@ -14,6 +14,26 @@ dataRegister <- function (x, register) {
   if (!is.list(meta)) setMeta(o, list(identifiers=NULL, logs=NULL, exclusion=NULL))
   o
 }
+
+# This is mainly for attributes so has little effect at the moment
+#' @exportS3Method dplyr::dplyr_reconstruct
+dplyr_reconstruct.dataRegister <- function(data, template) {
+  class(data) <- union(class(template), class(data))
+  data
+}
+
+group_by.dataRegister <- function (x, ...) {
+  o <- NextMethod()
+  class(o) <- c('dataRegister', class(o))
+  o
+}
+
+ungroup.dataRegister <- function (x, ...) {
+  o <- NextMethod()
+  class(o) <- c('dataRegister', class(o))
+  o
+}
+
 setOldClass(c('dataRegister', 'data.table','data.frame', 'tibble'))
 
 ### Functions to interact with the metadata
