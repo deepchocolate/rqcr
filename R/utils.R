@@ -463,9 +463,12 @@ recodeSex <- function (x, default=NA) {
 #' @param ... Arguments to `format`
 #' @param strmask The text to put numbers in. Must contain "\{n\}" and "\{percent\}".
 #' @export
-txtNPercent <- function(n, N, ..., strmask='{n} ({percent})') {
+txtNPercent <- function(n, N, ..., strmask='{n} ({percent})', maxPercent=NULL) {
+  maxPercent <- dplyr::coalesce(maxPercent, configRQCR('txtNPercent', 'maxPercent'), F)
+  if (n == 0 & N==0) N <- 1
   percent <- 100*n/N
   if (length(c(...)) == 0) percent <- format(percent, digits=3)
   else percent <- format(percent, ...)
+  if (!isFALSE(maxPercent) && maxPercent < percent) warning('Percent exceeds maximum: ', percent)
   glue::glue(strmask)
 }

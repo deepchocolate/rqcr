@@ -1,6 +1,7 @@
 
 .pkg_env <- new.env()
 .pkg_env$updateCases = list(warnings=F)
+.pkg_env$txtNPercent <- list(maxPercent=F)
 
 #' Configure RQCR
 #' @name configRQCR
