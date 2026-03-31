@@ -219,4 +219,5 @@ test_that('txtNPercent', {
   expect_equal(txtNPercent(0, 0), '0 (0)')
   configRQCR('txtNPercent', 'maxPercent', 100)
   expect_warning(txtNPercent(10, 1))
+  expect_equal(txtNPercent(10, 1, maxPercent=1000), '10 (1000)')
 })
