@@ -27,10 +27,10 @@ test_that('mergeEventsWithin, indicateEventsWithin', {
   dta <- data.frame(id=1:2,
                     A=c('2001-01-01', '2001-02-01'),
                     B=c('2001-01-03', '2001-02-10'))
-  dtaEv <- data.frame(id=2, dateEv='2001-02-09')
+  dtaEv <- data.frame(id=c(2,3), dateEv=c('2001-02-09', '2001-01-15'))
+  dtaExp <- dta %>% mutate(A=as.Date(A), B=as.Date(B))
   o <- indicateEventsWithin(dta, dtaEv, A, B, dateEv, .ids=id)
-  expect_equal(nrow(o), 2)
-  expect_equal(o$event, c(FALSE, TRUE))
+  expect_equal(as.data.frame(o), dtaExp %>% mutate(dateEv=as.Date(c(NA, '2001-02-09')), event=c(F,T)))
   dtaEv$dateEv <- '2001-02-11'
   o <- indicateEventsWithin(dta, dtaEv, A, B, dateEv, .ids=id)
   expect_equal(nrow(o), 2)
@@ -38,6 +38,13 @@ test_that('mergeEventsWithin, indicateEventsWithin', {
   o <- indicateEventsWithin(dta, dtaEv, A, B, dateEv, .ids=id, .slide=1)
   expect_equal(nrow(o), 2)
   expect_equal(o$event, c(FALSE, TRUE))
+  # Check when individuals occur multiple times
+  dta <- dta %>% add_row(id=2, A='2001-01-04', B='2001-02-20')
+  o <- indicateEventsWithin(dta, dtaEv, A, B, dateEv, .ids=id, .name='eventHello')
+  dtaExp <- dta %>% mutate(A=as.Date(A), B=as.Date(B))
+  expect_equal(as.data.frame(o), dtaExp %>% mutate(dateEv=as.Date(c(NA, '2001-02-11', '2001-02-11')), eventHello=c(F, F, T)))
+  o <- indicateEventsWithin(dta, dtaEv, A, B, dateEv, .ids=id, .slide=1, .name='eventHello')
+  expect_equal(as.data.frame(o), dtaExp %>% mutate(dateEv=as.Date(c(NA, '2001-02-11', '2001-02-11')), eventHello=c(F, T, T)))
 })
 
 test_that('splitDataByRow, mergeDataByRow', {
