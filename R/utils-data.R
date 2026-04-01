@@ -220,7 +220,7 @@ setMethod('standardizeColumns', signature('data.frame'),
 #' @seealso [dplyr::case_when()]
 #' @export
 #' @import formula.tools
-#' @importFrom rlang := enquos quo_get_expr
+#' @importFrom rlang := enquos quo_get_expr as_label
 #' @param .data Anything accepted by dplyr (can be piped).
 #' @param col The column to update
 #' @param ... Conditions for updates in the form `Column == "value" ~ Replacement`.
@@ -231,7 +231,7 @@ updateCases <- function (.data, col, ..., .warnIfMissing=FALSE) {
       frmQ <- quo_get_expr(frm)
       if (typeof(.data %>% pull({{col}})) == 'character') {
         varRhs <- rhs(frmQ)
-        if (is.numeric(varRhs)) rhs(frmQ) <- as.character(varRhs)
+        if (is.numeric(varRhs)) rhs(frmQ) <- as_label(varRhs)
       }
       if (.warnIfMissing | configRQCR('updateCases', 'warnings')) {
         rows <- lhs(frmQ)

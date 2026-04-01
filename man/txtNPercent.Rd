@@ -4,7 +4,7 @@
 \alias{txtNPercent}
 \title{Create a string with n and percent}
 \usage{
-txtNPercent(n, N, ..., strmask = "{n} ({percent})")
+txtNPercent(n, N, ..., strmask = "{n} ({percent})", maxPercent = NULL)
 }
 \arguments{
 \item{n}{A number}
@@ -14,6 +14,8 @@ txtNPercent(n, N, ..., strmask = "{n} ({percent})")
 \item{...}{Arguments to \code{format}}
 
 \item{strmask}{The text to put numbers in. Must contain "\{n\}" and "\{percent\}".}
+
+\item{maxPercent}{If the calculated percent exceeds this limit, a warning is thrown.}
 }
 \description{
 Create a string with n and percent
