@@ -23,6 +23,17 @@ test_that('indicateNovel', {
   expect_equal(o$novel, c(1,1,1,0,0,1,1))
 })
 
+test_that('joinLeftPrefix', {
+  dta <- data.frame(id=1:2, B=c('A56','A513'))
+  prfx <- data.frame(C=c('B5', 'A51'), text=c('Case B', 'Case A'))
+  dtaJ <- joinLeftPrefix(dta, prfx, join_by(B==C))
+  expect_equal(data.frame(id=1:2, B=c('A56','A513'), C=c(NA,'A51'), text=c(NA,'Case A')), dtaJ)
+  dtaJ <- joinLeftPrefix(prfx, dta, join_by(C==B))
+  prfx$id <- as.integer(NA)
+  prfx$B <- as.character(NA)
+  expect_equal(prfx, dtaJ)
+})
+
 test_that('mergeEventsWithin, indicateEventsWithin', {
   dta <- data.frame(id=1:2,
                     A=c('2001-01-01', '2001-02-01'),

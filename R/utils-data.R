@@ -89,6 +89,28 @@ setMethod('indicateNovel', signature('data.frame'),
               mutate("{.name}" :=indicateNovel({{ values }})) %>% ungroup()
             })
 
+#' Join data based on column as prefixes
+#' @description
+#' This function joins data based on prefixes in a column. If `x` is data with
+#' a character column, and `y` data with a column of prefixes, `joinLeftPrefix`
+#' will perform a join pairs of columns where prefixes in `y` matches prefixes in `x`.
+#'
+#' @name joinPrefix
+#' @aliases joinLeftPrefix
+#' @param x Any data object accepted by fuzzyjoin.
+#' @param y Data with prefix column(s),
+#' @param by Specification of joining, equavalent to `dplyr::join_by`. Note: Only equality joins (`==`) accepted.
+#' @param ... Other arguments
+#' @export
+setGeneric('joinLeftPrefix', function (x, y, by, ...) standardGeneric('joinLeftPrefix'))
+setOldClass('dplyr_join_by')
+#' @rdname joinPrefix
+setMethod('joinLeftPrefix', signature('data.frame','data.frame', 'dplyr_join_by'),
+          function (x, y, by) {
+            mf <- as.list(stats::setNames(rep('startsWith', length(by$x)), by$x))
+            fuzzyjoin::fuzzy_left_join(x, y, by, match_fun=startsWith)
+          })
+
 #' Split data by rows that are equal to some value.
 #' @details
 #' The motivation for this function comes from spreadsheet in which multiple tables
