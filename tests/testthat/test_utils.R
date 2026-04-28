@@ -96,6 +96,9 @@ test_that('expandRange', {
   expect_equal(expandRange('A8#A10', '#', leadZeroes=F), c('A8', 'A9', 'A10'))
   expect_equal(expandRange('A10-A8'), c('A10', 'A09', 'A08'))
   expect_equal(expandRange('A09-A10'), c('A09', 'A10'))
+  df <- data.frame(txt=c('A1-A3'), desc='Some info')
+  expect_equal(expandRange(df, txt), data.frame(txt=c('A1','A2','A3')))
+  expect_equal(expandRange(df, txt, desc), data.frame(desc=rep('Some info',3), txt=c('A1','A2','A3')))
 })
 
 test_that('getPrefixMatches', {
@@ -217,6 +220,7 @@ test_that('txtNPercent', {
   expect_equal(txtNPercent(1, 10), '1 (10)')
   expect_equal(txtNPercent(1, 3), '1 (33.3)')
   expect_equal(txtNPercent(0, 0), '0 (0)')
+  expect_warning(txtNPercent(1, 0))
   configRQCR('txtNPercent', 'maxPercent', 100)
   expect_equal(txtNPercent(1, 9), '1 (11.1)')
   expect_warning(txtNPercent(10, 1))

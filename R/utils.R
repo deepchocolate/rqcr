@@ -118,6 +118,7 @@ distanceBetween <- function (states, times, from, to) {
 }
 
 #' Expand a numerical range embedded in strings
+#' @name expandRange
 #' @details
 #' `expandRange` will take strings in the format of "A#-A#" and repeat these
 #' into their implied range.
@@ -133,35 +134,43 @@ distanceBetween <- function (states, times, from, to) {
 #' @param x Strings to expand.
 #' @param sep A separator for ranges
 #' @param leadZeroes Whether to align numbers in strings to equal length, eg 1 becomes 01 if range max is within 10-99, eg A9-A10
-expandRange <- function (x, sep='-', leadZeroes=T) {
-  if (length(sep) > 1) {
-    for (xx in sep) x <- expandRange(x, xx, leadZeroes)
-    return(x)
-  }
-  o <- which(stri_detect(x, fixed=sep))
-  if (!any(o)) return(x)
-  splts <- stri_split(x[o], fixed=sep)
-  # Letters
-  let <- sapply(splts, FUN=stri_extract, regex='^[A-Z]+')
-  # Numbers
-  splts <- sapply(splts, FUN=stri_extract, regex='([0-9]+)')
-  # Ranges
-  rngs <- apply(splts, MARGIN=2, FUN=function (x) {
-      o <- seq(x[[1]], x[[2]])
-      if (leadZeroes) {
-        nCharMax <- max(nchar(x))
-        fmt <- '%0' %s+% (nCharMax) %s+% 'd'
-        o <- sprintf(fmt, o)
-      }
-      o
-    }, simplify=F)
-  j <- 1
-  for (i in o) {
-    x[i] <- list(paste0(let[1,j], rngs[[j]]))
-    j <- j + 1
-  }
-  do.call('c', list(x, recursive=T))
-}
+setGeneric('expandRange', function (x, ...) standardGeneric('expandRange'))
+#' @rdname expandRange
+setMethod('expandRange', signature('character'),
+          function (x, sep='-', leadZeroes=T) {
+            if (length(sep) > 1) {
+              for (xx in sep) x <- expandRange(x, xx, leadZeroes)
+              return(x)
+            }
+            o <- which(stri_detect(x, fixed=sep))
+            if (!any(o)) return(x)
+            splts <- stri_split(x[o], fixed=sep)
+            # Letters
+            let <- sapply(splts, FUN=stri_extract, regex='^[A-Z]+')
+            # Numbers
+            splts <- sapply(splts, FUN=stri_extract, regex='([0-9]+)')
+            # Ranges
+            rngs <- apply(splts, MARGIN=2, FUN=function (x) {
+              o <- seq(x[[1]], x[[2]])
+              if (leadZeroes) {
+                nCharMax <- max(nchar(x))
+                fmt <- '%0' %s+% (nCharMax) %s+% 'd'
+                o <- sprintf(fmt, o)
+              }
+              o
+            }, simplify=F)
+            j <- 1
+            for (i in o) {
+              x[i] <- list(paste0(let[1,j], rngs[[j]]))
+              j <- j + 1
+              }
+            do.call('c', list(x, recursive=T))
+            })
+#' @rdname expandRange
+setMethod('expandRange', signature('data.frame'),
+          function (x, column, ..., sep='-', leadZeroes=T) {
+            dplyr::reframe(x, {{column}} := expandRange({{column}}, sep, leadZeroes),.by = c(...))
+          })
 
 .collapse_transformer <- function(sep='',...) {
   function(text, envir) {
@@ -466,6 +475,7 @@ recodeSex <- function (x, default=NA) {
 #' @export
 txtNPercent <- function(n, N, ..., strmask='{n} ({percent})', maxPercent=NULL) {
   maxPercent <- dplyr::coalesce(maxPercent, configRQCR('txtNPercent', 'maxPercent'), F)
+  if (n != 0 & N == 0) warning('N is 0')
   if (n == 0 & N==0) N <- 1
   percent <- 100*n/N
   if (!isFALSE(maxPercent) && maxPercent < percent) warning('Percent exceeds maximum: ', percent)
