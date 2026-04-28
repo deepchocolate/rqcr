@@ -128,6 +128,9 @@ distanceBetween <- function (states, times, from, to) {
 #' expandRange(vec)
 #' # Multiple delimiters
 #' expandRange(c('A9/A10', 'B11-B12'), sep=c('/', '-'))
+#' # A whole data.frame
+#' df <- data.frame(txt=vec, id=c(1,2))
+#' expandRange(df, txt, id)
 #'
 #' @export
 #' @importFrom stringi stri_detect stri_extract stri_split
@@ -167,6 +170,8 @@ setMethod('expandRange', signature('character'),
             do.call('c', list(x, recursive=T))
             })
 #' @rdname expandRange
+#' @param column Column to expand.
+#' @param ... Columns to append into the resulting data.frame.
 setMethod('expandRange', signature('data.frame'),
           function (x, column, ..., sep='-', leadZeroes=T) {
             dplyr::reframe(x, {{column}} := expandRange({{column}}, sep, leadZeroes),.by = c(...))

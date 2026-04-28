@@ -2,16 +2,26 @@
 % Please edit documentation in R/utils.R
 \name{expandRange}
 \alias{expandRange}
+\alias{expandRange,character-method}
+\alias{expandRange,data.frame-method}
 \title{Expand a numerical range embedded in strings}
 \usage{
-expandRange(x, sep = "-", leadZeroes = T)
+expandRange(x, ...)
+
+\S4method{expandRange}{character}(x, sep = "-", leadZeroes = T)
+
+\S4method{expandRange}{data.frame}(x, column, ..., sep = "-", leadZeroes = T)
 }
 \arguments{
 \item{x}{Strings to expand.}
 
+\item{...}{Columns to append into the resulting data.frame.}
+
 \item{sep}{A separator for ranges}
 
 \item{leadZeroes}{Whether to align numbers in strings to equal length, eg 1 becomes 01 if range max is within 10-99, eg A9-A10}
+
+\item{column}{Column to expand.}
 }
 \description{
 Expand a numerical range embedded in strings
@@ -25,5 +35,8 @@ vec <- c("A", "A1-A3")
 expandRange(vec)
 # Multiple delimiters
 expandRange(c('A9/A10', 'B11-B12'), sep=c('/', '-'))
+# A whole data.frame
+df <- data.frame(txt=vec, id=c(1,2))
+expandRange(df, txt, id)
 
 }
