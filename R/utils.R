@@ -124,30 +124,32 @@ distanceBetween <- function (states, times, from, to) {
 #' into their implied range.
 #'
 #' @examples
-#' vec <- c("A", "A1-A3")
+#' vec <- c("A", "A1-A3", "B3-B5,B10")
 #' expandRange(vec)
 #' # Multiple delimiters
 #' expandRange(c('A9/A10', 'B11-B12'), sep=c('/', '-'))
 #' # A whole data.frame
-#' df <- data.frame(txt=vec, id=c(1,2))
+#' df <- data.frame(txt=vec, id=1:3)
 #' expandRange(df, txt, id)
 #'
 #' @export
 #' @importFrom stringi stri_detect stri_extract stri_split
 #' @param x Strings to expand.
-#' @param sep A separator for ranges
+#' @param sepRange A separator for ranges
+#' @param sep A value separator.
 #' @param leadZeroes Whether to align numbers in strings to equal length, eg 1 becomes 01 if range max is within 10-99, eg A9-A10
 setGeneric('expandRange', function (x, ...) standardGeneric('expandRange'))
 #' @rdname expandRange
 setMethod('expandRange', signature('character'),
-          function (x, sep='-', leadZeroes=T) {
-            if (length(sep) > 1) {
-              for (xx in sep) x <- expandRange(x, xx, leadZeroes)
+          function (x, sepRange='-', sep=',', leadZeroes=T) {
+            if (length(sep) == 1) x <- unlist(sapply(x, FUN=stri_split, fixed=sep), use.names=F)
+            if (length(sepRange) > 1) {
+              for (xx in sepRange) x <- expandRange(x, sepRange=xx, leadZeroes)
               return(x)
             }
-            o <- which(stri_detect(x, fixed=sep))
+            o <- which(stri_detect(x, fixed=sepRange))
             if (!any(o)) return(x)
-            splts <- stri_split(x[o], fixed=sep)
+            splts <- stri_split(x[o], fixed=sepRange)
             # Letters
             let <- sapply(splts, FUN=stri_extract, regex='^[A-Z]+')
             # Numbers
@@ -173,8 +175,8 @@ setMethod('expandRange', signature('character'),
 #' @param column Column to expand.
 #' @param ... Columns to append into the resulting data.frame.
 setMethod('expandRange', signature('data.frame'),
-          function (x, column, ..., sep='-', leadZeroes=T) {
-            dplyr::reframe(x, {{column}} := expandRange({{column}}, sep, leadZeroes),.by = c(...))
+          function (x, column, ..., sepRange='-', sep=',', leadZeroes=T) {
+            dplyr::reframe(x, {{column}} := expandRange({{column}}, sepRange, sep, leadZeroes),.by = c(...))
           })
 
 .collapse_transformer <- function(sep='',...) {

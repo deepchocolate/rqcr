@@ -8,16 +8,18 @@
 \usage{
 expandRange(x, ...)
 
-\S4method{expandRange}{character}(x, sep = "-", leadZeroes = T)
+\S4method{expandRange}{character}(x, sepRange = "-", sep = ",", leadZeroes = T)
 
-\S4method{expandRange}{data.frame}(x, column, ..., sep = "-", leadZeroes = T)
+\S4method{expandRange}{data.frame}(x, column, ..., sepRange = "-", sep = ",", leadZeroes = T)
 }
 \arguments{
 \item{x}{Strings to expand.}
 
 \item{...}{Columns to append into the resulting data.frame.}
 
-\item{sep}{A separator for ranges}
+\item{sepRange}{A separator for ranges}
+
+\item{sep}{A value separator.}
 
 \item{leadZeroes}{Whether to align numbers in strings to equal length, eg 1 becomes 01 if range max is within 10-99, eg A9-A10}
 
@@ -31,12 +33,12 @@ Expand a numerical range embedded in strings
 into their implied range.
 }
 \examples{
-vec <- c("A", "A1-A3")
+vec <- c("A", "A1-A3", "B3-B5,B10")
 expandRange(vec)
 # Multiple delimiters
 expandRange(c('A9/A10', 'B11-B12'), sep=c('/', '-'))
 # A whole data.frame
-df <- data.frame(txt=vec, id=c(1,2))
+df <- data.frame(txt=vec, id=1:3)
 expandRange(df, txt, id)
 
 }

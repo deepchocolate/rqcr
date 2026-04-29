@@ -95,7 +95,7 @@ test_that('expandRange', {
   expect_equal(expandRange(c('A8#A10', 'A99-A101'), c('#', '-')), c('A08', 'A09', 'A10', 'A099','A100','A101'))
   expect_equal(expandRange('A8#A10', '#', leadZeroes=F), c('A8', 'A9', 'A10'))
   expect_equal(expandRange('A10-A8'), c('A10', 'A09', 'A08'))
-  expect_equal(expandRange('A09-A10'), c('A09', 'A10'))
+  expect_equal(expandRange('A01,A09-A10'), c('A01','A09', 'A10'))
   df <- data.frame(txt=c('A1-A3'), desc='Some info')
   expect_equal(expandRange(df, txt), data.frame(txt=c('A1','A2','A3')))
   expect_equal(expandRange(df, txt, desc), data.frame(desc=rep('Some info',3), txt=c('A1','A2','A3')))
