@@ -95,7 +95,7 @@ test_that('expandRange', {
   expect_equal(expandRange(c('A8#A10', 'A99-A101'), c('#', '-')), c('A08', 'A09', 'A10', 'A099','A100','A101'))
   expect_equal(expandRange('A8#A10', '#', leadZeroes=F), c('A8', 'A9', 'A10'))
   expect_equal(expandRange('A10-A8'), c('A10', 'A09', 'A08'))
-  expect_equal(expandRange('A01,A09-A10'), c('A01','A09', 'A10'))
+  expect_equal(expandRange('A01, A09-A10, B1000-B1001'), c('A01','A09', 'A10','B1000','B1001'))
   df <- data.frame(txt=c('A1-A3'), desc='Some info')
   expect_equal(expandRange(df, txt), data.frame(txt=c('A1','A2','A3')))
   expect_equal(expandRange(df, txt, desc), data.frame(desc=rep('Some info',3), txt=c('A1','A2','A3')))
@@ -136,12 +136,13 @@ test_that('whichTransitionsInterval', {
 })
 
 test_that('indexAlong, adjacent, positionsAdjacent', {
-  dta <- data.frame(A=c('A','A','B'), B=1:3, C=c('a','b', 'c'))
+  dta <- data.frame(A=c('A','A','B'), B=1:3, C=c('a','b', 'c'), D=c('A','B','A'))
   expect_equal(indexAlong(dta), 1:3)
   expect_equal(indexAlong(tibble(dta), 'A'), c(1,2,1))
   expect_equal(indexAlong(dta, 'A', 'B'), c(1,1,1))
   # indexAlongUnique
   expect_equal(indexAlongUnique(dta$A), c(1,1,2))
+  expect_equal(indexAlongUnique(dta$D), c(1,2,1))
   expect_equal(indexAlongUnique(dta, A), tibble(cbind(dta, i=c(1,1,2))))
   expect_equal(indexAlongUnique(dta, A, .name='N', .nameMax='NMax'), tibble(cbind(dta, N=c(1,1,2), NMax=2)))
   expect_equal(indexAlongUnique(dta, A, A), tibble(cbind(dta, i=c(1,1,1))))

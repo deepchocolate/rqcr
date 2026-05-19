@@ -133,7 +133,7 @@ distanceBetween <- function (states, times, from, to) {
 #' expandRange(df, txt, id)
 #'
 #' @export
-#' @importFrom stringi stri_detect stri_extract stri_split
+#' @importFrom stringi stri_detect stri_extract stri_replace stri_split
 #' @param x Strings to expand.
 #' @param sepRange A separator for ranges
 #' @param sep A value separator.
@@ -142,6 +142,8 @@ setGeneric('expandRange', function (x, ...) standardGeneric('expandRange'))
 #' @rdname expandRange
 setMethod('expandRange', signature('character'),
           function (x, sepRange='-', sep=',', leadZeroes=T) {
+            # Remove whitespace
+            x <- stri_replace(x, replacement='', fixed=' ', mode='all')
             if (length(sep) == 1) x <- unlist(sapply(x, FUN=stri_split, fixed=sep), use.names=F)
             if (length(sepRange) > 1) {
               for (xx in sepRange) x <- expandRange(x, sepRange=xx, leadZeroes)
@@ -252,7 +254,10 @@ setGeneric('indexAlongUnique', function (.data, col, ..., .name='i', .nameMax=NU
 setMethod('indexAlongUnique', signature('integer'), function (.data) indexAlongUnique(as.character(.data)))
 #' @rdname indexAlongUnique
 setMethod('indexAlongUnique', signature('character'),
-          function (.data) data.table::rleid(.data))
+          function (.data) {
+            tmp <- sort(unique(.data))
+            as.integer(factor(.data, levels=tmp, labels=1:length(tmp)))
+          })
 #' @rdname indexAlongUnique
 #' @param .name The column name of the index.
 #' @param .nameMax Column name of maximum index value.
