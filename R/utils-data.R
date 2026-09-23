@@ -101,6 +101,7 @@ setMethod('indicateNovel', signature('data.frame'),
 #' @param y Data with prefix column(s),
 #' @param by Specification of joining, equavalent to `dplyr::join_by`. Note: Only equality joins (`==`) accepted.
 #' @param ... Other arguments
+#' @import fuzzyjoin
 #' @export
 setGeneric('joinLeftPrefix', function (x, y, by, ...) standardGeneric('joinLeftPrefix'))
 setOldClass('dplyr_join_by')
@@ -108,7 +109,7 @@ setOldClass('dplyr_join_by')
 setMethod('joinLeftPrefix', signature('data.frame','data.frame', 'dplyr_join_by'),
           function (x, y, by) {
             mf <- as.list(stats::setNames(rep('startsWith', length(by$x)), by$x))
-            fuzzyjoin::fuzzy_left_join(x, y, by, match_fun=startsWith)
+            fuzzy_left_join(x, y, by, match_fun=startsWith)
           })
 
 #' Split data by rows that are equal to some value.

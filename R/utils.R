@@ -85,6 +85,7 @@ setMethod('elements', signature('ANY'),
             unique(.data)
           })
 #' @rdname elements
+#' @param lowercase Lowercase all characters.
 setMethod('elements', signature('data.frame'),
           function (.data, ..., lowercase=F) {
             if (lowercase == T) .data <- .data %>% mutate(across(everything(), function (x) if(is.character(x)) {tolower(x)} else {x}))

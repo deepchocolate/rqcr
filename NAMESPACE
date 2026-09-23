@@ -75,26 +75,37 @@ export(updateCases)
 export(whichTransitionsInterval)
 import(dplyr)
 import(formula.tools)
+import(fuzzyjoin)
 import(lubridate)
 import(methods)
 import(rio)
 import(tibble)
-importFrom(DBI,dbConnect)
-importFrom(DBI,dbExecute)
+importFrom(DBI,
+  dbConnect,
+  dbExecute
+)
 importFrom(dplyr,case_match)
-importFrom(duckdb,dbDisconnect)
-importFrom(duckdb,dbRemoveTable)
+importFrom(duckdb,
+  dbDisconnect,
+  dbRemoveTable
+)
 importFrom(glue,glue)
 importFrom(lubridate,today)
-importFrom(rlang,":=")
-importFrom(rlang,as_label)
-importFrom(rlang,enquos)
-importFrom(rlang,quo_get_expr)
+importFrom(rlang,
+  ":=",
+  as_label,
+  enquos,
+  quo_get_expr
+)
 importFrom(stats,ave)
-importFrom(stringi,"%s+%")
-importFrom(stringi,stri_detect)
-importFrom(stringi,stri_extract)
-importFrom(stringi,stri_replace)
-importFrom(stringi,stri_split)
-importFrom(utils,read.csv)
-importFrom(utils,write.csv)
+importFrom(stringi,
+  "%s+%",
+  stri_detect,
+  stri_extract,
+  stri_replace,
+  stri_split
+)
+importFrom(utils,
+  read.csv,
+  write.csv
+)

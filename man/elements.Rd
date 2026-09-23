@@ -10,12 +10,14 @@ elements(.data, ...)
 
 \S4method{elements}{ANY}(.data)
 
-\S4method{elements}{data.frame}(.data, ...)
+\S4method{elements}{data.frame}(.data, ..., lowercase = F)
 }
 \arguments{
 \item{.data}{Any data accepted by dplyr.}
 
 \item{...}{Columns in .data.}
+
+\item{lowercase}{Lowercase all characters.}
 }
 \description{
 Get unique elements in data.
