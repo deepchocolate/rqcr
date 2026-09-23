@@ -1,9 +1,7 @@
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/deepchocolate/rqcr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/deepchocolate/rqcr/actions/workflows/R-CMD-check.yaml)
-  
-[![DOI](https://zenodo.org/badge/1054117019.svg)](https://doi.org/10.5281/zenodo.22916814)
-
-[![codecov](https://codecov.io)](https://codecov.io)
+  [![codecov](https://codecov.io/gh/deepchocolate/rqcr/graph/badge.svg?token=V5UV9G9WDE)](https://codecov.io/gh/deepchocolate/rqcr)
+  [![DOI](https://zenodo.org/badge/1054117019.svg)](https://doi.org/10.5281/zenodo.22916814)
 <!-- badges: end -->
 
 
