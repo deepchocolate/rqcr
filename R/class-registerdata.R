@@ -371,6 +371,14 @@ setMethod('summariseATC', signature('dataRegister'),
             x %>% group_by(!!as.name(atcCol)) %>% summarise(N=n(), Individuals=length(unique(.data[[idCol]])), First=min(.data[[dateCol]]), Last=max(.data[[dateCol]]))
           })
 
+#' Get indications for dispensed drug
+#' @export
+setGeneric('getDrugIndications', function (.data, npr, kuhr) standardGeneric('getDrugIndications'))
+setMethod('getDrugIndications', signature('drugRegister', 'patientRegister', 'patientRegister'),
+          function (.data) {
+            .data ...
+          })
+
 #' Save data to file
 #' @export
 #' @param x A dataRegister class.
