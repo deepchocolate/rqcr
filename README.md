@@ -1,5 +1,6 @@
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/deepchocolate/rqcr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/deepchocolate/rqcr/actions/workflows/R-CMD-check.yaml)
+  
 [![DOI](https://zenodo.org/badge/1054117019.svg)](https://doi.org/10.5281/zenodo.22916814)
 <!-- badges: end -->
 
