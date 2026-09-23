@@ -1,3 +1,7 @@
+# Note on DuckDB: Recent version will throw a message asking for a configuration
+# Running command below will store duckdb configurations in ~/.duckdb and silence the info (this is a one-time configuration command)
+# duckdb::duckdb(shared_home = T)
+
 FILE_NO_DR <- 'data/norwegian_drug_register.csv'
 FILE_EXCEL <- 'data/workbook.xlsx'
 DIR_DB <- withr::local_tempdir(.local_envir = .GlobalEnv)
@@ -20,7 +24,7 @@ dataPDRCreate <- function (error=F) {
 }
 
 setupDatabases <- function () {
-  require(duckdb)
+  require(duckdb, quietly = T)
   require(stringi)
   require(readr)
   dbA <- readr::read_file('data/database-a.sql')

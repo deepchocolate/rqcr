@@ -83,12 +83,13 @@ test_that('elements', {
   df <- data.frame(A=c('A','B','B'), B=c(1,2,2))
   expect_equal(elements(df, B), c(1,2))
   expect_equal(elements(df), unique(df))
+  expect_equal(elements(df, lowercase=T), data.frame(A=c('a','b'), B=c(1,2)))
   expect_equal(elements(df$A), c('A','B'))
   expect_error(elements(df$C))
 })
 
 test_that('expandRange', {
-  expect_equal(expandRange(c('A','A1-A3', 'A08','C100-C101')), c('A','A1','A2','A3', 'A08','C100','C101'))
+  expect_equal(expandRange(c('A','A1-A3','I', 'A08','C100-C101')), c('A','A1','A2','A3', 'I', 'A08','C100','C101'))
   expect_equal(expandRange(c('A','A01-A03','B00-B02')), c('A','A01','A02','A03','B00','B01','B02'))
   vec <- c('A', 'A1-A3', 'ABC10-ABC11', 'ABC19','B3-B2')
   expect_equal(expandRange(vec, leadZeroes=F), c('A', 'A1','A2','A3', 'ABC10','ABC11', 'ABC19', 'B3', 'B2'))

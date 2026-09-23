@@ -67,6 +67,8 @@ test_that('drugRegister', {
   expect_equal(class(b), c('dataRegister', 'data.frame'))
   b <- b %>% arrange(desc(A))
   expect_equal(class(b), c('dataRegister', 'data.frame'))
+  b <- b %>% filter(A==1)
+  expect_equal(class(b), c('dataRegister', 'data.frame'))
   a <- drugRegister(a)
   a <- logCheckpoint(a, 'Test', 1, 'Test')
   expect_equal(class(a), c('dataRegister', 'data.frame'))

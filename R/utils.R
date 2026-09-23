@@ -86,7 +86,8 @@ setMethod('elements', signature('ANY'),
           })
 #' @rdname elements
 setMethod('elements', signature('data.frame'),
-          function (.data, ...) {
+          function (.data, ..., lowercase=F) {
+            if (lowercase == T) .data <- .data %>% mutate(across(everything(), function (x) if(is.character(x)) {tolower(x)} else {x}))
             o <- .data %>% distinct(...)
             if (ncol(o) == 1) return(pull(o))
             o
