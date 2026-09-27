@@ -1,6 +1,9 @@
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/deepchocolate/rqcr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/deepchocolate/rqcr/actions/workflows/R-CMD-check.yaml)
-  <!-- badges: end -->
+  [![codecov](https://codecov.io/gh/deepchocolate/rqcr/graph/badge.svg?token=V5UV9G9WDE)](https://codecov.io/gh/deepchocolate/rqcr)
+  [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22916814-blue)](https://doi.org/10.5281/zenodo.22916814)
+<!-- badges: end -->
+
 
 # Register Quality-Control in R
 
