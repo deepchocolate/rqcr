@@ -53,6 +53,13 @@ test_that('drugRegister', {
   periods <- getMergedPeriods(a)
   expect_equal(periods, tibble(id=c(1,1,2), date=c('2000-01-01','2000-01-10','2020-12-30'), days=c(8,4,6)))
 
+  ### Get indications
+  a <- drugRegister(FILE_NO_DR)
+  #print(a)
+  a <- renameColumns(a, NO_NAMES$DRUG_REGISTER$English, NO_NAMES$DRUG_REGISTER$Delivery, T)
+  #print(a)
+  dtaInd <- getDrugIndications(a)
+
   ### Illustrate some issues with certain operations, notable change of class when grouping in dplyr
   # Class is preserved with bind_rows
   a <- drugRegister(tibble(A=1:3, B=1))
@@ -85,6 +92,17 @@ test_that('renameColumns', {
   dta <- read.csv(FILE_NO_DR)
   dta2 <- renameColumns(dta, NO_NAMES$DRUG_REGISTER$Norwegian, NO_NAMES$DRUG_REGISTER$Delivery, verbose=F)
   expect_equal(dta2$lopenr, dta$Lopenummer_NPR)
+  cols <- colnames(dta)
+  mtches <- match(NO_NAMES$DRUG_REGISTER$Delivery, cols)
+  cols2 <- colnames(dta2)
+  expect_equal(cols2[mtches], NO_NAMES$DRUG_REGISTER$Norwegian)
+  dta2 <- renameColumns(dta, NO_NAMES$DRUG_REGISTER$English, NO_NAMES$DRUG_REGISTER$Delivery, verbose=F)
+  cols <- colnames(dta)
+  colsEn <- NO_NAMES$DRUG_REGISTER$English
+  colsEn[is.na(colsEn)] <- NO_NAMES$DRUG_REGISTER$Delivery[is.na(colsEn)]
+  mtches <- match(colsEn, cols)
+  cols2 <- colnames(dta2)
+  expect_equal(cols2[mtches], colsEn[mtches])
   # No overlap should keep everything as is
   dta3 <- data.frame(A=1,B=2)
   expect_equal(renameColumns(dta3, NO_NAMES$DRUG_REGISTER$Norwegian, NO_NAMES$DRUG_REGISTER$Delivery), dta3)

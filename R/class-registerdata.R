@@ -178,6 +178,8 @@ setMethod('getLog', signature('dataRegister'),
             getMeta(x, 'logs')
           })
 
+### DRUG REGISTER
+
 #' Create object for the drug register
 #' @name drugRegister
 #' @export
@@ -205,6 +207,35 @@ setMethod('drugRegister', signature('data.frame', 'character'),
 #' @rdname drugRegister
 setMethod('drugRegister', signature('data.frame', 'missing'),
           function (x) dataRegister(x, 'drugRegister'))
+
+### PATIENT REGISTER
+#' Create object for a patient register
+#' @name patientRegister
+#' @export
+#' @param x Register input: a file or tabular data.
+#' @param config A configuration file in YAML format.
+setGeneric('patientRegister', function (x, config) standardGeneric('patientRegister'))
+#' @rdname patientRegister
+setMethod('patientRegister', signature('character', 'character'),
+          function (x, config) {
+            x <- patientRegister(x)
+            configure(x, config)
+          })
+#' @rdname patientRegister
+setMethod('patientRegister', signature('character', 'missing'),
+          function (x) {
+            x <- data.table::fread(x)
+            patientRegister(x)
+          })
+#' @rdname patientRegister
+setMethod('patientRegister', signature('data.frame', 'character'),
+          function (x, config) {
+            x <- patientRegister(x)
+            configure(x, config)
+          })
+#' @rdname patientRegister
+setMethod('patientRegister', signature('data.frame', 'missing'),
+          function (x) patientRegister(x, 'patientRegister'))
 
 #' Get/set columns for dataRegister methods
 #'
@@ -316,36 +347,14 @@ setMethod('getMergedPeriods', signature('dataRegister'),
 #' @param verbose Control information output.
 renameColumnsMap <- function (dta, colsName, colsRename=NULL, verbose=T) {
   cnames <- colnames(dta)
-  # Indices in Delivery
-  overl <- match(cnames, colsRename)
-  # Positions in data columns
-  inx <- 1:length(overl)
-  colMissing <- is.na(overl)
-  # Columns not present in renaming map
-  novel <- inx[colMissing]
-  # Remove positions that are not present in the mapping as they should not be renamed
-  if (any(is.na(overl))) inx <- inx[!colMissing]
-  overl <- stats::na.omit(overl)
-  # If no overlap exists, just return data
-  if (!any(overl)) {
-    if (verbose) message('No columns to rename provided')
-    return(dta)
+  mp <- tibble(names=cnames) %>% left_join(tibble(names=colsRename, newNames=colsName), join_by(names)) %>%
+    mutate(newNames=na_if(newNames, ''), changed=!is.na(newNames), newNames=coalesce(newNames, names))
+  colnames(dta) <- mp$newNames
+  if (verbose) {
+    pos <- which(mp$changed)
+    message(stringi::stri_sprintf(paste0('%', max(nchar(mp$names[pos])),'s \t %-',max(nchar(mp$newNames[pos])),'s\n'), mp$names[pos], mp$newNames[pos]))
   }
-  colsNew <- colsName
-  # Replace any empty entries with their default names (mainly for English)
-  colsEmpty <- colsNew == ''
-  if (any(colsEmpty)) colsNew[colsEmpty] <- cnames[colsEmpty]
-  listOldNames <- cnames
-  cnames[inx] <- colsNew[overl]
-  listNewNames <- cnames
-  listNewNames[novel] <- ''
-  listNewNames <- c('CHANGE', listNewNames)
-  listOldNames <- c('COLUMN', listOldNames)
-  mx <- max(nchar(listOldNames))
-  mx2 <- max(nchar(listNewNames))
-  if (verbose) message(stringi::stri_sprintf(paste0('%',mx,'s \t %-',mx2,'s\n'), listOldNames, listNewNames))
-  colnames(dta) <- cnames
-  dta
+  return(dta)
 }
 
 #' Rename columns in a `dataRegister` object
@@ -374,9 +383,14 @@ setMethod('summariseATC', signature('dataRegister'),
 #' Get indications for dispensed drug
 #' @export
 setGeneric('getDrugIndications', function (.data, npr, kuhr) standardGeneric('getDrugIndications'))
-setMethod('getDrugIndications', signature('drugRegister', 'patientRegister', 'patientRegister'),
+setMethod('getDrugIndications', signature('dataRegister', 'missing', 'missing'),
           function (.data) {
-            .data ...
+            colsIndications <- getColumn(.data, 'code_indication')
+            for (col in colsIndications) {
+              o <- .data %>% mutate({{ col }} := case_when({{ col }} == '' ~ NA, .default= {{ col }}))
+            }
+            o
+            #print(o)
           })
 
 #' Save data to file
