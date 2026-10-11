@@ -463,7 +463,7 @@ setMethod('getPrefixMatches', signature('character', 'character'),
 #' @export
 recodeToNA <- function (x, cases) {
   if (all(is.na(x))) return(x)
-  dplyr::case_match(x, cases~NA, .default=x)
+  dplyr::replace_values(x,  cases ~ NA)
 }
 
 #' Recode individual sex to M(ale)/F(emale).
@@ -473,10 +473,10 @@ recodeToNA <- function (x, cases) {
 #' @export
 recodeSex <- function (x, default=NA) {
   x <- as.character(x)
-  dplyr::case_match(x,
+  dplyr::recode_values(x,
                     c('1','M')~'M',
                     c('2', 'K')~'F',
-                    .default=default
+                    default=default
   )
 }
 

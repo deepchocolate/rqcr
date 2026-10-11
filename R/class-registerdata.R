@@ -15,12 +15,71 @@ dataRegister <- function (x, register) {
   o
 }
 
-# This is mainly for attributes so has little effect at the moment
-#' @exportS3Method dplyr::dplyr_reconstruct
-dplyr_reconstruct.dataRegister <- function(data, template) {
-  class(data) <- union(class(template), class(data))
-  data
+# If a data.frame is passed
+#' @export
+`[.dataRegister` <- function(x, ...) {
+  # Save the original custom attribute
+  saved_attr <- attr(x, "register")
+  xcl <- class(x)
+
+  # Re-apply the class and attribute if the result is still a data.frame
+  if (is.data.table(x)) {
+    setattr(x, 'class', setdiff(xcl, 'dataRegister'))
+    on.exit(setattr(x, "class", xcl), add = TRUE)
+    res <- data.table:::`[.data.table`(x, ...)
+    setattr(x, 'class', xcl)
+    if (is.data.frame(res)) {
+      setDT(res)
+      setattr(res, 'class', xcl)
+      setattr(res, "register", saved_attr)
+    }
+  } else {
+    res <- NextMethod('[')
+    if (is.data.frame(res)) {
+      attr(res, "register") <- saved_attr
+      class(res) <- xcl
+    }
+  }
+  return(res)
 }
+
+# This is mainly for attributes so has little effect at the moment
+#' @export
+#' @exportS3Method dplyr::dplyr_reconstruct
+dplyr_reconstruct.dataRegister <- function(.data, template) {
+  class(.data) <- union(class(template), class(.data))
+  attr(.data, 'register') <- attr(template, 'register')
+  if (inherits(template, "data.table")) {
+    setattr(.data, "register", attr(template, 'register'))
+  }
+  .data
+}
+
+#' @exportS3Method dplyr::dplyr_col_modify
+dplyr_col_modify.dataRegister <- function (.data, cols) {
+  sattr <- attr(.data, 'register')
+  isdt <- inherits(.data, 'data.table')
+  res <- NextMethod('dplyr_col_modify')
+  if (isdt) setDT(.data)
+  setattr(res, 'register', sattr)
+  res
+}
+
+#' @exportS3Method dplyr::dplyr_row_slice
+dplyr_row_slice.dataRegister <- function(.data, i, ...) {
+  # Call standard data.frame row slicing
+  sattr <- attr(.data, 'register')
+  cls <- class(.data)
+  isdt <- inherits(.data, 'data.table')
+  res <- NextMethod("dplyr_row_slice")
+  if (isdt) {
+    setDT(.data)
+    setattr(.data, 'class', cls)
+  }
+  setattr(res, 'register', sattr)
+  res
+}
+
 
 #' @exportS3Method dplyr::group_by
 group_by.dataRegister <- function (.data, ..., .add, .drop) {
@@ -351,6 +410,10 @@ renameColumnsMap <- function (dta, colsName, colsRename=NULL, verbose=T) {
     mutate(newNames=na_if(newNames, ''), changed=!is.na(newNames), newNames=coalesce(newNames, names))
   colnames(dta) <- mp$newNames
   if (verbose) {
+    if (!any(mp$changed)) {
+      message('No changes made')
+      return(dta)
+    }
     pos <- which(mp$changed)
     message(stringi::stri_sprintf(paste0('%', max(nchar(mp$names[pos])),'s \t %-',max(nchar(mp$newNames[pos])),'s\n'), mp$names[pos], mp$newNames[pos]))
   }
@@ -382,15 +445,31 @@ setMethod('summariseATC', signature('dataRegister'),
 
 #' Get indications for dispensed drug
 #' @export
-setGeneric('getDrugIndications', function (.data, npr, kuhr) standardGeneric('getDrugIndications'))
+setGeneric('getDrugIndications', function (.data, npr, kuhr, impute=0) standardGeneric('getDrugIndications'))
 setMethod('getDrugIndications', signature('dataRegister', 'missing', 'missing'),
-          function (.data) {
+          function (.data, impute=0) {
             colsIndications <- getColumn(.data, 'code_indication')
+            # Add a temporary row ID
+            .data <- .data %>% mutate(tid=row_number())
+            # 1. Indication from drug register
+            tmp <- .data %>% select(all_of(colsIndications))
             for (col in colsIndications) {
-              o <- .data %>% mutate({{ col }} := case_when({{ col }} == '' ~ NA, .default= {{ col }}))
+              tmp <- tmp %>% mutate({{ col }} := case_when( .data[[col]]  == '' ~ NA, .default= .data[[col]]))
             }
-            o
-            #print(o)
+            .data <- .data %>% mutate(indication=coalesce(tmp[,1], tmp[,2]), indicationSource=case_when(!is.na(indication) ~ 'drugRegister'))
+            tmp <- .data %>% filter(is.na(indication))
+            .data <- .data %>% filter(!is.na(indication))
+
+            # 2. Impute indications from adjacent dispensations
+            colIID <- getColumn(.data, 'individual')
+            if (impute > 0) {
+              tmp <- tmp %>% select(tid, indication, {{ colIID }})
+              tmp <- tmp %>% mutate(indicationSource = case_when(length(unique(indication)) == 1 ~ 'drugRegister dispensations', .default=indicationSource) , .by={{ colIID }})
+              tmp <- tmp %>% mutate(indication=case_when(indicationSource == 'drugRegister dispensations' ~ unique(indication), .default=indicationSource ), .by={{ colIID }})
+            }
+            .data <- .data %>% bind_rows(tmp %>% filter(!is.na(indicationSource)))
+            # Search patient register
+            .data
           })
 
 #' Save data to file
