@@ -90,6 +90,11 @@ importFrom(DBI,
   dbConnect,
   dbExecute
 )
+importFrom(data.table,
+  is.data.table,
+  setDT,
+  setattr
+)
 importFrom(dplyr,case_match)
 importFrom(duckdb,
   dbDisconnect,

@@ -16,6 +16,7 @@ dataRegister <- function (x, register) {
 }
 
 # If a data.frame is passed
+#' @importFrom data.table setattr setDT is.data.table
 #' @export
 `[.dataRegister` <- function(x, ...) {
   # Save the original custom attribute
@@ -44,6 +45,7 @@ dataRegister <- function (x, register) {
 }
 
 # This is mainly for attributes so has little effect at the moment
+#' @importFrom data.table setattr
 #' @export
 #' @exportS3Method dplyr::dplyr_reconstruct
 dplyr_reconstruct.dataRegister <- function(.data, template) {
@@ -55,6 +57,7 @@ dplyr_reconstruct.dataRegister <- function(.data, template) {
   .data
 }
 
+#' @importFrom data.table setattr setDT
 #' @exportS3Method dplyr::dplyr_col_modify
 dplyr_col_modify.dataRegister <- function (.data, cols) {
   sattr <- attr(.data, 'register')
@@ -65,6 +68,7 @@ dplyr_col_modify.dataRegister <- function (.data, cols) {
   res
 }
 
+#' @importFrom data.table setattr setDT
 #' @exportS3Method dplyr::dplyr_row_slice
 dplyr_row_slice.dataRegister <- function(.data, i, ...) {
   # Call standard data.frame row slicing
