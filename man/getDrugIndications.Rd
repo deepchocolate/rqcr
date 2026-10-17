@@ -2,9 +2,21 @@
 % Please edit documentation in R/class-registerdata.R
 \name{getDrugIndications}
 \alias{getDrugIndications}
+\alias{getDrugIndications,dataRegister,missing,missing-method}
 \title{Get indications for dispensed drug}
 \usage{
 getDrugIndications(.data, npr, kuhr, impute = 0)
+
+\S4method{getDrugIndications}{dataRegister,missing,missing}(.data, impute = 0)
+}
+\arguments{
+\item{.data}{A dataRegister object.}
+
+\item{npr}{Primary data source with diagnoses for missing indications.}
+
+\item{kuhr}{Secondary data source with diagnoses for missing indications.}
+
+\item{impute}{Whether to impute indications from an individuals adjacent dispensations.}
 }
 \description{
 Get indications for dispensed drug

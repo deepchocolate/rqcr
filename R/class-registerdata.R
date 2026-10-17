@@ -27,7 +27,10 @@ dataRegister <- function (x, register) {
   if (is.data.table(x)) {
     setattr(x, 'class', setdiff(xcl, 'dataRegister'))
     on.exit(setattr(x, "class", xcl), add = TRUE)
-    res <- data.table:::`[.data.table`(x, ...)
+    cl <- match.call()
+    #cl[[1]] <- quote(data.table:::`[.data.table`)
+    cl[[1]] <- quote(`[`)
+    res <- eval(cl, envir=parent.frame())
     setattr(x, 'class', xcl)
     if (is.data.frame(res)) {
       setDT(res)
@@ -48,37 +51,37 @@ dataRegister <- function (x, register) {
 #' @importFrom data.table setattr
 #' @export
 #' @exportS3Method dplyr::dplyr_reconstruct
-dplyr_reconstruct.dataRegister <- function(.data, template) {
-  class(.data) <- union(class(template), class(.data))
-  attr(.data, 'register') <- attr(template, 'register')
+dplyr_reconstruct.dataRegister <- function(data, template) {
+  class(data) <- union(class(template), class(data))
+  attr(data, 'register') <- attr(template, 'register')
   if (inherits(template, "data.table")) {
-    setattr(.data, "register", attr(template, 'register'))
+    setattr(data, "register", attr(template, 'register'))
   }
-  .data
+  data
 }
 
 #' @importFrom data.table setattr setDT
 #' @exportS3Method dplyr::dplyr_col_modify
-dplyr_col_modify.dataRegister <- function (.data, cols) {
-  sattr <- attr(.data, 'register')
-  isdt <- inherits(.data, 'data.table')
+dplyr_col_modify.dataRegister <- function (data, cols) {
+  sattr <- attr(data, 'register')
+  isdt <- inherits(data, 'data.table')
   res <- NextMethod('dplyr_col_modify')
-  if (isdt) setDT(.data)
+  if (isdt) setDT(data)
   setattr(res, 'register', sattr)
   res
 }
 
 #' @importFrom data.table setattr setDT
 #' @exportS3Method dplyr::dplyr_row_slice
-dplyr_row_slice.dataRegister <- function(.data, i, ...) {
+dplyr_row_slice.dataRegister <- function(data, i, ...) {
   # Call standard data.frame row slicing
-  sattr <- attr(.data, 'register')
-  cls <- class(.data)
-  isdt <- inherits(.data, 'data.table')
+  sattr <- attr(data, 'register')
+  cls <- class(data)
+  isdt <- inherits(data, 'data.table')
   res <- NextMethod("dplyr_row_slice")
   if (isdt) {
-    setDT(.data)
-    setattr(.data, 'class', cls)
+    setDT(data)
+    setattr(data, 'class', cls)
   }
   setattr(res, 'register', sattr)
   res
@@ -409,6 +412,7 @@ setMethod('getMergedPeriods', signature('dataRegister'),
 #' @param colsRename Columns to rename.
 #' @param verbose Control information output.
 renameColumnsMap <- function (dta, colsName, colsRename=NULL, verbose=T) {
+  newNames <- NULL
   cnames <- colnames(dta)
   mp <- tibble(names=cnames) %>% left_join(tibble(names=colsRename, newNames=colsName), join_by(names)) %>%
     mutate(newNames=na_if(newNames, ''), changed=!is.na(newNames), newNames=coalesce(newNames, names))
@@ -449,9 +453,16 @@ setMethod('summariseATC', signature('dataRegister'),
 
 #' Get indications for dispensed drug
 #' @export
+#' @name getDrugIndications
+#' @param .data A dataRegister object.
+#' @param npr Primary data source with diagnoses for missing indications.
+#' @param kuhr Secondary data source with diagnoses for missing indications.
+#' @param impute Whether to impute indications from an individuals adjacent dispensations.
 setGeneric('getDrugIndications', function (.data, npr, kuhr, impute=0) standardGeneric('getDrugIndications'))
+#' @rdname getDrugIndications
 setMethod('getDrugIndications', signature('dataRegister', 'missing', 'missing'),
           function (.data, impute=0) {
+            tid <- indication <- indicationSource <- NULL
             colsIndications <- getColumn(.data, 'code_indication')
             # Add a temporary row ID
             .data <- .data %>% mutate(tid=row_number())
@@ -460,7 +471,7 @@ setMethod('getDrugIndications', signature('dataRegister', 'missing', 'missing'),
             for (col in colsIndications) {
               tmp <- tmp %>% mutate({{ col }} := case_when( .data[[col]]  == '' ~ NA, .default= .data[[col]]))
             }
-            .data <- .data %>% mutate(indication=coalesce(tmp[,1], tmp[,2]), indicationSource=case_when(!is.na(indication) ~ 'drugRegister'))
+            .data <- .data %>% mutate(indication=coalesce(tmp[,1] %>% pull(), tmp[,2] %>% pull()), indicationSource=case_when(!is.na(indication) ~ 'drugRegister'))
             tmp <- .data %>% filter(is.na(indication))
             .data <- .data %>% filter(!is.na(indication))
 
