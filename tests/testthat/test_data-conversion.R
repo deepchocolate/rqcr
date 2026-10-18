@@ -15,7 +15,7 @@ test_that('Test parquet', {
   filePar <- withr::local_tempfile()
   convertDBTableToParquet(con, 'temp', filePar, partition='year')
   dtaPar <- arrow::open_dataset(filePar) |> collect()
-  expect_equal(dta, as.data.frame(dtaPar))
+  expect_equal(dta %>% arrange(Date), as.data.frame(dtaPar))
 })
 
 test_that('Test convertToCSV', {
@@ -55,5 +55,5 @@ test_that('convertBigCSV', {
   fileSpss <- convertBigCSV(pathFile, pathOutput)
   expect_true(file.exists(fileSpss))
   dta <- haven::read_dta(fileSpss)
-  expect_equal(nrow(dta), 4)
+  expect_equal(nrow(dta), 5)
 })

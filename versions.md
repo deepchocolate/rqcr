@@ -3,6 +3,7 @@
 ## 0.5.0
 - Bugs fixed:
   - Column renaming in `renameColumnsMap`. Missnaming occured when new column names had missing values or empty strings.
+  - Attributes persist after operations on data frames.
 
 ## 0.4.0
 - Changed to flexible way of storing exclusion data.

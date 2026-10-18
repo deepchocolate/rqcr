@@ -5,6 +5,7 @@ test_that('Compare drug frequencies', {
   # Adapt local input data
   fileIn <- dataPDRCreate()
   dtaLoc <- read.csv(fileIn)
+  dtaLoc <- dtaLoc[1:4,]
   dtaExt <- dtaLoc
   dtaExt$ATC <- c(rep('A01AA', 3), 'A01AA01')
   dtaExt$Date <- c(2016, 2020,2009,2006)

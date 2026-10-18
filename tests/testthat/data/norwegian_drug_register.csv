@@ -3,3 +3,4 @@ ERROR,Lopenummer_NPR,Utlevering_Dato,Legemiddel_ATCkode_Niva5,Utlevering_DDD,Pas
 ,I2,2025-01-03,N06BA02,2,1982,N06B,,,,,P81,,,,,,,,,,,,,,,,,,,,
 ,I3,2025-01-03,N06BA01,-1,1981,N06B,,,,F14,,,,,,,,,,,,,,,,,,,,,
 Bad date,I3,x,N06BA01,-1,1980,N06B,,,,,P70,,,,,,,,,,,,,,,,,,,,
+,I4,2020-05-30,N06BA01,,1973,,,,,,,,,,,,,,,,,,,,,,,,,,

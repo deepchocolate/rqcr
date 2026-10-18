@@ -41,20 +41,20 @@ test_that('drugRegister', {
   expect_error(frequencyATC(a))
   a <- setColumn(a, 'code_atc', 'atcCode4')
   r <- frequencyATC(a)
-  expect_equal(r$atcCode4, 'N06B')
-  expect_equal(r$N, 4)
-  expect_equal(r$Percent, 100)
+  expect_equal(r$atcCode4, c('','N06B'))
+  expect_equal(r$N, c(1,4))
+  expect_equal(r$Percent, c(20,80))
 
   a <- renameColumns(a, NO_NAMES$DRUG_REGISTER$English, NO_NAMES$DRUG_REGISTER$Delivery, F)
   # Index observations
   a <- a %>% indexObservations()
-  expect_equal(a$i, 1:4)
+  expect_equal(a$i, 1:5)
   a <- a %>% indexObservations(IID, .nameMax='I')
-  expect_equal(a$i, c(1,1,1,2))
-  expect_equal(a$I, c(1,1,2,2))
+  expect_equal(a$i, c(1,1,1,2,1))
+  expect_equal(a$I, c(1,1,2,2,1))
   ### Merge periods
   a <- subset(a, dateDelivery != 'x')
-  expect_equal(getMergedPeriods(a), tibble(IID=c('I1','I2','I3'), date=c('2024-12-31','2025-01-03','2025-01-03'), days=c(1,2,-1)))
+  expect_equal(getMergedPeriods(a), tibble(IID=c('I1','I2','I3','I4'), date=c('2024-12-31','2025-01-03','2025-01-03','2020-05-30'), days=c(1,2,-1, NA)))
   dta <- tibble(id=c(1,1,1,2,2),
                 date=c('2000-01-01', '2000-01-05', '2000-01-10', '2020-12-30', '2021-01-02'),
                 days=c(4, 4, 4, 4, 2))
