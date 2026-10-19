@@ -32,6 +32,7 @@ dataRegister <- function (x, register) {
     cl[[1]] <- quote(`[`)
     res <- eval(cl, envir=parent.frame())
     setattr(x, 'class', xcl)
+    setattr(x, 'register', saved_attr)
     if (is.data.frame(res)) {
       setDT(res)
       setattr(res, 'class', xcl)
@@ -105,6 +106,17 @@ ungroup.dataRegister <- function (x, ...) {
 setOldClass(c('dataRegister', 'data.table','data.frame', 'tibble'))
 
 ### Functions to interact with the metadata
+#' Get register type
+#' @name registerType
+#' @export
+#' @param .data Data of class dataRegister
+setGeneric('registerType', function (.data) standardGeneric('registerType'))
+#' @rdname registerType
+setMethod('registerType', signature('dataRegister'),
+          function (.data) {
+            attr(.data, 'register')
+          })
+
 # Get object stored under name
 setGeneric('getMeta', function (.data, name=NULL) standardGeneric('getMeta'))
 setMethod('getMeta', signature('dataRegister'),
@@ -301,7 +313,7 @@ setMethod('patientRegister', signature('data.frame', 'character'),
           })
 #' @rdname patientRegister
 setMethod('patientRegister', signature('data.frame', 'missing'),
-          function (x) patientRegister(x, 'patientRegister'))
+          function (x) dataRegister(x, 'patientRegister'))
 
 #' Get/set columns for dataRegister methods
 #'
@@ -455,36 +467,50 @@ setMethod('summariseATC', signature('dataRegister'),
 #' @export
 #' @name getDrugIndications
 #' @param .data A dataRegister object.
-#' @param npr Primary data source with diagnoses for missing indications.
-#' @param kuhr Secondary data source with diagnoses for missing indications.
+#' @param ... Patient data with diagnoses. Priority will be given in order of appearance
 #' @param impute Whether to impute indications from an individuals adjacent dispensations.
-setGeneric('getDrugIndications', function (.data, npr, kuhr, impute=0) standardGeneric('getDrugIndications'))
+setGeneric('getDrugIndications', function (.data, ..., impute=0, days=NA) standardGeneric('getDrugIndications'))
 #' @rdname getDrugIndications
-setMethod('getDrugIndications', signature('dataRegister', 'missing', 'missing'),
-          function (.data, impute=0) {
+setMethod('getDrugIndications', signature('dataRegister'),
+          function (.data, ..., impute=0, days=NA) {
+            dta <- .data
+            if (is.data.table(dta)) dta <- data.table:::shallow(.data)
+            rtype <- registerType(dta)
+            if (rtype != 'drugRegister') stop('The first argument should be of type drugRegister. Received ', rtype)
             tid <- indication <- indicationSource <- NULL
-            colsIndications <- getColumn(.data, 'code_indication')
+            colsIndications <- getColumn(dta, 'code_indication')
             # Add a temporary row ID
-            .data <- .data %>% mutate(tid=row_number())
+            dta <- dta %>% mutate(tid=row_number())
             # 1. Indication from drug register
-            tmp <- .data %>% select(all_of(colsIndications))
+            tmp <- dta %>% select(all_of(colsIndications))
             for (col in colsIndications) {
-              tmp <- tmp %>% mutate({{ col }} := case_when( .data[[col]]  == '' ~ NA, .default= .data[[col]]))
+              tmp <- tmp %>% mutate({{ col }} := case_when( dta[[col]]  == '' ~ NA, .default= dta[[col]]))
             }
-            .data <- .data %>% mutate(indication=coalesce(tmp[,1] %>% pull(), tmp[,2] %>% pull()), indicationSource=case_when(!is.na(indication) ~ 'drugRegister'))
-            tmp <- .data %>% filter(is.na(indication))
-            .data <- .data %>% filter(!is.na(indication))
+            dta <- dta %>% mutate(indication=coalesce(tmp[,1] %>% pull(), tmp[,2] %>% pull()), indicationSource=case_when(!is.na(indication) ~ 'drugRegister'))
+            # Remove missing indications from drug register and store separately
+            tmp <- dta %>% filter(is.na(indication))
+            dta <- dta %>% filter(!is.na(indication))
 
             # 2. Impute indications from adjacent dispensations
-            colIID <- getColumn(.data, 'individual')
+            colIID <- getColumn(dta, 'individual')
             if (impute > 0) {
               tmp <- tmp %>% select(tid, indication, {{ colIID }})
               tmp <- tmp %>% mutate(indicationSource = case_when(length(unique(indication)) == 1 ~ 'drugRegister dispensations', .default=indicationSource) , .by={{ colIID }})
               tmp <- tmp %>% mutate(indication=case_when(indicationSource == 'drugRegister dispensations' ~ unique(indication), .default=indicationSource ), .by={{ colIID }})
             }
-            .data <- .data %>% bind_rows(tmp %>% filter(!is.na(indicationSource)))
-            # Search patient register
-            .data
+            dta <- dta %>% bind_rows(tmp %>% filter(!is.na(indicationSource)))
+            pdArgs <- list(...)
+            # 3. Search patient register(s)
+            # Individual ID in drug register
+            colIID <- getColumn(.data, 'individual')
+            for (pd in list(...)) {
+              rtype <- registerType(pd)
+              if (rtype != 'patientRegister') stop('Data passed in `...` should be of type patientRegister. Received ', rtype)
+              colIIDpd <- getColumn(pd, 'individual')
+              tmp2 <- tmp %>% left_join(pd, join_by({{ colIID }} == {{ colIIDpd }}))
+              #print(tmp2)
+            }
+            dta
           })
 
 #' Save data to file

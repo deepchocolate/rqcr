@@ -4,6 +4,7 @@ require(duckdb, quietly=T)
 duckdb::duckdb(shared_home = T)
 
 FILE_NO_DR <- 'data/norwegian_drug_register.csv'
+FILE_NO_NPR <- 'data/norwegian_patient_register.csv'
 FILE_EXCEL <- 'data/workbook.xlsx'
 DIR_DB <- withr::local_tempdir(.local_envir = .GlobalEnv)
 
