@@ -469,10 +469,10 @@ setMethod('summariseATC', signature('dataRegister'),
 #' @param .data A dataRegister object.
 #' @param ... Patient data with diagnoses. Priority will be given in order of appearance
 #' @param impute Whether to impute indications from an individuals adjacent dispensations.
-setGeneric('getDrugIndications', function (.data, ..., impute=0, days=NA) standardGeneric('getDrugIndications'))
+setGeneric('getDrugIndications', function (.data, ..., impute=0, days=NA, diagnoses=NULL) standardGeneric('getDrugIndications'))
 #' @rdname getDrugIndications
 setMethod('getDrugIndications', signature('dataRegister'),
-          function (.data, ..., impute=0, days=NA) {
+          function (.data, ..., impute=0, days=NA, diagnoses=NULL) {
             dta <- .data
             if (is.data.table(dta)) dta <- data.table:::shallow(.data)
             rtype <- registerType(dta)
@@ -489,7 +489,6 @@ setMethod('getDrugIndications', signature('dataRegister'),
             dta <- dta %>% mutate(indication=coalesce(tmp[,1] %>% pull(), tmp[,2] %>% pull()), indicationSource=case_when(!is.na(indication) ~ 'drugRegister'))
             # Remove missing indications from drug register and store separately
             tmp <- dta %>% filter(is.na(indication))
-            dta <- dta %>% filter(!is.na(indication))
 
             # 2. Impute indications from adjacent dispensations
             colIID <- getColumn(dta, 'individual')
@@ -498,16 +497,36 @@ setMethod('getDrugIndications', signature('dataRegister'),
               tmp <- tmp %>% mutate(indicationSource = case_when(length(unique(indication)) == 1 ~ 'drugRegister dispensations', .default=indicationSource) , .by={{ colIID }})
               tmp <- tmp %>% mutate(indication=case_when(indicationSource == 'drugRegister dispensations' ~ unique(indication), .default=indicationSource ), .by={{ colIID }})
             }
+            # Add imputed indications
+            dta <- dta %>% filter(!tid %in% subset(tmp, !is.na(indicationSource))$tid)
             dta <- dta %>% bind_rows(tmp %>% filter(!is.na(indicationSource)))
             pdArgs <- list(...)
+            if (length(pdArgs) == 0) return(dta)
+            tmp <- tmp %>% filter(is.na(indicationSource))
             # 3. Search patient register(s)
             # Individual ID in drug register
             colIID <- getColumn(.data, 'individual')
+            colDate <- getColumn(.data, 'dispensation_date')
             for (pd in list(...)) {
               rtype <- registerType(pd)
               if (rtype != 'patientRegister') stop('Data passed in `...` should be of type patientRegister. Received ', rtype)
               colIIDpd <- getColumn(pd, 'individual')
-              tmp2 <- tmp %>% left_join(pd, join_by({{ colIID }} == {{ colIIDpd }}))
+              colDiagsPd <- getColumn(pd, 'diagnosis')
+              colDatePd <- getColumn(pd, 'date')
+              if (!is.null(diagnoses)) pd <- pd %>% filter({{ colDiagsPd }} %in% diagnoses)
+              #print(tmp)
+              # Default mode: Identify the diagnosis closest to dispensation
+              tmp2 <- tmp %>% inner_join(pd, join_by({{ colIID }} == {{ colIIDpd }}))
+              tmp2 <- tmp2 %>% mutate(dateDiff=lubridate::as_date( tmp2[[colDate]]) - lubridate::as_date( tmp2[[colDatePd ]]))
+              #print(tmp2)
+              tmp2 <- tmp2 %>% filter(abs(dateDiff) == min(dateDiff), .by={{ colIID }})
+              if (countUnique(tmp2, tid) != nrow(tmp2)) warning('Multiple potential indications found for at least 1 individual')
+              tmp2 <- tmp2 %>% mutate(indication= .data[[colDiagsPd]], indicationSource=registerType(pd))
+              dta <- dta %>% filter(!tid %in% tmp2$tid)
+              dta <- dta %>% bind_rows(tmp2)
+              tmp <- tmp %>% filter(!tid %in% tmp2$tid)
+              if (nrow(tmp) == 0) break
+              #tmp2 <- tmp %>% indicateEventsWithin(pd, )
               #print(tmp2)
             }
             dta

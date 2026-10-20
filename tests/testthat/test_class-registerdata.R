@@ -71,16 +71,19 @@ test_that('drugRegister', {
   a <- renameColumns(a, NO_NAMES$DRUG_REGISTER$Norwegian, NO_NAMES$DRUG_REGISTER$Delivery)
   expect_equal(registerType(a), 'drugRegister')
   dtaInd <- getDrugIndications(a)
-  print(a)
+  #print(a)
   expect_equal(registerType(dtaInd), 'drugRegister')
   expect_equal(registerType(a), 'drugRegister')
-  expect_equal(dtaInd$indication, c('F90', 'P81', 'F14', 'P70'))
+  expect_equal(dtaInd$indication, c('F90', 'P81', 'F14', 'P70', NA))
   # Load patient data
   pd <- patientRegister(FILE_NO_NPR, 'data/no-patient-register.yaml')
   expect_equal(registerType(pd), 'patientRegister')
   expect_equal(getColumn(pd, 'individual'), 'lopenr')
   expect_error(getDrugIndications(pd))
   tmp <- getDrugIndications(a, pd)
+  expect_equal(tmp$indication, c('F90','P81','F14','P70','F90'))
+  expect_equal(tmp$indicationSource, c(rep('drugRegister', 4), 'patientRegister'))
+  #print(tmp)
 
   ### Illustrate some issues with certain operations, notable change of class when grouping in dplyr
   # Class is preserved with bind_rows
