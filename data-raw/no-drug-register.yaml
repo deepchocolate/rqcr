@@ -3,6 +3,7 @@ identifiers:
  dispensation_date: dateDelivery
  dispensation_days: DDD
  code_atc: atcCode4
+ code_indication: [refICD10, refICPC2]
 
 rename:
  Legemiddel_ATCkode_Niva5: atcCode5

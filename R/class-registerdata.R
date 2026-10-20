@@ -15,12 +15,79 @@ dataRegister <- function (x, register) {
   o
 }
 
+# If a data.frame is passed
+#' @importFrom data.table setattr setDT is.data.table
+#' @export
+`[.dataRegister` <- function(x, ...) {
+  # Save the original custom attribute
+  saved_attr <- attr(x, "register")
+  xcl <- class(x)
+
+  # Re-apply the class and attribute if the result is still a data.frame
+  if (is.data.table(x)) {
+    setattr(x, 'class', setdiff(xcl, 'dataRegister'))
+    on.exit(setattr(x, "class", xcl), add = TRUE)
+    cl <- match.call()
+    #cl[[1]] <- quote(data.table:::`[.data.table`)
+    cl[[1]] <- quote(`[`)
+    res <- eval(cl, envir=parent.frame())
+    setattr(x, 'class', xcl)
+    setattr(x, 'register', saved_attr)
+    if (is.data.frame(res)) {
+      setDT(res)
+      setattr(res, 'class', xcl)
+      setattr(res, "register", saved_attr)
+    }
+  } else {
+    res <- NextMethod('[')
+    if (is.data.frame(res)) {
+      attr(res, "register") <- saved_attr
+      class(res) <- xcl
+    }
+  }
+  return(res)
+}
+
 # This is mainly for attributes so has little effect at the moment
+#' @importFrom data.table setattr
+#' @export
 #' @exportS3Method dplyr::dplyr_reconstruct
 dplyr_reconstruct.dataRegister <- function(data, template) {
   class(data) <- union(class(template), class(data))
+  attr(data, 'register') <- attr(template, 'register')
+  if (inherits(template, "data.table")) {
+    setattr(data, "register", attr(template, 'register'))
+  }
   data
 }
+
+#' @importFrom data.table setattr setDT
+#' @exportS3Method dplyr::dplyr_col_modify
+dplyr_col_modify.dataRegister <- function (data, cols) {
+  sattr <- attr(data, 'register')
+  isdt <- inherits(data, 'data.table')
+  res <- NextMethod('dplyr_col_modify')
+  if (isdt) setDT(data)
+  setattr(res, 'register', sattr)
+  res
+}
+
+#' @importFrom data.table setattr setDT
+#' @exportS3Method dplyr::dplyr_row_slice
+dplyr_row_slice.dataRegister <- function(data, i, ...) {
+  # Call standard data.frame row slicing
+  sattr <- attr(data, 'register')
+  cls <- class(data)
+  isdt <- inherits(data, 'data.table')
+  res <- NextMethod("dplyr_row_slice")
+  if (isdt) {
+    setDT(data)
+    setattr(data, 'class', cls)
+  }
+  setattr(res, 'register', sattr)
+  res
+}
+
 
 #' @exportS3Method dplyr::group_by
 group_by.dataRegister <- function (.data, ..., .add, .drop) {
@@ -39,6 +106,17 @@ ungroup.dataRegister <- function (x, ...) {
 setOldClass(c('dataRegister', 'data.table','data.frame', 'tibble'))
 
 ### Functions to interact with the metadata
+#' Get register type
+#' @name registerType
+#' @export
+#' @param .data Data of class dataRegister
+setGeneric('registerType', function (.data) standardGeneric('registerType'))
+#' @rdname registerType
+setMethod('registerType', signature('dataRegister'),
+          function (.data) {
+            attr(.data, 'register')
+          })
+
 # Get object stored under name
 setGeneric('getMeta', function (.data, name=NULL) standardGeneric('getMeta'))
 setMethod('getMeta', signature('dataRegister'),
@@ -178,6 +256,8 @@ setMethod('getLog', signature('dataRegister'),
             getMeta(x, 'logs')
           })
 
+### DRUG REGISTER
+
 #' Create object for the drug register
 #' @name drugRegister
 #' @export
@@ -205,6 +285,35 @@ setMethod('drugRegister', signature('data.frame', 'character'),
 #' @rdname drugRegister
 setMethod('drugRegister', signature('data.frame', 'missing'),
           function (x) dataRegister(x, 'drugRegister'))
+
+### PATIENT REGISTER
+#' Create object for a patient register
+#' @name patientRegister
+#' @export
+#' @param x Register input: a file or tabular data.
+#' @param config A configuration file in YAML format.
+setGeneric('patientRegister', function (x, config) standardGeneric('patientRegister'))
+#' @rdname patientRegister
+setMethod('patientRegister', signature('character', 'character'),
+          function (x, config) {
+            x <- patientRegister(x)
+            configure(x, config)
+          })
+#' @rdname patientRegister
+setMethod('patientRegister', signature('character', 'missing'),
+          function (x) {
+            x <- data.table::fread(x)
+            patientRegister(x)
+          })
+#' @rdname patientRegister
+setMethod('patientRegister', signature('data.frame', 'character'),
+          function (x, config) {
+            x <- patientRegister(x)
+            configure(x, config)
+          })
+#' @rdname patientRegister
+setMethod('patientRegister', signature('data.frame', 'missing'),
+          function (x) dataRegister(x, 'patientRegister'))
 
 #' Get/set columns for dataRegister methods
 #'
@@ -315,37 +424,20 @@ setMethod('getMergedPeriods', signature('dataRegister'),
 #' @param colsRename Columns to rename.
 #' @param verbose Control information output.
 renameColumnsMap <- function (dta, colsName, colsRename=NULL, verbose=T) {
+  newNames <- NULL
   cnames <- colnames(dta)
-  # Indices in Delivery
-  overl <- match(cnames, colsRename)
-  # Positions in data columns
-  inx <- 1:length(overl)
-  colMissing <- is.na(overl)
-  # Columns not present in renaming map
-  novel <- inx[colMissing]
-  # Remove positions that are not present in the mapping as they should not be renamed
-  if (any(is.na(overl))) inx <- inx[!colMissing]
-  overl <- stats::na.omit(overl)
-  # If no overlap exists, just return data
-  if (!any(overl)) {
-    if (verbose) message('No columns to rename provided')
-    return(dta)
+  mp <- tibble(names=cnames) %>% left_join(tibble(names=colsRename, newNames=colsName), join_by(names)) %>%
+    mutate(newNames=na_if(newNames, ''), changed=!is.na(newNames), newNames=coalesce(newNames, names))
+  colnames(dta) <- mp$newNames
+  if (verbose) {
+    if (!any(mp$changed)) {
+      message('No changes made')
+      return(dta)
+    }
+    pos <- which(mp$changed)
+    message(stringi::stri_sprintf(paste0('%', max(nchar(mp$names[pos])),'s \t %-',max(nchar(mp$newNames[pos])),'s\n'), mp$names[pos], mp$newNames[pos]))
   }
-  colsNew <- colsName
-  # Replace any empty entries with their default names (mainly for English)
-  colsEmpty <- colsNew == ''
-  if (any(colsEmpty)) colsNew[colsEmpty] <- cnames[colsEmpty]
-  listOldNames <- cnames
-  cnames[inx] <- colsNew[overl]
-  listNewNames <- cnames
-  listNewNames[novel] <- ''
-  listNewNames <- c('CHANGE', listNewNames)
-  listOldNames <- c('COLUMN', listOldNames)
-  mx <- max(nchar(listOldNames))
-  mx2 <- max(nchar(listNewNames))
-  if (verbose) message(stringi::stri_sprintf(paste0('%',mx,'s \t %-',mx2,'s\n'), listOldNames, listNewNames))
-  colnames(dta) <- cnames
-  dta
+  return(dta)
 }
 
 #' Rename columns in a `dataRegister` object
@@ -369,6 +461,75 @@ setMethod('summariseATC', signature('dataRegister'),
             dateCol <- getColumn(.data, 'dispensation_date')
             atcCol <- getColumn(.data, 'code_atc')
             x %>% group_by(!!as.name(atcCol)) %>% summarise(N=n(), Individuals=length(unique(.data[[idCol]])), First=min(.data[[dateCol]]), Last=max(.data[[dateCol]]))
+          })
+
+#' Get indications for dispensed drug
+#' @export
+#' @name getDrugIndications
+#' @param .data A dataRegister object.
+#' @param ... Patient data with diagnoses. Priority will be given in order of appearance
+#' @param impute Whether to impute indications from an individuals adjacent dispensations.
+setGeneric('getDrugIndications', function (.data, ..., impute=0, days=NA, diagnoses=NULL) standardGeneric('getDrugIndications'))
+#' @rdname getDrugIndications
+setMethod('getDrugIndications', signature('dataRegister'),
+          function (.data, ..., impute=0, days=NA, diagnoses=NULL) {
+            dta <- .data
+            if (is.data.table(dta)) dta <- data.table:::shallow(.data)
+            rtype <- registerType(dta)
+            if (rtype != 'drugRegister') stop('The first argument should be of type drugRegister. Received ', rtype)
+            tid <- indication <- indicationSource <- NULL
+            colsIndications <- getColumn(dta, 'code_indication')
+            # Add a temporary row ID
+            dta <- dta %>% mutate(tid=row_number())
+            # 1. Indication from drug register
+            tmp <- dta %>% select(all_of(colsIndications))
+            for (col in colsIndications) {
+              tmp <- tmp %>% mutate({{ col }} := case_when( dta[[col]]  == '' ~ NA, .default= dta[[col]]))
+            }
+            dta <- dta %>% mutate(indication=coalesce(tmp[,1] %>% pull(), tmp[,2] %>% pull()), indicationSource=case_when(!is.na(indication) ~ 'drugRegister'))
+            # Remove missing indications from drug register and store separately
+            tmp <- dta %>% filter(is.na(indication))
+
+            # 2. Impute indications from adjacent dispensations
+            colIID <- getColumn(dta, 'individual')
+            if (impute > 0) {
+              tmp <- tmp %>% select(tid, indication, {{ colIID }})
+              tmp <- tmp %>% mutate(indicationSource = case_when(length(unique(indication)) == 1 ~ 'drugRegister dispensations', .default=indicationSource) , .by={{ colIID }})
+              tmp <- tmp %>% mutate(indication=case_when(indicationSource == 'drugRegister dispensations' ~ unique(indication), .default=indicationSource ), .by={{ colIID }})
+            }
+            # Add imputed indications
+            dta <- dta %>% filter(!tid %in% subset(tmp, !is.na(indicationSource))$tid)
+            dta <- dta %>% bind_rows(tmp %>% filter(!is.na(indicationSource)))
+            pdArgs <- list(...)
+            if (length(pdArgs) == 0) return(dta)
+            tmp <- tmp %>% filter(is.na(indicationSource))
+            # 3. Search patient register(s)
+            # Individual ID in drug register
+            colIID <- getColumn(.data, 'individual')
+            colDate <- getColumn(.data, 'dispensation_date')
+            for (pd in list(...)) {
+              rtype <- registerType(pd)
+              if (rtype != 'patientRegister') stop('Data passed in `...` should be of type patientRegister. Received ', rtype)
+              colIIDpd <- getColumn(pd, 'individual')
+              colDiagsPd <- getColumn(pd, 'diagnosis')
+              colDatePd <- getColumn(pd, 'date')
+              if (!is.null(diagnoses)) pd <- pd %>% filter({{ colDiagsPd }} %in% diagnoses)
+              #print(tmp)
+              # Default mode: Identify the diagnosis closest to dispensation
+              tmp2 <- tmp %>% inner_join(pd, join_by({{ colIID }} == {{ colIIDpd }}))
+              tmp2 <- tmp2 %>% mutate(dateDiff=lubridate::as_date( tmp2[[colDate]]) - lubridate::as_date( tmp2[[colDatePd ]]))
+              #print(tmp2)
+              tmp2 <- tmp2 %>% filter(abs(dateDiff) == min(dateDiff), .by={{ colIID }})
+              if (countUnique(tmp2, tid) != nrow(tmp2)) warning('Multiple potential indications found for at least 1 individual')
+              tmp2 <- tmp2 %>% mutate(indication= .data[[colDiagsPd]], indicationSource=registerType(pd))
+              dta <- dta %>% filter(!tid %in% tmp2$tid)
+              dta <- dta %>% bind_rows(tmp2)
+              tmp <- tmp %>% filter(!tid %in% tmp2$tid)
+              if (nrow(tmp) == 0) break
+              #tmp2 <- tmp %>% indicateEventsWithin(pd, )
+              #print(tmp2)
+            }
+            dta
           })
 
 #' Save data to file

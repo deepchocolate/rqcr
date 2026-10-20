@@ -1,8 +1,10 @@
 # Note on DuckDB: Recent version will throw a message asking for a configuration
 # Running command below will store duckdb configurations in ~/.duckdb and silence the info (this is a one-time configuration command)
-# duckdb::duckdb(shared_home = T)
+require(duckdb, quietly=T)
+duckdb::duckdb(shared_home = T)
 
 FILE_NO_DR <- 'data/norwegian_drug_register.csv'
+FILE_NO_NPR <- 'data/norwegian_patient_register.csv'
 FILE_EXCEL <- 'data/workbook.xlsx'
 DIR_DB <- withr::local_tempdir(.local_envir = .GlobalEnv)
 
@@ -15,7 +17,6 @@ dataPDRCreate <- function (error=F) {
   fileNew <- withr::local_tempfile(.local_envir = .GlobalEnv)
   if (!isFALSE(error)) dta <- subset(dta, ERROR %in% error)
   dta <- renameColumns(dta, NO_NAMES$DRUG_REGISTER$English, NO_NAMES$DRUG_REGISTER$Delivery, F)
-  #print(dta)
   dta <- dta[,c('IID', 'dateDelivery', 'atcCode5', 'DDD','birthYear', 'ERROR')]
   colnames(dta) <- c('lopenr', 'Date', 'ATC', 'DDD', 'faar', 'ERROR')
   utils::write.csv(dta, file=fileNew, row.names=F)
@@ -24,7 +25,6 @@ dataPDRCreate <- function (error=F) {
 }
 
 setupDatabases <- function () {
-  require(duckdb, quietly = T)
   require(stringi)
   require(readr)
   dbA <- readr::read_file('data/database-a.sql')
