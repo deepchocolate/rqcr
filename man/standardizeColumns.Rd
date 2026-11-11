@@ -5,9 +5,9 @@
 \alias{standardizeColumns,data.frame-method}
 \title{Standardize columns in data}
 \usage{
-standardizeColumns(.data, ..., .names = NULL)
+standardizeColumns(.data, ..., .names = NULL, .threshold = NULL)
 
-\S4method{standardizeColumns}{data.frame}(.data, ..., .names = NULL)
+\S4method{standardizeColumns}{data.frame}(.data, ..., .names = NULL, .threshold = NULL)
 }
 \arguments{
 \item{.data}{Anything accepted by dplyr.}
@@ -15,7 +15,11 @@ standardizeColumns(.data, ..., .names = NULL)
 \item{...}{Columns to standardize.}
 
 \item{.names}{Use to name the standardize column see \code{dplyr::across}, E.g \code{"prefix{.col}"}.}
+
+\item{.threshold}{Threshold for the minimum unique values in a column to perform standardization.}
 }
 \description{
-Standardize columns in data
+Numeric columns passed to this function are transformed to a mean of zero and variance equal to one.
+By default standardized columns are replaced, but the \code{.names} argument can be used to provide a prefix
+which will create new columns of the standardized variables.
 }

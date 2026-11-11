@@ -110,7 +110,10 @@ test_that('mergePeriods', {
 test_that('standardizeColumns', {
   df <- data.frame(A=1:3, B=1:3, C=4:6)
   o <- standardizeColumns(df, A, B, C)
-  expect_equal(o, data.frame(A=-1:1, B=-1:1, C=-1:1))
+  res <- data.frame(A=-1:1, B=-1:1, C=-1:1)
+  expect_equal(o, res)
+  o <- df %>% standardizeColumns(.)
+  expect_equal(o, res)
   df <- standardizeColumns(df, B, C)
   expect_equal(df, data.frame(A=1:3, B=-1:1, C=-1:1))
 })

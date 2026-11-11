@@ -223,16 +223,26 @@ mergePeriods <- function (dates, days, maxDistance=0, reset=F, resetFun=mean) {
 }
 
 #' Standardize columns in data
+#' @description
+#' Numeric columns passed to this function are transformed to a mean of zero and variance equal to one.
+#' By default standardized columns are replaced, but the `.names` argument can be used to provide a prefix
+#' which will create new columns of the standardized variables.
+#'
 #' @export
 #' @name standardizeColumns
 #' @param .data Anything accepted by dplyr.
 #' @param ... Columns to standardize.
 #' @param .names Use to name the standardize column see `dplyr::across`, E.g `"prefix{.col}"`.
-setGeneric('standardizeColumns', function (.data, ..., .names=NULL) standardGeneric('standardizeColumns'))
+#' @param .threshold Threshold for the minimum unique values in a column to perform standardization.
+setGeneric('standardizeColumns', function (.data, ..., .names=NULL, .threshold=NULL) standardGeneric('standardizeColumns'))
 #' @rdname standardizeColumns
 setMethod('standardizeColumns', signature('data.frame'),
-          function (.data, ..., .names=NULL) {
-            .data %>% mutate(across(.cols=c(...), .fns=standardize, .names=.names))
+          function (.data, ..., .names=NULL, .threshold=NULL) {
+            if (length(enquos(...)) > 0) {
+              .data %>% mutate(across(.cols=c(...), .fns=standardize, .names=.names))
+            } else {
+              .data %>% mutate(across(.cols=all_of(colnames(.data)), .fns=standardize, .names=.names))
+            }
           })
 
 #' Update values conditionally in tabular data
