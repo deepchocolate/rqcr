@@ -109,7 +109,8 @@ test_that('getDrugIndications', {
   npr <- patientRegister(FILE_NO_NPR, 'data/no-patient-register.yaml')
   expect_equal(registerType(npr), 'patientRegister')
   expect_equal(getColumn(npr, 'individual'), 'lopenr')
-  expect_error(getDrugIndications(npr))
+  expect_error(getDrugIndications(npr), 'The first argument should be of type drugRegister. Received patientRegister')
+  expect_error(getDrugIndications(a, a), 'Data passed in `...` should be of type patientRegister. Received drugRegister')
   tmp <- getDrugIndications(a, npr)
   expect_equal(tmp$indication, c('F90','P81','F14','P70','F90',NA,'F90'))
   expect_equal(tmp$indicationSource, c(rep('drugRegister', 5),NA, 'patientRegister'))
@@ -123,6 +124,8 @@ test_that('getDrugIndications', {
   expect_equal(tmp$tid, c(1:7))
   expect_equal(tmp$indication, c('F90','P81','F14','P70',NA,'F90','F90'))
   expect_equal(tmp$indicationSource, c(rep('drugRegister', 4), NA,'drugRegister', 'drugRegister dispensations'))
+  # Errors
+  expect_error(getDrugIndications(a, npr, impute=60, days=5:7), 'days should either be a single number or an upper and lower limit')
   # Limit diagnoses
   tmp <- getDrugIndications(a, npr, impute=60, diagnoses=c('F10'))
   expect_equal(tmp$tid, c(1:7))

@@ -508,15 +508,11 @@ setMethod('getDrugIndications', signature('dataRegister'),
               tmp2 <- dta %>% filter(.data[[colIID]] %in% tmp[[colIID]]) %>% select(tid, indication, {{ colIID }}, {{ colDate }}) %>%
                 filter(!all(is.na(indication)), .by= {{ colIID }}) %>% arrange({{ colIID }}, {{ colDate }})
               # Keep only dispensations within the imputation limit
-              #tmp2 <- tmp2 %>% filter(diffDays(.data[[colDate]], lag(.data[[colDate]] )) < impute, .by={{colIID}})
               tmp2 <- tmp2 %>% addDiffDays(.data[[colDate]], .data[[colDate]], .name='ddays') %>% mutate(tidLag=case_when(ddays < impute ~ lag(tid), .default=NA))
               tmp2 <- tmp2 %>% filter(ddays < impute | tid == lead(tidLag))
-              #print(tmp2)
               # For individuals that only have one indication
               tmp2 <- tmp2 %>% mutate(indicationSource = case_when(!all(is.na(indication)) & countUnique(indication) == 1 ~ 'drugRegister dispensations', .default=indicationSource) , .by={{ colIID }})
-              #print(tmp2)
               tmp2 <- tmp2 %>% mutate(indication=case_when(indicationSource == 'drugRegister dispensations' ~ unique(na.omit(indication)), .default=indication ), .by={{ colIID }})
-              #print(tmp2)
               tmp2 <- tmp %>% filter(tid %in% tmp2$tid) %>% select(!c(indication,indicationSource)) %>%
                 left_join(tmp2 %>% select(tid, indication,indicationSource))
               # Add imputed indications
@@ -547,14 +543,8 @@ setMethod('getDrugIndications', signature('dataRegister'),
               colDatePd <- getColumn(pd, 'date')
               if (!is.null(diagnoses)) pd <- pd %>% filter({{ colDiagsPd }} %in% diagnoses)
               if (nrow(pd) == 0) next
-              #print(tmp)
               # Default mode: Identify the diagnosis closest to dispensation
               tmp2 <- tmp %>% inner_join(pd, join_by({{ colIID }} == {{ colIIDpd }}))
-              #print(colDate)
-              #print(tmp)
-              #print(tmp2)
-              #print(tmp2[[colDate]])
-              #print(tmp2[[colDatePd]])
               tmp2 <- tmp2 %>% mutate(dateDiff=lubridate::as_date( tmp2[[colDate]]) - lubridate::as_date( tmp2[[colDatePd ]]))
               # Restrict timing of diagnoses
               if (!is.null(days)) {
