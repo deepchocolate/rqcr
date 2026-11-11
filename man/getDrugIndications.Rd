@@ -2,21 +2,23 @@
 % Please edit documentation in R/class-registerdata.R
 \name{getDrugIndications}
 \alias{getDrugIndications}
-\alias{getDrugIndications,dataRegister,missing,missing-method}
+\alias{getDrugIndications,dataRegister-method}
 \title{Get indications for dispensed drug}
 \usage{
-getDrugIndications(.data, npr, kuhr, impute = 0)
+getDrugIndications(.data, ..., impute = 0, days = NULL, diagnoses = NULL)
 
-\S4method{getDrugIndications}{dataRegister,missing,missing}(.data, impute = 0)
+\S4method{getDrugIndications}{dataRegister}(.data, ..., impute = 0, days = NULL, diagnoses = NULL)
 }
 \arguments{
 \item{.data}{A dataRegister object.}
 
-\item{npr}{Primary data source with diagnoses for missing indications.}
-
-\item{kuhr}{Secondary data source with diagnoses for missing indications.}
+\item{...}{Patient data with diagnoses. Priority will be given in order of appearance}
 
 \item{impute}{Whether to impute indications from an individuals adjacent dispensations.}
+
+\item{days}{Either the maximum days passed from diagnosis to dispensation or a minimum and a maximum. The minimum to also include diagnoses after dispensation date, e.g. \code{c(-10, 10)} for 10 days after/before.}
+
+\item{diagnoses}{Restrict diagnoses in patient data sources to these.}
 }
 \description{
 Get indications for dispensed drug

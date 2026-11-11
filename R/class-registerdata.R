@@ -105,6 +105,14 @@ ungroup.dataRegister <- function (x, ...) {
 
 setOldClass(c('dataRegister', 'data.table','data.frame', 'tibble'))
 
+#' Test if object is of class `dataRegister`
+#' @export
+#' @param x Anything to test
+#' @return TRUE or FALSE
+is.dataRegister <- function (x) {
+  'dataRegister' %in% class(x)
+}
+
 ### Functions to interact with the metadata
 #' Get register type
 #' @name registerType
@@ -469,15 +477,17 @@ setMethod('summariseATC', signature('dataRegister'),
 #' @param .data A dataRegister object.
 #' @param ... Patient data with diagnoses. Priority will be given in order of appearance
 #' @param impute Whether to impute indications from an individuals adjacent dispensations.
-setGeneric('getDrugIndications', function (.data, ..., impute=0, days=NA, diagnoses=NULL) standardGeneric('getDrugIndications'))
+#' @param days Either the maximum days passed from diagnosis to dispensation or a minimum and a maximum. The minimum to also include diagnoses after dispensation date, e.g. `c(-10, 10)` for 10 days after/before.
+#' @param diagnoses Restrict diagnoses in patient data sources to these.
+setGeneric('getDrugIndications', function (.data, ..., impute=0, days=NULL, diagnoses=NULL) standardGeneric('getDrugIndications'))
 #' @rdname getDrugIndications
 setMethod('getDrugIndications', signature('dataRegister'),
-          function (.data, ..., impute=0, days=NA, diagnoses=NULL) {
+          function (.data, ..., impute=0, days=NULL, diagnoses=NULL) {
             dta <- .data
             if (is.data.table(dta)) dta <- data.table:::shallow(.data)
             rtype <- registerType(dta)
             if (rtype != 'drugRegister') stop('The first argument should be of type drugRegister. Received ', rtype)
-            tid <- indication <- indicationSource <- NULL
+            tid <- indication <- indicationSource <- tidLag <- dateDiff <- NULL
             colsIndications <- getColumn(dta, 'code_indication')
             # Add a temporary row ID
             dta <- dta %>% mutate(tid=row_number())
@@ -492,32 +502,67 @@ setMethod('getDrugIndications', signature('dataRegister'),
 
             # 2. Impute indications from adjacent dispensations
             colIID <- getColumn(dta, 'individual')
+            colDate <- getColumn(.data, 'dispensation_date')
             if (impute > 0) {
-              tmp <- tmp %>% select(tid, indication, {{ colIID }})
-              tmp <- tmp %>% mutate(indicationSource = case_when(length(unique(indication)) == 1 ~ 'drugRegister dispensations', .default=indicationSource) , .by={{ colIID }})
-              tmp <- tmp %>% mutate(indication=case_when(indicationSource == 'drugRegister dispensations' ~ unique(indication), .default=indicationSource ), .by={{ colIID }})
+              # Get all dispensations for individuals with missing indications and remove individuals which have all missing
+              tmp2 <- dta %>% filter(.data[[colIID]] %in% tmp[[colIID]]) %>% select(tid, indication, {{ colIID }}, {{ colDate }}) %>%
+                filter(!all(is.na(indication)), .by= {{ colIID }}) %>% arrange({{ colIID }}, {{ colDate }})
+              # Keep only dispensations within the imputation limit
+              #tmp2 <- tmp2 %>% filter(diffDays(.data[[colDate]], lag(.data[[colDate]] )) < impute, .by={{colIID}})
+              tmp2 <- tmp2 %>% addDiffDays(.data[[colDate]], .data[[colDate]], .name='ddays') %>% mutate(tidLag=case_when(ddays < impute ~ lag(tid), .default=NA))
+              tmp2 <- tmp2 %>% filter(ddays < impute | tid == lead(tidLag))
+              #print(tmp2)
+              # For individuals that only have one indication
+              tmp2 <- tmp2 %>% mutate(indicationSource = case_when(!all(is.na(indication)) & countUnique(indication) == 1 ~ 'drugRegister dispensations', .default=indicationSource) , .by={{ colIID }})
+              #print(tmp2)
+              tmp2 <- tmp2 %>% mutate(indication=case_when(indicationSource == 'drugRegister dispensations' ~ unique(na.omit(indication)), .default=indication ), .by={{ colIID }})
+              #print(tmp2)
+              tmp2 <- tmp %>% filter(tid %in% tmp2$tid) %>% select(!c(indication,indicationSource)) %>%
+                left_join(tmp2 %>% select(tid, indication,indicationSource))
+              # Add imputed indications
+              dta <- dta %>% filter(!tid %in% subset(tmp2, !is.na(indicationSource))$tid)
+              dta <- dta %>% bind_rows(tmp2)
+              #print(dta)
             }
-            # Add imputed indications
-            dta <- dta %>% filter(!tid %in% subset(tmp, !is.na(indicationSource))$tid)
-            dta <- dta %>% bind_rows(tmp %>% filter(!is.na(indicationSource)))
             pdArgs <- list(...)
             if (length(pdArgs) == 0) return(dta)
-            tmp <- tmp %>% filter(is.na(indicationSource))
+            tmp <- dta %>% filter(is.na(indicationSource))
+
             # 3. Search patient register(s)
             # Individual ID in drug register
             colIID <- getColumn(.data, 'individual')
-            colDate <- getColumn(.data, 'dispensation_date')
-            for (pd in list(...)) {
+            args <- list(...)
+            argNames <- as.list(substitute(list(...)))[-1L]
+            argNames <- sapply(argNames, deparse)
+            for (i in 1:length(args) ) {
+              pd <- args[[i]]
+              if (!is.dataRegister(pd)) {
+                warning(glue::glue('Argument "{argNames[i]}" is not of class dataRegister. Skipping...'))
+                next
+              }
               rtype <- registerType(pd)
               if (rtype != 'patientRegister') stop('Data passed in `...` should be of type patientRegister. Received ', rtype)
               colIIDpd <- getColumn(pd, 'individual')
               colDiagsPd <- getColumn(pd, 'diagnosis')
               colDatePd <- getColumn(pd, 'date')
               if (!is.null(diagnoses)) pd <- pd %>% filter({{ colDiagsPd }} %in% diagnoses)
+              if (nrow(pd) == 0) next
               #print(tmp)
               # Default mode: Identify the diagnosis closest to dispensation
               tmp2 <- tmp %>% inner_join(pd, join_by({{ colIID }} == {{ colIIDpd }}))
+              #print(colDate)
+              #print(tmp)
+              #print(tmp2)
+              #print(tmp2[[colDate]])
+              #print(tmp2[[colDatePd]])
               tmp2 <- tmp2 %>% mutate(dateDiff=lubridate::as_date( tmp2[[colDate]]) - lubridate::as_date( tmp2[[colDatePd ]]))
+              # Restrict timing of diagnoses
+              if (!is.null(days)) {
+                if (length(days) > 2) stop('days should either be a single number or an upper and lower limit')
+                days <- c(0, days)
+                tmp2 <- tmp2 %>% filter(dateDiff %in% range(days[1], days[2]))
+              }
+              if (nrow(tmp2) == 0) next
               #print(tmp2)
               tmp2 <- tmp2 %>% filter(abs(dateDiff) == min(dateDiff), .by={{ colIID }})
               if (countUnique(tmp2, tid) != nrow(tmp2)) warning('Multiple potential indications found for at least 1 individual')
@@ -525,9 +570,7 @@ setMethod('getDrugIndications', signature('dataRegister'),
               dta <- dta %>% filter(!tid %in% tmp2$tid)
               dta <- dta %>% bind_rows(tmp2)
               tmp <- tmp %>% filter(!tid %in% tmp2$tid)
-              if (nrow(tmp) == 0) break
-              #tmp2 <- tmp %>% indicateEventsWithin(pd, )
-              #print(tmp2)
+              if (nrow(tmp) == 0) next
             }
             dta
           })

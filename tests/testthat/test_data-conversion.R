@@ -46,7 +46,7 @@ test_that('readBigCSV', {
     dta <- readBigCSV(pathFile, nlines=2)
   })
   expect_type(dta, 'list')
-  expect_equal(nrow(dta), 4)
+  expect_equal(nrow(dta), 6)
 })
 
 test_that('convertBigCSV', {
@@ -55,5 +55,5 @@ test_that('convertBigCSV', {
   fileSpss <- convertBigCSV(pathFile, pathOutput)
   expect_true(file.exists(fileSpss))
   dta <- haven::read_dta(fileSpss)
-  expect_equal(nrow(dta), 5)
+  expect_equal(nrow(dta), 7)
 })

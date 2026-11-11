@@ -2,9 +2,12 @@
 % Please edit documentation in R/class-registerdata.R
 \name{registerType}
 \alias{registerType}
+\alias{registerType,dataRegister-method}
 \title{Get register type}
 \usage{
 registerType(.data)
+
+\S4method{registerType}{dataRegister}(.data)
 }
 \arguments{
 \item{.data}{Data of class dataRegister}

@@ -41,19 +41,20 @@ test_that('drugRegister', {
   a <- setColumn(a, 'code_atc', 'atcCode4')
   r <- frequencyATC(a)
   expect_equal(r$atcCode4, c('','N06B'))
-  expect_equal(r$N, c(1,4))
-  expect_equal(r$Percent, c(20,80))
+  expect_equal(r$N, c(3,4))
+  expect_equal(r$Percent, c(42.86,57.14), tolerance=.01)
 
   a <- renameColumns(a, NO_NAMES$DRUG_REGISTER$English, NO_NAMES$DRUG_REGISTER$Delivery, F)
   # Index observations
   a <- a %>% indexObservations()
-  expect_equal(a$i, 1:5)
+  expect_equal(a$i, 1:7)
   a <- a %>% indexObservations(IID, .nameMax='I')
-  expect_equal(a$i, c(1,1,1,2,1))
-  expect_equal(a$I, c(1,1,2,2,1))
+  expect_equal(a$i, c(1,1,1,2,1,1,2))
+  expect_equal(a$I, c(1,1,2,2,1,2,2))
   ### Merge periods
   a <- subset(a, dateDelivery != 'x')
-  expect_equal(getMergedPeriods(a), tibble(IID=c('I1','I2','I3','I4'), date=c('2024-12-31','2025-01-03','2025-01-03','2020-05-30'), days=c(1,2,-1, NA)))
+  expect_equal(getMergedPeriods(a), tibble(IID=c('I1','I2','I3','I4','I5','I5'), date=c('2024-12-31','2025-01-03','2025-01-03','2020-05-30', '2018-06-30','2018-08-05'),
+                                           days=c(1,2,-1, NA,NA,NA)))
   dta <- tibble(id=c(1,1,1,2,2),
                 date=c('2000-01-01', '2000-01-05', '2000-01-10', '2020-12-30', '2021-01-02'),
                 days=c(4, 4, 4, 4, 2))
@@ -64,26 +65,6 @@ test_that('drugRegister', {
   periods <- getMergedPeriods(a)
   expect_equal(periods, tibble(id=c(1,1,2), date=c('2000-01-01','2000-01-10','2020-12-30'), days=c(8,4,6)))
 
-  ### Get indications
-  a <- drugRegister(FILE_NO_DR, 'data/no-drug-register.yaml')
-  expect_contains(names(attributes(a)), c('register'))
-  # FIX: Why is it already renamed?
-  a <- renameColumns(a, NO_NAMES$DRUG_REGISTER$Norwegian, NO_NAMES$DRUG_REGISTER$Delivery)
-  expect_equal(registerType(a), 'drugRegister')
-  dtaInd <- getDrugIndications(a)
-  #print(a)
-  expect_equal(registerType(dtaInd), 'drugRegister')
-  expect_equal(registerType(a), 'drugRegister')
-  expect_equal(dtaInd$indication, c('F90', 'P81', 'F14', 'P70', NA))
-  # Load patient data
-  pd <- patientRegister(FILE_NO_NPR, 'data/no-patient-register.yaml')
-  expect_equal(registerType(pd), 'patientRegister')
-  expect_equal(getColumn(pd, 'individual'), 'lopenr')
-  expect_error(getDrugIndications(pd))
-  tmp <- getDrugIndications(a, pd)
-  expect_equal(tmp$indication, c('F90','P81','F14','P70','F90'))
-  expect_equal(tmp$indicationSource, c(rep('drugRegister', 4), 'patientRegister'))
-  #print(tmp)
 
   ### Illustrate some issues with certain operations, notable change of class when grouping in dplyr
   # Class is preserved with bind_rows
@@ -110,6 +91,54 @@ test_that('drugRegister', {
   a <- a %>% ungroup()
   expect_equal(class(a), c('dataRegister', 'tbl_df', 'tbl', 'data.frame'))
   expect_error(getLog(a))
+})
+
+test_that('getDrugIndications', {
+  ### Get indications
+  a <- drugRegister(FILE_NO_DR, 'data/no-drug-register.yaml')
+  expect_contains(names(attributes(a)), c('register'))
+  # FIX: Why is it already renamed?
+  a <- renameColumns(a, NO_NAMES$DRUG_REGISTER$Norwegian, NO_NAMES$DRUG_REGISTER$Delivery)
+  expect_equal(registerType(a), 'drugRegister')
+  dtaInd <- getDrugIndications(a)
+  #print(a)
+  expect_equal(registerType(dtaInd), 'drugRegister')
+  expect_equal(registerType(a), 'drugRegister')
+  expect_equal(dtaInd$indication, c('F90', 'P81', 'F14', 'P70', NA,'F90',NA))
+  # Load patient data
+  npr <- patientRegister(FILE_NO_NPR, 'data/no-patient-register.yaml')
+  expect_equal(registerType(npr), 'patientRegister')
+  expect_equal(getColumn(npr, 'individual'), 'lopenr')
+  expect_error(getDrugIndications(npr))
+  tmp <- getDrugIndications(a, npr)
+  expect_equal(tmp$indication, c('F90','P81','F14','P70','F90',NA,'F90'))
+  expect_equal(tmp$indicationSource, c(rep('drugRegister', 5),NA, 'patientRegister'))
+  # This should remain the same with imputation
+  tmp <- getDrugIndications(a, npr, impute=60)
+  expect_equal(tmp$tid, c(1:4,6,7,5))
+  expect_equal(tmp$indication, c('F90','P81','F14','P70','F90','F90','F90'))
+  expect_equal(tmp$indicationSource, c(rep('drugRegister', 5), 'drugRegister dispensations', 'patientRegister'))
+  # Limit days
+  tmp <- getDrugIndications(a, npr, impute=60, days=5)
+  expect_equal(tmp$tid, c(1:7))
+  expect_equal(tmp$indication, c('F90','P81','F14','P70',NA,'F90','F90'))
+  expect_equal(tmp$indicationSource, c(rep('drugRegister', 4), NA,'drugRegister', 'drugRegister dispensations'))
+  # Limit diagnoses
+  tmp <- getDrugIndications(a, npr, impute=60, diagnoses=c('F10'))
+  expect_equal(tmp$tid, c(1:7))
+  expect_equal(tmp$indication, c('F90','P81','F14','P70',NA,'F90','F90'))
+  expect_equal(tmp$indicationSource, c(rep('drugRegister', 4),NA, 'drugRegister', 'drugRegister dispensations'))
+
+  # Add another source (the filtering performed above causes the npr object to loose attributes)
+  pd2 <- patientRegister(FILE_NO_NPR, 'data/no-patient-register.yaml')
+  #print(pd2)
+  #print(npr)
+  b <- tibble(A=1:20)
+  expect_warning(tmp <- getDrugIndications(a, pd2, b, impute=60), 'Argument "b" is not of class dataRegister. Skipping...')
+  expect_equal(tmp$tid, c(1:4,6,7,5))
+  expect_equal(tmp$indication, c('F90','P81','F14','P70','F90','F90','F90'))
+  expect_equal(tmp$indicationSource, c(rep('drugRegister', 5), 'drugRegister dispensations', 'patientRegister'))
+  #print(tmp)
 })
 
 test_that('renameColumns', {
