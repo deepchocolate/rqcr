@@ -108,7 +108,8 @@ importFrom(rlang,
   ":=",
   as_label,
   enquos,
-  quo_get_expr
+  quo_get_expr,
+  quos
 )
 importFrom(stats,ave)
 importFrom(stringi,

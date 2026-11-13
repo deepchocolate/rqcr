@@ -21,5 +21,6 @@ standardizeColumns(.data, ..., .names = NULL, .threshold = NULL)
 \description{
 Numeric columns passed to this function are transformed to a mean of zero and variance equal to one.
 By default standardized columns are replaced, but the \code{.names} argument can be used to provide a prefix
-which will create new columns of the standardized variables.
+which will create new columns of the standardized variables. Use \code{.threshold} to limit columns by how
+many unique values are inside a column. \code{.threshold} only applies to integer columns
 }
