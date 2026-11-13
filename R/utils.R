@@ -471,7 +471,7 @@ recodeToNA <- function (x, cases) {
 #' @export
 recodeSex <- function (x, default=NA) {
   x <- as.character(x)
-  dplyr::recode_values(x,
+  recode_values(x,
                     c('1','M')~'M',
                     c('2', 'K')~'F',
                     default=default)

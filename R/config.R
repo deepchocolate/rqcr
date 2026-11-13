@@ -5,9 +5,10 @@
 
 # For compatibility with older versions of dplyr
 .dplyrExports <- getNamespaceExports('dplyr')
-replace_values <- dplyr::replace_values
-if (!'replace_values' %in% .dplyrExports) replace_values <- function (.x, cases) dplyr::case_match(.x, {{cases}} ~NA)
-
+replace_values <- function (.x, cases) dplyr::case_match(.x, {{cases}} ~NA)
+if ('replace_values' %in% .dplyrExports) replace_values <- dplyr::replace_values
+recode_values <- function (.x,..., default) dplyr::case_match(.x, ..., .default=default)
+if ('recode_values' %in% .dplyrExports) replace_values <- dplyr::recode_values
 
 #' Configure RQCR
 #' @name configRQCR
