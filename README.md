@@ -5,7 +5,11 @@
 <!-- badges: end -->
 
 
-# Register Quality-Control in R
+# RQCR: Register Quality-Control in R
+An R-package with utilities to simplify the processing of data in register data.
+
+While development focuses on Norwegian registers, applications likely extend to 
+registers in other countries and similar data structures.
 
 ## Installation
 
