@@ -112,10 +112,19 @@ test_that('standardizeColumns', {
   o <- standardizeColumns(df, A, B, C)
   res <- data.frame(A=-1:1, B=-1:1, C=-1:1)
   expect_equal(o, res)
-  o <- df %>% standardizeColumns(.)
+  o <- df %>% standardizeColumns()
   expect_equal(o, res)
   df <- standardizeColumns(df, B, C)
   expect_equal(df, data.frame(A=1:3, B=-1:1, C=-1:1))
+  # Non numeric columns are not standardized
+  df$D <- 'a'
+  df <- standardizeColumns(df)
+  expect_equal(df, data.frame(A=-1:1, B=-1:1, C=-1:1, D='a'))
+  expect_error(standardizeColumns(df, D))
+  # Using the threshold: Standardize columns with at least 3 unique values
+  df <- data.frame(A=1:3, B=1:3, C=c(1,2,2))
+  df <- standardizeColumns(df, .threshold=3)
+  expect_equal(df, data.frame(A=-1:1, B=-1:1, C=c(1,2,2)))
 })
 
 test_that('updateCases', {
