@@ -5,7 +5,7 @@
 
 # For compatibility with older versions of dplyr
 .dplyrExports <- getNamespaceExports('dplyr')
-replace_values <- function (.x, cases) dplyr::case_match(.x, {{cases}} ~NA)
+replace_values <- function (.x, ...) dplyr::case_match(.x, ..., .default=.x)
 if ('replace_values' %in% .dplyrExports) replace_values <- dplyr::replace_values
 recode_values <- function (.x,..., default) dplyr::case_match(.x, ..., .default=default)
 if ('recode_values' %in% .dplyrExports) replace_values <- dplyr::recode_values

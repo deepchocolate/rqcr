@@ -194,7 +194,7 @@ test_that('labelStrings', {
 })
 
 test_that('Test recodeToNA', {
-  expect_equal(c('1','2',NA,NA), recodeToNA(c(1,2, NA, ''), c('')))
+  expect_equal(recodeToNA(c(1,2, NA, ''), c('')), c('1','2',NA,NA))
   # Cannot include numbers as NA codes
   expect_error(recodeToNA(c('1',2, NA, ''), c(2)))
   expect_equal(c('1',NA,NA,NA), recodeToNA(c(1,2, NA, ''), c('2','', NA)))
