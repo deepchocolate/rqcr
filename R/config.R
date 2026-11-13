@@ -3,6 +3,12 @@
 .pkg_env$updateCases = list(warnings=F)
 .pkg_env$txtNPercent <- list(maxPercent=F)
 
+# For compatibility with older versions of dplyr
+.dplyrExports <- getNamespaceExports('dplyr')
+replace_values <- dplyr::replace_values
+if (!'replace_values' %in% .dplyrExports) replace_values <- function (.x, cases) dplyr::case_match(.x, {{cases}} ~NA)
+
+
 #' Configure RQCR
 #' @name configRQCR
 #' @export
