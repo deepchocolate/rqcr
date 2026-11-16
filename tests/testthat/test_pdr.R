@@ -1,10 +1,12 @@
 test_that('Compare drug frequencies', {
   require(dplyr)
   # Raw data from API
+  # Characters can be messed up if locale is wrong. Works on some systems by issuing Sys.setlocale('LC_ALL')
   dtaApi <- read.csv('data/fhi-api-lmr-sample.csv')
   # Adapt local input data
   fileIn <- dataPDRCreate()
   dtaLoc <- read.csv(fileIn)
+  dtaLoc <- dtaLoc[1:4,]
   dtaExt <- dtaLoc
   dtaExt$ATC <- c(rep('A01AA', 3), 'A01AA01')
   dtaExt$Date <- c(2016, 2020,2009,2006)

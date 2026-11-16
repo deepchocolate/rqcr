@@ -459,25 +459,22 @@ setMethod('getPrefixMatches', signature('character', 'character'),
 #' Recode values to missing.
 #' @param x A vector of inputs.
 #' @param cases Cases in x to convert to NA.
-#' @importFrom dplyr case_match
 #' @export
 recodeToNA <- function (x, cases) {
   if (all(is.na(x))) return(x)
-  dplyr::case_match(x, cases~NA, .default=x)
+  replace_values(x,  cases ~ NA)
 }
 
 #' Recode individual sex to M(ale)/F(emale).
 #' @param x A vector of inputs.
 #' @param default Default value of x if no match is made.
-#' @importFrom dplyr case_match
 #' @export
 recodeSex <- function (x, default=NA) {
   x <- as.character(x)
-  dplyr::case_match(x,
+  recode_values(x,
                     c('1','M')~'M',
                     c('2', 'K')~'F',
-                    .default=default
-  )
+                    default=default)
 }
 
 #' Create a string with n and percent
