@@ -512,9 +512,15 @@ setMethod('getDrugIndications', signature('dataRegister'),
               tmp2 <- tmp2 %>% filter(ddays < impute | tid == lead(tidLag))
               # For individuals that only have one indication
               tmp2 <- tmp2 %>% mutate(indicationSource = case_when(!all(is.na(indication)) & countUnique(indication) == 1 ~ 'drugRegister dispensations', .default=indicationSource) , .by={{ colIID }})
-              tmp2 <- tmp2 %>% mutate(indication=case_when(indicationSource == 'drugRegister dispensations' ~ unique(na.omit(indication)), .default=indication ), .by={{ colIID }})
+              tmp2 <- tmp2 %>% filter(indicationSource == 'drugRegister dispensations') %>%
+                mutate(indication=case_when(indicationSource == 'drugRegister dispensations' ~ unique(na.omit(indication)), .default=indication), .by={{ colIID }})
+              #tmp2 <- tmp2 %>% filter(!tid %in% tmp3$tid)
+              #tmp2 <- tmp2 %>% bind_rows(tmp3)
+              #print(tmp2)
+              #tmp2 <- tmp2 %>% mutate(indication=case_when(indicationSource == 'drugRegister dispensations' ~ unique(na.omit(indication)), .default=indication), .by={{ colIID }})
               tmp2 <- tmp %>% filter(tid %in% tmp2$tid) %>% select(!c(indication,indicationSource)) %>%
                 left_join(tmp2 %>% select(tid, indication,indicationSource))
+              #print(tmp2)
               # Add imputed indications
               dta <- dta %>% filter(!tid %in% subset(tmp2, !is.na(indicationSource))$tid)
               dta <- dta %>% bind_rows(tmp2)
@@ -562,7 +568,7 @@ setMethod('getDrugIndications', signature('dataRegister'),
               tmp <- tmp %>% filter(!tid %in% tmp2$tid)
               if (nrow(tmp) == 0) next
             }
-            dta
+            dta %>% arrange(tid)
           })
 
 #' Save data to file

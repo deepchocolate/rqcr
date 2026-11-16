@@ -41,20 +41,20 @@ test_that('drugRegister', {
   a <- setColumn(a, 'code_atc', 'atcCode4')
   r <- frequencyATC(a)
   expect_equal(r$atcCode4, c('','N06B'))
-  expect_equal(r$N, c(3,4))
-  expect_equal(r$Percent, c(42.86,57.14), tolerance=.01)
+  expect_equal(r$N, c(4,4))
+  expect_equal(r$Percent, c(50,50), tolerance=.01)
 
   a <- renameColumns(a, NO_NAMES$DRUG_REGISTER$English, NO_NAMES$DRUG_REGISTER$Delivery, F)
   # Index observations
   a <- a %>% indexObservations()
-  expect_equal(a$i, 1:7)
+  expect_equal(a$i, 1:8)
   a <- a %>% indexObservations(IID, .nameMax='I')
-  expect_equal(a$i, c(1,1,1,2,1,1,2))
-  expect_equal(a$I, c(1,1,2,2,1,2,2))
+  expect_equal(a$i, c(1,1,1,2,1,1,2,3))
+  expect_equal(a$I, c(1,1,2,2,1,3,3,3))
   ### Merge periods
   a <- subset(a, dateDelivery != 'x')
-  expect_equal(getMergedPeriods(a), tibble(IID=c('I1','I2','I3','I4','I5','I5'), date=c('2024-12-31','2025-01-03','2025-01-03','2020-05-30', '2018-06-30','2018-08-05'),
-                                           days=c(1,2,-1, NA,NA,NA)))
+  expect_equal(getMergedPeriods(a), tibble(IID=c('I1','I2','I3','I4','I5','I5','I5'), date=c('2024-12-31','2025-01-03','2025-01-03','2020-05-30', '2018-06-30','2018-08-05','2018-07-01'),
+                                           days=c(1,2,-1, NA,NA,NA,NA)))
   dta <- tibble(id=c(1,1,1,2,2),
                 date=c('2000-01-01', '2000-01-05', '2000-01-10', '2020-12-30', '2021-01-02'),
                 days=c(4, 4, 4, 4, 2))
@@ -104,7 +104,7 @@ test_that('getDrugIndications', {
   #print(a)
   expect_equal(registerType(dtaInd), 'drugRegister')
   expect_equal(registerType(a), 'drugRegister')
-  expect_equal(dtaInd$indication, c('F90', 'P81', 'F14', 'P70', NA,'F90',NA))
+  expect_equal(dtaInd$indication, c('F90', 'P81', 'F14', 'P70', NA,'F90',NA,'F30'))
   # Load patient data
   npr <- patientRegister(FILE_NO_NPR, 'data/no-patient-register.yaml')
   expect_equal(registerType(npr), 'patientRegister')
@@ -112,25 +112,28 @@ test_that('getDrugIndications', {
   expect_error(getDrugIndications(npr), 'The first argument should be of type drugRegister. Received patientRegister')
   expect_error(getDrugIndications(a, a), 'Data passed in `...` should be of type patientRegister. Received drugRegister')
   tmp <- getDrugIndications(a, npr)
-  expect_equal(tmp$indication, c('F90','P81','F14','P70','F90',NA,'F90'))
-  expect_equal(tmp$indicationSource, c(rep('drugRegister', 5),NA, 'patientRegister'))
+  #print(tmp)
+  expect_equal(tmp$indication, c('F90','P81','F14','P70','F90','F90',NA,'F30'))
+  expect_equal(tmp$indicationSource, c(rep('drugRegister', 4),'patientRegister','drugRegister',NA,'drugRegister'))
   # This should remain the same with imputation
   tmp <- getDrugIndications(a, npr, impute=60)
-  expect_equal(tmp$tid, c(1:4,6,7,5))
-  expect_equal(tmp$indication, c('F90','P81','F14','P70','F90','F90','F90'))
-  expect_equal(tmp$indicationSource, c(rep('drugRegister', 5), 'drugRegister dispensations', 'patientRegister'))
+  #print('------------------------------>')
+  #print(tmp)
+  expect_equal(tmp$tid, c(1:8))
+  expect_equal(tmp$indication, c('F90','P81','F14','P70','F90','F90',NA,'F30'))
+  expect_equal(tmp$indicationSource, c(rep('drugRegister', 4), 'patientRegister', 'drugRegister',NA,'drugRegister'))
   # Limit days
   tmp <- getDrugIndications(a, npr, impute=60, days=5)
-  expect_equal(tmp$tid, c(1:7))
-  expect_equal(tmp$indication, c('F90','P81','F14','P70',NA,'F90','F90'))
-  expect_equal(tmp$indicationSource, c(rep('drugRegister', 4), NA,'drugRegister', 'drugRegister dispensations'))
+  expect_equal(tmp$tid, c(1:8))
+  expect_equal(tmp$indication, c('F90','P81','F14','P70',NA,'F90',NA,'F30'))
+  expect_equal(tmp$indicationSource, c(rep('drugRegister', 4), NA,'drugRegister',NA, 'drugRegister'))
   # Errors
   expect_error(getDrugIndications(a, npr, impute=60, days=5:7), 'days should either be a single number or an upper and lower limit')
   # Limit diagnoses
   tmp <- getDrugIndications(a, npr, impute=60, diagnoses=c('F10'))
-  expect_equal(tmp$tid, c(1:7))
-  expect_equal(tmp$indication, c('F90','P81','F14','P70',NA,'F90','F90'))
-  expect_equal(tmp$indicationSource, c(rep('drugRegister', 4),NA, 'drugRegister', 'drugRegister dispensations'))
+  expect_equal(tmp$tid, c(1:8))
+  expect_equal(tmp$indication, c('F90','P81','F14','P70',NA,'F90',NA,'F30'))
+  expect_equal(tmp$indicationSource, c(rep('drugRegister', 4),NA, 'drugRegister',NA, 'drugRegister'))
 
   # Add another source (the filtering performed above causes the npr object to loose attributes)
   pd2 <- patientRegister(FILE_NO_NPR, 'data/no-patient-register.yaml')
@@ -138,9 +141,9 @@ test_that('getDrugIndications', {
   #print(npr)
   b <- tibble(A=1:20)
   expect_warning(tmp <- getDrugIndications(a, pd2, b, impute=60), 'Argument "b" is not of class dataRegister. Skipping...')
-  expect_equal(tmp$tid, c(1:4,6,7,5))
-  expect_equal(tmp$indication, c('F90','P81','F14','P70','F90','F90','F90'))
-  expect_equal(tmp$indicationSource, c(rep('drugRegister', 5), 'drugRegister dispensations', 'patientRegister'))
+  expect_equal(tmp$tid, c(1:8))
+  expect_equal(tmp$indication, c('F90','P81','F14','P70','F90','F90',NA,'F30'))
+  expect_equal(tmp$indicationSource, c(rep('drugRegister', 4), 'patientRegister','drugRegister',NA,'drugRegister'))
   #print(tmp)
 })
 
