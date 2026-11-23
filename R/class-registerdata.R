@@ -473,6 +473,7 @@ setMethod('summariseATC', signature('dataRegister'),
 
 #' Get indications for dispensed drug
 #' @export
+#' @importFrom data.table as.data.table is.data.table as.IDate
 #' @name getDrugIndications
 #' @param .data A dataRegister object.
 #' @param ... Patient data with diagnoses. Priority will be given in order of appearance
@@ -559,10 +560,13 @@ setMethod('getDrugIndications', signature('dataRegister'),
                 tmp2 <- tmp2 %>% filter(dateDiff %in% range(days[1], days[2]))
               }
               if (nrow(tmp2) == 0) next
-              #print(tmp2)
               tmp2 <- tmp2 %>% filter(abs(dateDiff) == min(dateDiff), .by={{ colIID }})
               if (countUnique(tmp2, tid) != nrow(tmp2)) warning('Multiple potential indications found for at least 1 individual')
-              tmp2 <- tmp2 %>% mutate(indication= .data[[colDiagsPd]], indicationSource=registerType(pd))
+              tmp2 <- tmp2 %>% mutate(indication= .data[[colDiagsPd]], indicationSource=glue::glue('{registerType(pd)} (argument {1+i})'))
+              if (is.data.table(dta) && inherits(dta[[colDatePd]], 'IDate')) {
+                tmp2 <- as.data.table(tmp2)
+                tmp2[[colDatePd]] <- as.IDate(tmp2[[colDatePd]])
+              }
               dta <- dta %>% filter(!tid %in% tmp2$tid)
               dta <- dta %>% bind_rows(tmp2)
               tmp <- tmp %>% filter(!tid %in% tmp2$tid)

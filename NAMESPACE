@@ -93,11 +93,12 @@ importFrom(DBI,
   dbExecute
 )
 importFrom(data.table,
+  as.IDate,
+  as.data.table,
   is.data.table,
   setDT,
   setattr
 )
-importFrom(dplyr,case_match)
 importFrom(duckdb,
   dbDisconnect,
   dbRemoveTable
