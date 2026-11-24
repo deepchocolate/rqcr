@@ -130,7 +130,7 @@ test_that('getDrugIndications', {
   # Errors
   expect_error(getDrugIndications(a, npr, impute=60, days=5:7), 'days should either be a single number or an upper and lower limit')
   # Limit diagnoses
-  tmp <- getDrugIndications(a, npr, impute=60, diagnoses=c('F10'))
+  tmp <- getDrugIndications(a, npr, impute=60, diagnoses=c('F10', 'F11'))
   expect_equal(tmp$tid, c(1:8))
   expect_equal(tmp$indication, c('F90','P81','F14','P70',NA,'F90',NA,'F30'))
   expect_equal(tmp$indicationSource, c(rep('drugRegister', 4),NA, 'drugRegister',NA, 'drugRegister'))
@@ -151,6 +151,14 @@ test_that('getDrugIndications', {
   expect_equal(tmp$indicationSource, c(rep('drugRegister', 4), 'patientRegister (argument 2)', 'drugRegister', 'patientRegister (argument 3)', 'drugRegister'))
   tmp <- tmp %>% filter(tid %in% c(5,7)) %>% select(IID, indicationSource, indication)
   tmpExp <- data.table::data.table(IID=c('I4', 'I5'), indicationSource=c('patientRegister (argument 2)', 'patientRegister (argument 3)'), indication=c('F90','F30'))
+  expect_equal(tmp, drugRegister(tmpExp))
+
+  tmp <- getDrugIndications(a, pd2, b, diagnoses=c('F90'))
+  #print(tmp)
+  expect_equal(tmp$tid, 1:8)
+  expect_equal(tmp$indicationSource, c(rep('drugRegister', 4), 'patientRegister (argument 2)', 'drugRegister', NA, 'drugRegister'))
+  tmp <- tmp %>% filter(tid %in% c(5)) %>% select(IID, indicationSource, indication)
+  tmpExp <- data.table::data.table(IID=c('I4'), indicationSource=c('patientRegister (argument 2)'), indication=c('F90'))
   expect_equal(tmp, drugRegister(tmpExp))
   #expect_equal(na.omit(tmp$dato), c('2020-05-22', '2018-08-01'))
   #expect_equal(na.omit(tmp$diagnos))

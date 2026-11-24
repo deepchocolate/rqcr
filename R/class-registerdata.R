@@ -515,10 +515,6 @@ setMethod('getDrugIndications', signature('dataRegister'),
               tmp2 <- tmp2 %>% mutate(indicationSource = case_when(!all(is.na(indication)) & countUnique(indication) == 1 ~ 'drugRegister dispensations', .default=indicationSource) , .by={{ colIID }})
               tmp2 <- tmp2 %>% filter(indicationSource == 'drugRegister dispensations') %>%
                 mutate(indication=case_when(indicationSource == 'drugRegister dispensations' ~ unique(na.omit(indication)), .default=indication), .by={{ colIID }})
-              #tmp2 <- tmp2 %>% filter(!tid %in% tmp3$tid)
-              #tmp2 <- tmp2 %>% bind_rows(tmp3)
-              #print(tmp2)
-              #tmp2 <- tmp2 %>% mutate(indication=case_when(indicationSource == 'drugRegister dispensations' ~ unique(na.omit(indication)), .default=indication), .by={{ colIID }})
               tmp2 <- tmp %>% filter(tid %in% tmp2$tid) %>% select(!c(indication,indicationSource)) %>%
                 left_join(tmp2 %>% select(tid, indication,indicationSource))
               #print(tmp2)
@@ -537,10 +533,10 @@ setMethod('getDrugIndications', signature('dataRegister'),
             args <- list(...)
             argNames <- as.list(substitute(list(...)))[-1L]
             argNames <- sapply(argNames, deparse)
-            for (i in 1:length(args) ) {
-              pd <- args[[i]]
+            for (.i in 1:length(argNames) ) {
+              pd <- args[[.i]]
               if (!is.dataRegister(pd)) {
-                warning(glue::glue('Argument "{argNames[i]}" is not of class dataRegister. Skipping...'))
+                warning(glue::glue('Argument "{argNames[.i]}" is not of class dataRegister. Skipping...'))
                 next
               }
               rtype <- registerType(pd)
@@ -548,7 +544,10 @@ setMethod('getDrugIndications', signature('dataRegister'),
               colIIDpd <- getColumn(pd, 'individual')
               colDiagsPd <- getColumn(pd, 'diagnosis')
               colDatePd <- getColumn(pd, 'date')
-              if (!is.null(diagnoses)) pd <- pd %>% filter({{ colDiagsPd }} %in% diagnoses)
+              if (!is.null(diagnoses)) {
+                pat <- glueCollapse('^({x})', x=diagnoses, sep='|',.envir=environment())
+                pd <- pd %>% filter(grepl(pat, .data[[colDiagsPd]]))
+              }
               if (nrow(pd) == 0) next
               # Default mode: Identify the diagnosis closest to dispensation
               tmp2 <- tmp %>% inner_join(pd, join_by({{ colIID }} == {{ colIIDpd }}))
@@ -562,7 +561,7 @@ setMethod('getDrugIndications', signature('dataRegister'),
               if (nrow(tmp2) == 0) next
               tmp2 <- tmp2 %>% filter(abs(dateDiff) == min(dateDiff), .by={{ colIID }})
               if (countUnique(tmp2, tid) != nrow(tmp2)) warning('Multiple potential indications found for at least 1 individual')
-              tmp2 <- tmp2 %>% mutate(indication= .data[[colDiagsPd]], indicationSource=glue::glue('{registerType(pd)} (argument {1+i})'))
+              tmp2 <- tmp2 %>% mutate(indication= .data[[colDiagsPd]], indicationSource=glue::glue('{registerType(pd)} (argument {1+.i})'))
               if (is.data.table(dta) && inherits(dta[[colDatePd]], 'IDate')) {
                 tmp2 <- as.data.table(tmp2)
                 tmp2[[colDatePd]] <- as.IDate(tmp2[[colDatePd]])
